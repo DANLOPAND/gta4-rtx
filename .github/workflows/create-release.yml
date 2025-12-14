@@ -255,6 +255,10 @@ jobs:
             exit 1
           }
           
+          # Convert to forward slashes for cross-platform compatibility
+          $foundPath = $foundPath -replace '\\', '/'
+          Write-Host "Using installer path: $foundPath"
+          
           echo "installer_path=$foundPath" >> $env:GITHUB_OUTPUT
 
       - name: Create GitHub Release
