@@ -51,7 +51,7 @@ jobs:
         run: |
           Expand-Archive `
             -Path assets/.trex/d3d9_runtime.zip `
-            -DestinationPath assets `
+            -DestinationPath assets/.trex `
             -Force
           
           Remove-Item assets/.trex/d3d9_runtime.zip
