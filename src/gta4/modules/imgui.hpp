@@ -54,8 +54,8 @@ namespace gta4
 		bool m_dbg_debug_bool03 = false;
 		bool m_dbg_debug_bool04 = false;
 		bool m_dbg_debug_bool05 = false;
-		int m_dbg_int_01 = 0;
-		int m_dbg_int_02 = 0;
+		int m_dbg_int_01 = -1;
+		int m_dbg_int_02 = -1;
 
 		bool m_dbg_only_render_static = false;
 		bool m_dbg_do_not_render_static = false;

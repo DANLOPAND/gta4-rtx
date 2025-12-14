@@ -46,6 +46,16 @@ jobs:
           move build/bin/${{matrix.configuration}}/*.asi ./assets/
           move build/bin/${{matrix.configuration}}/*.pdb ./assets/
 
+      - name: Extract d3d9 runtime
+        shell: pwsh
+        run: |
+          Expand-Archive `
+            -Path assets/.trex/d3d9_runtime.zip `
+            -DestinationPath assets `
+            -Force
+          
+          Remove-Item assets/.trex/d3d9_runtime.zip
+
       - name: Upload ${{matrix.configuration}}-binaries-gta4-rtx
         uses: actions/upload-artifact@v4
         with:

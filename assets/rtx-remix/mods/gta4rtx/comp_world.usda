@@ -651,6 +651,15 @@ over "RootNode"
                 custom asset inputs:reflectionroughness_texture = @./assets/world_textures/glass/FBAB45A584C4DBDE_E14B2A36D9C90107/am_pkslpe_bstonetop_r.dds@
             }
         }
+
+        over "mat_E8B560FBA6991BD0"
+        {
+            over "Shader"
+            {
+                custom float inputs:ior_constant = 1.8
+                custom float inputs:thin_wall_thickness = 2
+            }
+        }
     }
 
     over "meshes"
@@ -702,6 +711,69 @@ over "RootNode"
             references = None
         )
         {
+            over "near_and_b_alt"
+            {
+                over "OGBackdrop"
+                {
+                    uniform token ui:description = "s"
+                    uniform float2 ui:nodegraph:node:pos = (-9.508784, -4.8477764)
+                }
+
+                over "greater_than"
+                {
+                    uniform float2 ui:nodegraph:node:pos = (38.187054, 48.261047)
+                }
+
+                over "camera"
+                {
+                    uniform float2 ui:nodegraph:node:pos = (-602.1727, -349.84143)
+                }
+
+                over "angle_to_mesh"
+                {
+                    uniform float2 ui:nodegraph:node:pos = (-287.69193, -287.2323)
+                }
+
+                over "constant_float"
+                {
+                    uniform float2 ui:nodegraph:node:pos = (-283.70276, -94.54229)
+                }
+
+                over "less_than"
+                {
+                    uniform float2 ui:nodegraph:node:pos = (46.78363, -206.5424)
+                }
+
+                over "keyboard_input"
+                {
+                    uniform float2 ui:nodegraph:node:pos = (398.39996, 6.7734795)
+                }
+
+                over "bool_and_01"
+                {
+                    uniform float2 ui:nodegraph:node:pos = (728.9975, -104.01116)
+                }
+
+                over "bool_and_02"
+                {
+                    uniform float2 ui:nodegraph:node:pos = (806.5334, 237.70093)
+                }
+
+                over "keyboard_input_01"
+                {
+                    uniform float2 ui:nodegraph:node:pos = (406.75534, 326.79193)
+                }
+
+                over "rtx_option_layer_action_02"
+                {
+                    uniform float2 ui:nodegraph:node:pos = (1088.0574, 218.49011)
+                }
+
+                over "rtx_option_layer_action"
+                {
+                    uniform float2 ui:nodegraph:node:pos = (1080.055, -235.77834)
+                }
+            }
         }
 
         over "mesh_9D59A0645F6C8228"
