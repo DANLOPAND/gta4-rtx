@@ -7,6 +7,9 @@ jobs:
   create-release:
     name: Create Release
     runs-on: windows-2022
+    permissions:
+      contents: write
+      pull-requests: read
     
     steps:
       - name: Check out files
@@ -15,6 +18,8 @@ jobs:
           submodules: true
           fetch-depth: 0
           lfs: false
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: true
 
       - name: Extract version from std_include.hpp
         id: version
@@ -121,11 +126,15 @@ jobs:
         id: changelog
         shell: pwsh
         run: |
+          # Fetch all tags first
+          git fetch --tags --force
+          
           # Get the latest tag, or use initial commit if no tags exist
           $latestTag = $null
           try {
-            $latestTag = git describe --tags --abbrev=0 2>$null
-            if ($LASTEXITCODE -ne 0) {
+            $latestTag = git describe --tags --abbrev=0 2>&1 | Out-String
+            $latestTag = $latestTag.Trim()
+            if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($latestTag)) {
               $latestTag = $null
             }
           } catch {
@@ -134,16 +143,23 @@ jobs:
           
           # Get commit messages since the latest tag
           if ($latestTag) {
-            $commits = git log --pretty=format:"- %s" $latestTag..HEAD
             Write-Host "Generating changelog from tag: $latestTag"
+            $commits = git log --pretty=format:"- %s" "$latestTag..HEAD" 2>&1 | Out-String
+            $commits = $commits.Trim()
+            
+            # Check if there are actually commits
+            if ([string]::IsNullOrWhiteSpace($commits) -or $commits -match "fatal:") {
+              $commits = "- No changes since last release"
+            }
           } else {
             # Get all commits if no tags exist
-            $commits = git log --pretty=format:"- %s" --max-count=50
             Write-Host "No previous tags found, using last 50 commits"
-          }
-          
-          if ([string]::IsNullOrWhiteSpace($commits)) {
-            $commits = "- No changes since last release"
+            $commits = git log --pretty=format:"- %s" --max-count=50 2>&1 | Out-String
+            $commits = $commits.Trim()
+            
+            if ([string]::IsNullOrWhiteSpace($commits)) {
+              $commits = "- No changes since last release"
+            }
           }
           
           $changelog = "## Changelog`n`n$commits"
@@ -164,21 +180,51 @@ jobs:
         shell: pwsh
         run: |
           $tag = "${{ steps.version.outputs.tag }}"
-          $tagExists = git rev-parse --verify "refs/tags/$tag" 2>$null
-          if ($LASTEXITCODE -eq 0) {
+          $tagExists = $false
+          
+          try {
+            $ErrorActionPreference = "Stop"
+            $output = git rev-parse --verify "refs/tags/$tag" 2>&1
+            if ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrWhiteSpace($output)) {
+              $tagExists = $true
+            }
+          } catch {
+            $tagExists = $false
+          } finally {
+            $ErrorActionPreference = "Continue"
+          }
+          
+          if ($tagExists) {
             Write-Host "Tag $tag already exists"
             echo "exists=true" >> $env:GITHUB_OUTPUT
           } else {
             Write-Host "Tag $tag does not exist, will create it"
             echo "exists=false" >> $env:GITHUB_OUTPUT
           }
+          
+          # Always exit successfully
+          exit 0
 
       - name: Create Git tag
         if: steps.version.outputs.tag != '' && steps.check_tag.outputs.exists == 'false'
+        shell: pwsh
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git tag -a "${{ steps.version.outputs.tag }}" -m "Release ${{ steps.version.outputs.version }}"
+          
+          # Configure git credential helper to use the token from environment variable
+          # Using $env:GITHUB_TOKEN directly to avoid storing in a variable
+          $repo = "${{ github.repository }}"
+          
+          # Set up credential helper
+          git config --global credential.helper store
+          "https://x-access-token:$env:GITHUB_TOKEN@github.com" | Out-File -FilePath "$env:USERPROFILE\.git-credentials" -Encoding ascii -NoNewline
+          
+          # Update remote URL
+          git remote set-url origin "https://github.com/$repo.git"
+          
+          # Push the tag
           git push origin "${{ steps.version.outputs.tag }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
