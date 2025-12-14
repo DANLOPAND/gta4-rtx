@@ -49,7 +49,7 @@ RTX Remix has a certain overhead because of how it works and intercepts the game
 You'll experience CPU bottlenecks because of the amount of detailed meshes the game is rendering,  
 which means that the performance you'll see in certain places is not entirely due to pathtracing.  
 
-The mod comes with a custom [Remix Runtime](https://github.com/xoxor4d/dxvk-remix/tree/game/gta4_v2) required for a few game specific features   
+The mod comes with a custom [Remix Runtime](https://github.com/xoxor4d/dxvk-remix/tree/game/gta4_rebase5) required for a few game specific features   
 and with [Ultimate ASI Loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases/tag/v9.0.0) to load the Compatibility Mod itself. 
 
 </div>
@@ -59,10 +59,10 @@ and with [Ultimate ASI Loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader
 
 ###### The good:  
 - Most objects rendered via fixed function to increase performance
-- Cascaded anti culling of static objects (__wip__ - not perfect yet)
-- All game lights (including the sun) are translated to remix light by the compatibility mod
+- Cascaded anti culling of static objects (__wip__)
+- All game lights (including the sun) are translated to remix lights
 - Ability to create overrides for translated game lights (change position, color, intensity etc.)
-- Vehicles now feature two headlights and two rearlights instead of a single, centered one
+- Vehicles now feature two headlights and two rear lights instead of a single, centered ones
 - Dynamic emissive surfaces work (vehicle lights, building-windows, shops etc.)
 - Dynamic wetness that works similar to the original game (only outdoors and with falloff on angled surfaces + raindrops)
 - Working vehicle dirt and livery
@@ -73,15 +73,14 @@ and with [Ultimate ASI Loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader
 - Screenshot Mode and FreeCam Mode
 - FusionFix compatible (custom fork: [GTAIV.EFLC.FusionFix.RTXRemix](https://github.com/xoxor4d/GTAIV.EFLC.FusionFix.RTXRemix))
 - Many many tweakable settings via the in-game __F4__ menu
+- A few PBR materials
+- Installer
 
 ###### The bad:
 - CPU Bottlenecked (reduce draw distance / quality)
-- Mobilephone UI can look a little broken
+- Mobilephone UI looks a little broken
 - Anti-Culling is not perfect yet
-- Can be a little unstable
-- Particles can look weird in-front of emissive surfaces (because they are tagged as "ignore transparency" to prevent flickering)
-- TV's, scrolling ads etc. are not working or are static
-- Raindrops/splashes on vehicles are disabled by default because they are not fully ready yet
+- TV's are not working
 - No blood on peds
 
 <br>
@@ -98,10 +97,6 @@ and with [Ultimate ASI Loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader
 ## Installing
 - Grab the latest [Release](https://github.com/xoxor4d/gta4-rtx/releases) and follow the instructions found there
 
-> [!IMPORTANT]  
-> __Usage with Fusion Fix:__
-> - The original, unmodified version might cause a few issues / instability. I've made a fork of FF specifically for RTX-Remix.
-> - https://github.com/xoxor4d/GTAIV.EFLC.FusionFix.RTXRemix/tree/feature/rtx-remix
 
 <br>
 
