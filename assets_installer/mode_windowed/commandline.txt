@@ -1,0 +1,7 @@
+-windowed
+-d3dst
+-noprecache
+-availablevidmem 4096
+-nomemrestrict
+-norestrictions
+-disableimposters

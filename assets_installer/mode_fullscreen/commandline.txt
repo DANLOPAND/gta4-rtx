@@ -1,0 +1,7 @@
+-d3dst 
+-noprecache
+-availablevidmem 1024
+-nomemrestrict
+-norestrictions
+-forcer2vb
+-disableimposters

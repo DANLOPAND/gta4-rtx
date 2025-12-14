@@ -7,6 +7,7 @@
 #include <string>
 #include <filesystem>
 #include <iostream>
+#include <fstream>
 
 std::string open_file_dialog()
 {
@@ -33,6 +34,58 @@ std::string open_file_dialog()
 bool file_exists(const std::string& path)
 {
     return GetFileAttributesA(path.c_str()) != INVALID_FILE_ATTRIBUTES;
+}
+
+std::string read_file_from_zip(const std::string& zip_path, const std::string& file_path_in_zip)
+{
+	mz_zip_archive zip = {};
+	if (!mz_zip_reader_init_file(&zip, zip_path.c_str(), 0)) {
+		return "";
+	}
+
+	size_t file_size = 0;
+	void* file_data = mz_zip_reader_extract_file_to_heap(&zip, file_path_in_zip.c_str(), &file_size, 0);
+	
+	std::string result;
+	if (file_data && file_size > 0) {
+		result.assign(static_cast<const char*>(file_data), file_size);
+		mz_free(file_data);
+	}
+
+	mz_zip_reader_end(&zip);
+	return result;
+}
+
+std::string read_file_from_disk(const std::string& file_path)
+{
+	std::ifstream file(file_path);
+	if (!file.is_open()) {
+		return "";
+	}
+	
+	std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+	return content;
+}
+
+bool extract_single_file_from_zip(const std::string& zip_path, const std::string& file_path_in_zip, const std::string& target_path)
+{
+	mz_zip_archive zip = {};
+	if (!mz_zip_reader_init_file(&zip, zip_path.c_str(), 0)) {
+		return false;
+	}
+
+	// Find the file in the zip
+	int file_index = mz_zip_reader_locate_file(&zip, file_path_in_zip.c_str(), nullptr, 0);
+	if (file_index < 0) {
+		mz_zip_reader_end(&zip);
+		return false;
+	}
+
+	// Extract to file
+	bool result = mz_zip_reader_extract_to_file(&zip, file_index, target_path.c_str(), 0);
+	
+	mz_zip_reader_end(&zip);
+	return result;
 }
 
 bool extract_zip(const std::string & zip_path, const std::string & target_dir, const std::string & inner_folder = "")
@@ -122,67 +175,8 @@ int main()
 	}
 	
 	std::cout << "Using Path: '" << game_dir << "'\n\n";
-	std::cout << "Checking for FusionFix presence ...\n";
-	Sleep(500);
-
-
-    // check if any FusionFix version exists
-    const bool has_fusion_fix = file_exists(game_dir + "\\d3d9.dll") &&
-								file_exists(game_dir + "\\plugins\\GTAIV.EFLC.FusionFix.asi");
-
-	// check if original FusionFix version exists
-	const bool has_original_fusion_fix = has_fusion_fix && file_exists(game_dir + "\\vulkan.dll");
-
-	// check if comp mod and remix are installed -> update
-	const bool has_remix_comp_mod = file_exists(game_dir + "\\d3d9.dll") &&
-									file_exists(game_dir + "\\a_gta4-rtx.asi");
-
-	if (has_remix_comp_mod) {
-		std::cout << "Detected another version of the RTX Remix Compatibility Mod. Updating ... \n";
-	}
-
-    bool opt_install_fusion_fix_fork = false;
-    if (has_original_fusion_fix)
-    {
-		const auto res = MessageBoxA(nullptr, "FusionFix detected. Replace with a fork specifically tailored for RTX Remix? (Recommended)", "FusionFix", MB_YESNO | MB_ICONQUESTION);
-        opt_install_fusion_fix_fork = (res == IDYES);
-
-		if (!opt_install_fusion_fix_fork) {
-			std::cout << "Not replacing installed FusionFix version. This might lead to issues.\n\n";
-		} else {
-			std::cout << "Installing RTXRemix FusionFix Fork.\n\n";
-		}
-    }
-    else
-    {
-		if (!has_remix_comp_mod || !has_fusion_fix)
-		{
-			const auto res = MessageBoxA(nullptr, "Install FusionFix fork specifically tailored for RTX Remix? (Recommended)", "FusionFix", MB_YESNO | MB_ICONQUESTION);
-			opt_install_fusion_fix_fork = res == IDYES;
-			std::cout << (opt_install_fusion_fix_fork ? "Installing FusionFix RTXRemix Fork." : "Not installing FusionFix RTXRemix Fork.") << "\n\n";
-		}
-    }
-
-	// ask for fullscreen / windowed
-	bool fullscreen = true;
-
-	if (!has_remix_comp_mod)
-	{
-		if (const auto res = MessageBoxA(nullptr, "Setup GTA IV to run in fullscreen/borderless mode?\n(Choose No if you want to run the game in windowed mode)", "Display mode", MB_YESNO | MB_ICONQUESTION))
-		{
-			if (res == IDNO) {
-				fullscreen = false;
-			}
-			else {
-				std::cout << "If you are having trouble with launching the game in fullscreen:\n> Go into 'rtx_comp/game_settings.toml'\n> Set 'manual_game_resolution_enabled' to 'true'\n> Set your desired resolution via 'manual_game_resolution'\n\n";
-			}
-		}
-
-		// steam launch args warning
-		MessageBoxA(nullptr, "Make sure to remove ALL launch arguments from Steam properties for GTA IV!\n", "IMPORTANT", MB_OK | MB_ICONWARNING);
-	}
-
-	// extract comp files
+	
+	// Find zip file first (needed for version comparison)
 	static const wchar_t* zip_prefix = L"GTAIV-Remix-CompatibilityMod";
 	std::filesystem::path found_zip;
 
@@ -222,6 +216,131 @@ int main()
 		MessageBoxA(nullptr, "The zip file found is not accessible.", "Error", MB_ICONERROR);
 		return 1;
 	}
+
+	std::cout << "Checking for FusionFix presence ...\n";
+	Sleep(500);
+
+
+    // check if any FusionFix version exists
+    const bool has_fusion_fix = file_exists(game_dir + "\\d3d9.dll") &&
+								file_exists(game_dir + "\\plugins\\GTAIV.EFLC.FusionFix.asi");
+
+	// check if original FusionFix version exists
+	const bool has_original_fusion_fix = has_fusion_fix && file_exists(game_dir + "\\vulkan.dll");
+
+	// check if comp mod and remix are installed -> update
+	const bool has_remix_comp_mod = file_exists(game_dir + "\\d3d9.dll") &&
+									file_exists(game_dir + "\\a_gta4-rtx.asi");
+
+	// check if RTXRemix FusionFix fork marker exists
+	const bool has_rtxremix_fusionfix_marker = file_exists(game_dir + "\\plugins\\GTAIV.EFLC.FusionFix.RTXRemix.txt");
+
+	if (has_remix_comp_mod) {
+		std::cout << "Detected another version of the RTX Remix Compatibility Mod. Updating ... \n";
+	}
+
+    bool opt_install_fusion_fix_fork = false;
+    
+	// If RTXRemix FusionFix marker exists, compare versions
+	if (has_rtxremix_fusionfix_marker)
+	{
+		// Read version from existing marker file
+		std::string existing_version = read_file_from_disk(game_dir + "\\plugins\\GTAIV.EFLC.FusionFix.RTXRemix.txt");
+		
+		// Read version from zip file
+		std::string zip_version = read_file_from_zip(found_zip.string(), "_installer_options/FusionFix_RTXRemixFork/plugins/GTAIV.EFLC.FusionFix.RTXRemix.txt");
+		
+		// Trim whitespace from both versions
+		auto trim = [](std::string& s) {
+			s.erase(0, s.find_first_not_of(" \t\n\r"));
+			s.erase(s.find_last_not_of(" \t\n\r") + 1);
+		};
+		trim(existing_version);
+		trim(zip_version);
+		
+		if (existing_version == zip_version)
+		{
+			// Versions match, skip update
+			opt_install_fusion_fix_fork = false;
+			std::cout << "RTXRemix FusionFix fork is up to date (version: " << existing_version << "). Skipping update.\n\n";
+		}
+		else
+		{
+			// Versions differ, ask user if they want to update
+			std::string message = "A newer version of the RTXRemix FusionFix fork is available.\n\n";
+			message += "Current version: " + (existing_version.empty() ? "Unknown" : existing_version) + "\n";
+			message += "New version: " + (zip_version.empty() ? "Unknown" : zip_version) + "\n\n";
+			message += "Do you want to update?";
+			
+			const auto res = MessageBoxA(nullptr, message.c_str(), "FusionFix Update", MB_YESNO | MB_ICONQUESTION);
+			opt_install_fusion_fix_fork = (res == IDYES);
+			
+			if (opt_install_fusion_fix_fork) {
+				std::cout << "Updating RTXRemix FusionFix fork from " << existing_version << " to " << zip_version << ".\n\n";
+			} else {
+				std::cout << "Skipping RTXRemix FusionFix fork update.\n\n";
+			}
+		}
+	}
+	else if (has_original_fusion_fix)
+    {
+		const auto res = MessageBoxA(nullptr, "FusionFix detected. Replace with a fork specifically tailored for RTX Remix? (Recommended)", "FusionFix", MB_YESNO | MB_ICONQUESTION);
+        opt_install_fusion_fix_fork = (res == IDYES);
+
+		if (!opt_install_fusion_fix_fork) {
+			std::cout << "Not replacing installed FusionFix version. This might lead to issues.\n\n";
+		} else {
+			std::cout << "Installing RTXRemix FusionFix Fork.\n\n";
+		}
+    }
+    else
+    {
+		// If user has FusionFix but not original FusionFix and no marker, they likely have RTXRemix fork already
+		// Extract the marker file from the zip so future updates can detect it
+		if (has_remix_comp_mod && !has_rtxremix_fusionfix_marker && !has_original_fusion_fix && has_fusion_fix)
+		{
+			// Ensure plugins directory exists
+			const std::string plugins_dir = game_dir + "\\plugins";
+			std::filesystem::create_directories(plugins_dir);
+			
+			// Extract the marker file from the zip
+			const std::string marker_path = plugins_dir + "\\GTAIV.EFLC.FusionFix.RTXRemix.txt";
+			if (extract_single_file_from_zip(found_zip.string(), "_installer_options/FusionFix_RTXRemixFork/plugins/GTAIV.EFLC.FusionFix.RTXRemix.txt", marker_path)) {
+				std::cout << "Extracted RTXRemix FusionFix marker file.\n\n";
+			} else {
+				std::cout << "Warning: Failed to extract RTXRemix FusionFix marker file.\n\n";
+			}
+		}
+		
+		if (!has_remix_comp_mod || !has_fusion_fix)
+		{
+			const auto res = MessageBoxA(nullptr, "Install FusionFix fork specifically tailored for RTX Remix? (Recommended)", "FusionFix", MB_YESNO | MB_ICONQUESTION);
+			opt_install_fusion_fix_fork = res == IDYES;
+			std::cout << (opt_install_fusion_fix_fork ? "Installing FusionFix RTXRemix Fork." : "Not installing FusionFix RTXRemix Fork.") << "\n\n";
+		}
+    }
+
+	// ask for fullscreen / windowed
+	bool fullscreen = true;
+
+	// Only ask about display mode and Steam args if this is a fresh install (a_gta4-rtx.asi doesn't exist)
+	if (!has_remix_comp_mod)
+	{
+		if (const auto res = MessageBoxA(nullptr, "Setup GTA IV to run in fullscreen/borderless mode?\n(Choose No if you want to run the game in windowed mode)", "Display mode", MB_YESNO | MB_ICONQUESTION))
+		{
+			if (res == IDNO) {
+				fullscreen = false;
+			}
+			else {
+				std::cout << "If you are having trouble with launching the game in fullscreen:\n> Go into 'rtx_comp/game_settings.toml'\n> Set 'manual_game_resolution_enabled' to 'true'\n> Set your desired resolution via 'manual_game_resolution'\n\n";
+			}
+		}
+
+		// steam launch args warning
+		MessageBoxA(nullptr, "Make sure to remove ALL launch arguments from Steam properties for GTA IV!\n", "IMPORTANT", MB_OK | MB_ICONWARNING);
+	}
+
+	// extract comp files
 
 	std::cout << "Extracting zip ...\n";
 	Sleep(100); // Small delay before extraction
@@ -303,6 +422,7 @@ int main()
         }
     }
 
+	// Only prompt about DirectX if this is a fresh install (a_gta4-rtx.asi doesn't exist)
 	if (!has_remix_comp_mod)
 	{
 		// DX9 June 2010 runtime
