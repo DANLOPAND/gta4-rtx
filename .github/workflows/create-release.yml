@@ -234,6 +234,7 @@ jobs:
         shell: pwsh
         run: |
           $installerPaths = @(
+            "bin\GTAIV-Remix-CompMod-Installer.exe",
             "build\bin\Release\GTAIV-Remix-CompMod-Installer.exe",
             "bin\Release\GTAIV-Remix-CompMod-Installer.exe"
           )
@@ -249,8 +250,8 @@ jobs:
           
           if (-not $foundPath) {
             Write-Host "Error: Installer executable not found in expected locations"
-            Get-ChildItem -Path "build\bin" -Recurse -Filter "*.exe" -ErrorAction SilentlyContinue | ForEach-Object { Write-Host "Found exe: $($_.FullName)" }
             Get-ChildItem -Path "bin" -Recurse -Filter "*.exe" -ErrorAction SilentlyContinue | ForEach-Object { Write-Host "Found exe: $($_.FullName)" }
+            Get-ChildItem -Path "build\bin" -Recurse -Filter "*.exe" -ErrorAction SilentlyContinue | ForEach-Object { Write-Host "Found exe: $($_.FullName)" }
             exit 1
           }
           
