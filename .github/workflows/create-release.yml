@@ -175,6 +175,39 @@ jobs:
           Write-Host "Generated changelog:"
           Write-Host $changelog
 
+      - name: Prepare release body
+        id: release_body
+        shell: pwsh
+        run: |
+          $version = "${{ steps.version.outputs.version }}"
+          $tag = "${{ steps.version.outputs.tag }}"
+          $zipName = "${{ steps.version.outputs.zip_name }}"
+          $modZipLink = "https://github.com/${{ github.repository }}/releases/download/$tag/$zipName"
+          $installerLink = "https://github.com/${{ github.repository }}/releases/download/$tag/GTAIV-Remix-CompMod-Installer.exe"
+
+          $readmePath = ".github/README_INSTALL.md"
+          if (-not (Test-Path $readmePath)) {
+            Write-Host "README_INSTALL.md not found"
+            exit 1
+          }
+
+          $readme = Get-Content -Raw -Path $readmePath
+
+          # Replace existing download link line (or any placeholder) with the computed zip link
+          $readme = $readme -replace 'Download\s+\[`?GTAIV-Remix-CompatibilityMod-[^\]]*\.zip`\?\]\([^)]+\)', "Download [`$zipName`]($modZipLink)"
+          $readme = $readme -replace '<LINK_TO_MOD_ZIP>', "[$zipName]($modZipLink)"
+          # Replace installer link (or placeholder)
+          $readme = $readme -replace 'Download\s+\[`?GTAIV-Remix-CompMod-Installer\.exe`\?\]\([^)]+\)', "Download [`GTAIV-Remix-CompMod-Installer.exe`]($installerLink)"
+          $readme = $readme -replace '<LINK_TO_INSTALLER>', "[GTAIV-Remix-CompMod-Installer.exe]($installerLink)"
+
+          $changelog = Get-Content -Raw -Path "changelog.txt"
+
+          $body = "$changelog`n`n---`n`n$readme"
+
+          echo "body<<EOF" >> $env:GITHUB_OUTPUT
+          echo "$body" >> $env:GITHUB_OUTPUT
+          echo "EOF" >> $env:GITHUB_OUTPUT
+
       - name: Check if tag exists
         id: check_tag
         shell: pwsh
@@ -266,10 +299,7 @@ jobs:
         with:
           tag_name: ${{ steps.version.outputs.tag }}
           name: Release ${{ steps.version.outputs.version }}
-          body: |
-            ${{ steps.changelog.outputs.changelog }}
-            
-            **Note:** This changelog is automatically generated. Please edit this release description to add more details if needed.
+          body: ${{ steps.release_body.outputs.body }}
           files: |
             ${{ steps.version.outputs.zip_name }}
             ${{ steps.find_installer.outputs.installer_path }}
