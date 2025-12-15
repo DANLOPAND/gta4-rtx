@@ -1785,6 +1785,7 @@ namespace gta4
 				{
 					im->m_freecam_mode = !im->m_freecam_mode;
 					n->SetCharCollision(ped, !im->m_freecam_mode);
+					n->FreezeCharPosition(ped, im->m_freecam_mode);
 				}
 			} TT("Enable FreeCam Mode - Not available when sitting in a car!");
 			ImGui::Style_ColorButtonPop();
@@ -1792,7 +1793,7 @@ namespace gta4
 			SET_CHILD_WIDGET_WIDTH_MAN(140.0f); ImGui::SliderFloat("FreeCam Forward Speed", &im->m_freecam_fwd_speed, 0.01f, 10.0f, "%.2f");
 			SET_CHILD_WIDGET_WIDTH_MAN(140.0f); ImGui::SliderFloat("FreeCam Strafe Speed", &im->m_freecam_rt_speed, 0.01f, 10.0f, "%.2f");
 			SET_CHILD_WIDGET_WIDTH_MAN(140.0f); ImGui::SliderFloat("FreeCam Upward Speed", &im->m_freecam_up_speed, 0.01f, 10.0f, "%.2f");
-			SET_CHILD_WIDGET_WIDTH_MAN(140.0f); ImGui::DragFloat("FreeCam Upward Offset", &im->m_freecam_up_offset, 0.0001f, 0, 0, "%.5f");
+			//SET_CHILD_WIDGET_WIDTH_MAN(140.0f); ImGui::DragFloat("FreeCam Upward Offset", &im->m_freecam_up_offset, 0.0001f, 0, 0, "%.5f");
 			ImGui::EndDisabled();
 		}
 	}

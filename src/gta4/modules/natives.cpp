@@ -19,6 +19,7 @@ namespace gta4
 			{
 				im->m_freecam_mode = false;
 				n->SetCharCollision(ped, true);
+				n->FreezeCharPosition(ped, false);
 			}
 			else
 			{
@@ -74,7 +75,7 @@ namespace gta4
 				n->GetCamRot(cam, &cam_rotation.x, &cam_rotation.y, &cam_rotation.z);
 
 				offset.z += offset.y * sinf(cam_rotation.x * 0.01745329252f);
-				offset.z -= im->m_freecam_up_offset;
+				//offset.z -= im->m_freecam_up_offset;
 
 				Vector new_player_pos;
 				n->GetOffsetFromCharInWorldCoords(ped, offset.x, offset.y, offset.z, &new_player_pos.x, &new_player_pos.y, &new_player_pos.z);
@@ -90,7 +91,7 @@ namespace gta4
 	{
 		p_this = this;
 
-		shared::utils::hook(game::hk_addr__on_cgame_process_hk, on_cgame_process_hk, HOOK_CALL).install()->quick();
+		shared::utils::hook(game::hk_addr__on_cgame_process_hk, on_cgame_process_hk, HOOK_CALL).install()->quick(); // 0x59D79F
 
 		// -----
 		m_initialized = true;

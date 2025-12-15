@@ -497,7 +497,7 @@ namespace gta4::game
 		} total_pattern_count++;
 
 
-		PATTERN_OFFSET_SIMPLE(hk_addr__on_cgame_process_hk, "E8 ? ? ? ? 83 C4 ? B9 ? ? ? ? E8 ? ? ? ? E8 ? ? ? ? E8", 0, 0x59D7FC);
+		PATTERN_OFFSET_SIMPLE(hk_addr__on_cgame_process_hk, "E8 ? ? ? ? E8 ? ? ? ? E8 ? ? ? ? 84 C0 74 ? E8 ? ? ? ? 84 DB", 0, 0x59D79F);
 
 		PATTERN_OFFSET_SIMPLE(retn_addr__on_add_frontendhelpertext_stub, "81 EC ? ? ? ? 53 56 8B 35 ? ? ? ? 57 85 F6", 0, 0x8B6C86);
 		PATTERN_OFFSET_SIMPLE(func_addr__add_renderfontbufferdc, "56 57 E8 ? ? ? ? 8B F0 8B CE", 0, 0x923950);
