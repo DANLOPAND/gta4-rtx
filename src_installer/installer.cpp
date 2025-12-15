@@ -8,6 +8,7 @@
 #include <filesystem>
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 std::string open_file_dialog()
 {
@@ -36,10 +37,33 @@ bool file_exists(const std::string& path)
     return GetFileAttributesA(path.c_str()) != INVALID_FILE_ATTRIBUTES;
 }
 
-std::string read_file_from_zip(const std::string& zip_path, const std::string& file_path_in_zip)
+bool init_zip_from_path(const std::filesystem::path& zip_path, mz_zip_archive& zip, std::vector<char>& buffer)
 {
+	std::ifstream file(zip_path, std::ios::binary);
+	if (!file.is_open()) {
+		return false;
+	}
+
+	file.seekg(0, std::ios::end);
+	const std::streamoff size = file.tellg();
+	if (size <= 0) {
+		return false;
+	}
+	buffer.resize(static_cast<size_t>(size));
+	file.seekg(0, std::ios::beg);
+	file.read(buffer.data(), size);
+	if (!file) {
+		return false;
+	}
+
+	return mz_zip_reader_init_mem(&zip, buffer.data(), buffer.size(), 0) == MZ_TRUE;
+}
+
+std::string read_file_from_zip(const std::filesystem::path& zip_path, const std::string& file_path_in_zip)
+{
+	std::vector<char> zip_buffer;
 	mz_zip_archive zip = {};
-	if (!mz_zip_reader_init_file(&zip, zip_path.c_str(), 0)) {
+	if (!init_zip_from_path(zip_path, zip, zip_buffer)) {
 		return "";
 	}
 
@@ -67,10 +91,11 @@ std::string read_file_from_disk(const std::string& file_path)
 	return content;
 }
 
-bool extract_single_file_from_zip(const std::string& zip_path, const std::string& file_path_in_zip, const std::string& target_path)
+bool extract_single_file_from_zip(const std::filesystem::path& zip_path, const std::string& file_path_in_zip, const std::filesystem::path& target_path)
 {
+	std::vector<char> zip_buffer;
 	mz_zip_archive zip = {};
-	if (!mz_zip_reader_init_file(&zip, zip_path.c_str(), 0)) {
+	if (!init_zip_from_path(zip_path, zip, zip_buffer)) {
 		return false;
 	}
 
@@ -81,17 +106,28 @@ bool extract_single_file_from_zip(const std::string& zip_path, const std::string
 		return false;
 	}
 
-	// Extract to file
-	bool result = mz_zip_reader_extract_to_file(&zip, file_index, target_path.c_str(), 0);
-	
+	// Extract to memory then write using wide-capable filesystem path to handle non-ASCII
+	size_t file_size = 0;
+	void* file_data = mz_zip_reader_extract_to_heap(&zip, file_index, &file_size, 0);
+	bool result = false;
+	if (file_data && file_size > 0) {
+		std::ofstream out(target_path, std::ios::binary);
+		if (out.is_open()) {
+			out.write(static_cast<const char*>(file_data), file_size);
+			result = static_cast<bool>(out);
+		}
+		mz_free(file_data);
+	}
+
 	mz_zip_reader_end(&zip);
 	return result;
 }
 
-bool extract_zip(const std::string & zip_path, const std::string & target_dir, const std::string & inner_folder = "")
+bool extract_zip(const std::filesystem::path& zip_path, const std::string& target_dir, const std::string& inner_folder = "")
 {
+	std::vector<char> zip_buffer;
 	mz_zip_archive zip = {};
-	if (!mz_zip_reader_init_file(&zip, zip_path.c_str(), 0)) {
+	if (!init_zip_from_path(zip_path, zip, zip_buffer)) {
 		return false;
 	}
 
@@ -248,7 +284,7 @@ int main()
 		std::string existing_version = read_file_from_disk(game_dir + "\\plugins\\GTAIV.EFLC.FusionFix.RTXRemix.txt");
 		
 		// Read version from zip file
-		std::string zip_version = read_file_from_zip(found_zip.string(), "_installer_options/FusionFix_RTXRemixFork/plugins/GTAIV.EFLC.FusionFix.RTXRemix.txt");
+		std::string zip_version = read_file_from_zip(found_zip, "_installer_options/FusionFix_RTXRemixFork/plugins/GTAIV.EFLC.FusionFix.RTXRemix.txt");
 		
 		// Trim whitespace from both versions
 		auto trim = [](std::string& s) {
@@ -305,7 +341,7 @@ int main()
 			
 			// Extract the marker file from the zip
 			const std::string marker_path = plugins_dir + "\\GTAIV.EFLC.FusionFix.RTXRemix.txt";
-			if (extract_single_file_from_zip(found_zip.string(), "_installer_options/FusionFix_RTXRemixFork/plugins/GTAIV.EFLC.FusionFix.RTXRemix.txt", marker_path)) {
+			if (extract_single_file_from_zip(found_zip, "_installer_options/FusionFix_RTXRemixFork/plugins/GTAIV.EFLC.FusionFix.RTXRemix.txt", marker_path)) {
 				std::cout << "Extracted RTXRemix FusionFix marker file.\n\n";
 			} else {
 				std::cout << "Warning: Failed to extract RTXRemix FusionFix marker file.\n\n";
@@ -345,7 +381,7 @@ int main()
 	std::cout << "Extracting zip ...\n";
 	Sleep(100); // Small delay before extraction
 
-	if (!extract_zip(found_zip.string(), game_dir, "GTAIV-Remix-CompatibilityMod"))
+	if (!extract_zip(found_zip, game_dir, "GTAIV-Remix-CompatibilityMod"))
 	{
 		std::cout << "[ERR] Failed to extract 'GTAIV-Remix-CompatibilityMod' files from 'GTAIV-Remix-CompatibilityMod.zip'\n";
 		std::cout << "> Aborting installation. Please extract files manually.\n";
@@ -358,7 +394,7 @@ int main()
 	{
 		// extract fullscreen or windowed files
 		std::string windowed_or_fullscreen_path = fullscreen ? "_installer_options/mode_fullscreen/" : "_installer_options/mode_windowed/";
-		if (!extract_zip(found_zip.string(), game_dir, windowed_or_fullscreen_path)) {
+		if (!extract_zip(found_zip, game_dir, windowed_or_fullscreen_path)) {
 			std::cout << "[ERR] Failed to extract '" << windowed_or_fullscreen_path << "' files from 'GTAIV-Remix-CompatibilityMod.zip'\n";
 		}
 
@@ -417,7 +453,7 @@ int main()
 			Sleep(25);
         }
 
-        if (!extract_zip(found_zip.string(), game_dir, "_installer_options/FusionFix_RTXRemixFork/")) {
+        if (!extract_zip(found_zip, game_dir, "_installer_options/FusionFix_RTXRemixFork/")) {
 			std::cout << "[ERR] Failed to extract '_installer_options/FusionFix_RTXRemixFork/' files from 'GTAIV-Remix-CompatibilityMod.zip'\n";
         }
     }
