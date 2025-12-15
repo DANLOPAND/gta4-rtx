@@ -34,6 +34,22 @@ over "RootNode"
                 custom uniform bool remix_category:decal_Static = 0
             }
         }
+
+        over "mesh_8FC7E15A049962C4" (
+            references = None
+        )
+        {
+            def Xform "ref_2c1017bb27334ce4be421ee22eb634e1" (
+                prepend references = @./assets/world_mesh_fixes/terrain/mesh_BD641207EB31BB95/mesh_8FC7E15A049962C4_ext.usda@
+            )
+            {
+                custom bool IsRemixRef = 1
+                double3 xformOp:rotateXYZ = (0, 0, 0)
+                double3 xformOp:scale = (1, 1, 1)
+                double3 xformOp:translate = (0, 0, 0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+            }
+        }
     }
 
     over "instances"

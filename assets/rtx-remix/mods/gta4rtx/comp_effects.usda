@@ -87,6 +87,16 @@ over "RootNode"
                 custom bool inputs:use_legacy_alpha_state = 0
             }
         }
+
+        over "mat_26B555F216198A0E"
+        {
+            over "Shader"
+            {
+                custom float inputs:emissive_intensity = 35
+                custom asset inputs:emissive_mask_texture = @./assets/effects/fire/26B555F216198A0E_emissive.e.rtex.dds@
+                custom bool inputs:enable_emission = 1
+            }
+        }
     }
 
     over "meshes"
