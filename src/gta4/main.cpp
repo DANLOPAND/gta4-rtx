@@ -3,7 +3,7 @@
 
 #include "shared/common/flags.hpp"
 #include "modules/d3d9ex.hpp"
-#include "modules/game_settings.hpp"
+#include "modules/comp_settings.hpp"
 #include "modules/renderer.hpp"
 
 //#define BLOCK_DISCORDHOOK // also hooks d3d
@@ -101,9 +101,9 @@ BOOL WINAPI SetRect_hk(LPRECT lprc, int xLeft, int yTop, int xRight, int yBottom
 	//RECT rect = {};
 
 	// if manual override via game setting
-	if (gta4::game_settings::get()->manual_game_resolution_enabled.get_as<bool>())
+	if (gta4::comp_settings::get()->manual_game_resolution_enabled.get_as<bool>())
 	{
-		const auto res_setting = gta4::game_settings::get()->manual_game_resolution.get_as<Vector2D*>();
+		const auto res_setting = gta4::comp_settings::get()->manual_game_resolution.get_as<Vector2D*>();
 		gta4::game::game_rect = { xLeft, yTop, static_cast<int>(res_setting->x), static_cast<int>(res_setting->y) };
 	}
 	else
@@ -124,7 +124,7 @@ BOOL WINAPI SetRect_hk(LPRECT lprc, int xLeft, int yTop, int xRight, int yBottom
 			if (*gta4::game::ms_bWindowed)
 			{
 				// fallback
-				const auto res_setting = gta4::game_settings::get()->manual_game_resolution.get_as<Vector2D*>();
+				const auto res_setting = gta4::comp_settings::get()->manual_game_resolution.get_as<Vector2D*>();
 				gta4::game::game_rect = { xLeft, yTop, static_cast<int>(res_setting->x), static_cast<int>(res_setting->y) };
 			}
 			else {
@@ -159,9 +159,9 @@ HWND WINAPI CreateWindowExA_hk(DWORD dwExStyle, LPCSTR lpClassName, LPCSTR lpWin
 	HWND wnd;
 
 	// if manual override via game setting
-	if (gta4::game_settings::get()->manual_game_resolution_enabled.get_as<bool>())
+	if (gta4::comp_settings::get()->manual_game_resolution_enabled.get_as<bool>())
 	{
-		const auto res_setting = gta4::game_settings::get()->manual_game_resolution.get_as<Vector2D*>();
+		const auto res_setting = gta4::comp_settings::get()->manual_game_resolution.get_as<Vector2D*>();
 		*reinterpret_cast<int*>(gta4::game::systemMetrics_xRight) = static_cast<int>(res_setting->x); // xRight - GetSystemMetrics(0)
 		*reinterpret_cast<int*>(gta4::game::systemMetrics_yBottom) = static_cast<int>(res_setting->y); // xBottom - GetSystemMetrics(1)
 		wnd = CreateWindowExA(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y, static_cast<int>(res_setting->x), static_cast<int>(res_setting->y), hWndParent, hMenu, hInstance, lpParam);
@@ -187,7 +187,7 @@ HWND WINAPI CreateWindowExA_hk(DWORD dwExStyle, LPCSTR lpClassName, LPCSTR lpWin
 			if (*gta4::game::ms_bWindowed)
 			{
 				// fallback
-				const auto res_setting = gta4::game_settings::get()->manual_game_resolution.get_as<Vector2D*>();
+				const auto res_setting = gta4::comp_settings::get()->manual_game_resolution.get_as<Vector2D*>();
 				wnd = CreateWindowExA(dwExStyle, lpClassName, lpWindowName, dwStyle, 0, 0, static_cast<int>(res_setting->x), static_cast<int>(res_setting->y), hWndParent, hMenu, hInstance, lpParam);
 
 				*reinterpret_cast<int*>(gta4::game::systemMetrics_xRight) = static_cast<int>(res_setting->x); // xRight - GetSystemMetrics(0) .. another but unused: 0x17ED8CC
@@ -220,19 +220,19 @@ BOOL __fastcall commandlinearg_get_int_hk(gta4::game::cmdarg* arg, [[maybe_unuse
 {
 	if (arg)
 	{
-		if (gta4::game_settings::get()->manual_game_resolution_enabled.get_as<bool>())
+		if (gta4::comp_settings::get()->manual_game_resolution_enabled.get_as<bool>())
 		{
 			// is game checking for width but val is null?
 			if (std::string_view(arg->arg_name) == "width" && (!arg->arg_val || !*arg->arg_val))
 			{
-				const auto res_setting = gta4::game_settings::get()->manual_game_resolution.get_as<Vector2D*>();
+				const auto res_setting = gta4::comp_settings::get()->manual_game_resolution.get_as<Vector2D*>();
 				*ret = static_cast<int>(res_setting->x);
 				return 1;
 			}
 
 			if (std::string_view(arg->arg_name) == "height" && (!arg->arg_val || !*arg->arg_val))
 			{
-				const auto res_setting = gta4::game_settings::get()->manual_game_resolution.get_as<Vector2D*>();
+				const auto res_setting = gta4::comp_settings::get()->manual_game_resolution.get_as<Vector2D*>();
 				*ret = static_cast<int>(res_setting->y);
 				return 1;
 			}
@@ -360,7 +360,7 @@ BOOL APIENTRY DllMain(HMODULE hmodule, const DWORD ul_reason_for_call, LPVOID)
 		gta4::game::init_game_addresses();
 
 		shared::common::loader::module_loader::register_module(std::make_unique<gta4::d3d9ex>());
-		shared::common::loader::module_loader::register_module(std::make_unique<gta4::game_settings>());
+		shared::common::loader::module_loader::register_module(std::make_unique<gta4::comp_settings>());
 
 		// we have to hook SetRect and CreateWindowExA after FusionFix (disables FusionFix' hooks)
 		shared::utils::hook(gta4::game::hk_addr__on_create_game_window_hk, on_create_game_window_stub, HOOK_JUMP).install()->quick();

@@ -1,7 +1,7 @@
 ﻿#include "std_include.hpp"
 #include "remix_lights.hpp"
 
-#include "game_settings.hpp"
+#include "comp_settings.hpp"
 #include "imgui.hpp"
 #include "map_settings.hpp"
 #include "shared/common/remix_api.hpp"
@@ -58,7 +58,7 @@ namespace gta4
 	bool remix_lights::spawn_or_update_remix_sphere_light(remix_light_def& light, bool update)
 	{
 		//const auto im = imgui::get();
-		const auto gs = game_settings::get();
+		const auto gs = comp_settings::get();
 		auto msov = map_settings::get_map_settings().light_overrides;
 		//const bool has_override = msov.contains(light.m_hash);
 
@@ -236,7 +236,7 @@ namespace gta4
 	void remix_lights::iterate_all_game_lights()
 	{
 		static auto im = imgui::get();
-		static auto gs = game_settings::get();
+		static auto gs = comp_settings::get();
 		static auto& api = shared::common::remix_api::get();
 
 		//destroy_and_clear_all_active_lights();
@@ -288,7 +288,7 @@ namespace gta4
 		const auto& ignored_lights = map_settings::get()->get_map_settings().ignored_lights;
 		const auto& allowed_lights = map_settings::get()->get_map_settings().allow_lights;
 
-		if (game_settings::get()->translate_game_lights.get_as<bool>() && light_count && light_list)
+		if (comp_settings::get()->translate_game_lights.get_as<bool>() && light_count && light_list)
 		{
 			for (auto i = 0u; i < light_count; i++)
 			{
@@ -565,7 +565,7 @@ namespace gta4
 					continue;
 				}
 
-				const float radius = def.mRadius * (game_settings::get()->translate_game_light_radius_scalar.get_as<float>() * 0.01f);
+				const float radius = def.mRadius * (comp_settings::get()->translate_game_light_radius_scalar.get_as<float>() * 0.01f);
 				auto& remixapi = shared::common::remix_api::get();
 
 				remixapi.add_debug_circle(circle_pos, Vector(0.0f, 0.0f, 1.0f), radius, radius * 0.5f, def.mColor, false);

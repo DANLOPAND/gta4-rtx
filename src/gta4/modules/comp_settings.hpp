@@ -2,13 +2,13 @@
 
 namespace gta4
 {
-	class game_settings final : public shared::common::loader::component_module
+	class comp_settings final : public shared::common::loader::component_module
 	{
 	public:
-		game_settings();
-		~game_settings() = default;
+		comp_settings();
+		~comp_settings() = default;
 	
-		static inline game_settings* p_this = nullptr;
+		static inline comp_settings* p_this = nullptr;
 		static auto get() { return &vars; }
 
 		static bool is_initialized()

@@ -461,7 +461,7 @@ namespace gta4
 		void tab_dev();
 		void tab_wip();
 		void tab_utilities();
-		void tab_gamesettings();
+		void tab_compsettings();
 		void tab_map_settings();
 		bool m_im_window_focused = false;
 		bool m_im_window_hovered = false;

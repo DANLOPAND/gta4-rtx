@@ -1,7 +1,7 @@
 #include "std_include.hpp"
 #include "timecycle.hpp"
 
-#include "game_settings.hpp"
+#include "comp_settings.hpp"
 #include "imgui.hpp"
 #include "remix_vars.hpp"
 
@@ -44,7 +44,7 @@ namespace gta4
 		{
 			static auto im = imgui::get();
 			static auto vars = remix_vars::get();
-			static auto gs = game_settings::get();
+			static auto gs = comp_settings::get();
 			remix_vars::option_value val{};
 
 			//auto first_timecycle = reinterpret_cast<game::TimeCycleParams*>(0x15E8910);

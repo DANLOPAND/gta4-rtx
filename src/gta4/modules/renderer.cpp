@@ -2,7 +2,7 @@
 #include "renderer.hpp"
 
 #include "d3d9ex.hpp"
-#include "game_settings.hpp"
+#include "comp_settings.hpp"
 #include "imgui.hpp"
 #include "natives.hpp"
 #include "remix_markers.hpp"
@@ -305,7 +305,7 @@ namespace gta4
 
 	void handle_vehicle_roughness_when_wet(IDirect3DDevice9* dev, [[maybe_unused]] const drawcall_mod_context& ctx)
 	{
-		const auto gs = game_settings::get();
+		const auto gs = comp_settings::get();
 
 		uint8_t rain_flags = renderer::WETNESS_FLAG_NONE;
 		if (gs->timecycle_wetness_vehicle_raindrop_enable.get_as<bool>())
@@ -329,7 +329,7 @@ namespace gta4
 
 	void handle_vehicle_dirt_roughness_when_wet(IDirect3DDevice9* dev, [[maybe_unused]] const drawcall_mod_context& ctx)
 	{
-		const auto gs = game_settings::get();
+		const auto gs = comp_settings::get();
 		renderer::set_remix_roughness_scalar(dev,
 			gs->timecycle_wetness_vehicle_dirt_roughness_scalar.get_as<float>(),
 			gs->timecycle_wetness_vehicle_dirt_z_normal.get_as<float>(),
@@ -338,7 +338,7 @@ namespace gta4
 
 	void handle_vehicle_dirt_roughness_when_dry(IDirect3DDevice9* dev, const drawcall_mod_context& ctx)
 	{
-		const auto gs = game_settings::get();
+		const auto gs = comp_settings::get();
 
 		// not wet: slightly scale roughness wi* imgui::get()->m_debug_vector2.xth dirt
 		const float adjusted = powf(ctx.info.ps_const_73_veh_dirt.x, gs->vehicle_dirt_expo.get_as<float>());
@@ -351,7 +351,7 @@ namespace gta4
 
 	void handle_vehicle_dirt_decal(IDirect3DDevice9* dev, drawcall_mod_context& ctx)
 	{
-		const auto gs = game_settings::get();
+		const auto gs = comp_settings::get();
 
 		ctx.save_rs(dev, D3DRS_ALPHABLENDENABLE);
 		dev->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
@@ -571,7 +571,7 @@ namespace gta4
 	void SetupVertexShaderAndConstants(game::vs_info_s* info, game::vs_data_s* data, game::shader_info_sub_s* constant_data_struct, game::shader_data_sub_s* sampler_data)
 	{
 		static auto im = imgui::get();
-		static auto gs = game_settings::get();
+		static auto gs = comp_settings::get();
 		const auto game_device = game::get_d3d_device();
 		auto& ctx = renderer::get()->dc_ctx;
 
@@ -790,7 +790,7 @@ namespace gta4
 	void SetupPixelShaderAndConstants(game::ps_info_s* info, game::ps_data_s* data, game::shader_info_sub_s* constant_data_struct, game::shader_data_sub_s* sampler_data)
 	{
 		static auto im = imgui::get();
-		static auto gs = game_settings::get();
+		static auto gs = comp_settings::get();
 		const auto game_device = game::get_d3d_device();
 		auto& ctx = renderer::get()->dc_ctx;
 
@@ -1233,7 +1233,7 @@ namespace gta4
 		}
 
 		static auto im = imgui::get();
-		static auto gs = game_settings::get();
+		static auto gs = comp_settings::get();
 
 		im->m_stats._drawcall_prim_incl_ignored.track_single();
 
@@ -1542,7 +1542,7 @@ namespace gta4
 
 		auto& ctx = setup_context(dev);
 		static auto im = imgui::get();
-		static auto gs = game_settings::get();
+		static auto gs = comp_settings::get();
 
 		bool render_with_ff = false;
 

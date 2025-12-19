@@ -1,7 +1,7 @@
 #include "std_include.hpp"
 #include "remix_markers.hpp"
 
-#include "game_settings.hpp"
+#include "comp_settings.hpp"
 #include "imgui.hpp"
 #include "map_settings.hpp"
 #include "natives.hpp"
@@ -48,7 +48,7 @@ namespace gta4
 
 	void handle_rain_marker(IDirect3DDevice9* dev)
 	{
-		const auto gs = game_settings::get();
+		const auto gs = comp_settings::get();
 
 		if (gs->rain_particle_system_enabled._bool())
 		{

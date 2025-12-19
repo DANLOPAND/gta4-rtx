@@ -2,7 +2,7 @@
 
 #include "modules/dinput_hook.hpp"
 #include "modules/game_lights.hpp"
-#include "modules/game_settings.hpp"
+#include "modules/comp_settings.hpp"
 #include "modules/imgui.hpp"
 #include "modules/map_settings.hpp"
 #include "modules/natives.hpp"
@@ -83,7 +83,7 @@ namespace gta4
 		}
 
 		// called in remix_vars::on_client_frame() otherwise
-		if (!game_settings::get()->timecycle_set_on_endscene.get_as<bool>()) {
+		if (!comp_settings::get()->timecycle_set_on_endscene.get_as<bool>()) {
 			timecycle::translate_and_apply_timecycle_settings();
 		}
 	}
@@ -101,7 +101,7 @@ namespace gta4
 	{
 		// this = AVCBuilding : AVCEntity : AUCVirtualBase
 		auto im = imgui::get();
-		auto gs = game_settings::get();
+		auto gs = comp_settings::get();
 
 		if (im->m_dbg_never_cull_statics) {
 			return TRUE;
@@ -269,7 +269,7 @@ namespace gta4
 	int extended_anticull_hk(game::CEntity* ent)
 	{
 		const auto im = imgui::get();
-		const auto gs = game_settings::get();
+		const auto gs = comp_settings::get();
 
 		if (ent && gs->nocull_extended.get_as<bool>())
 		{
@@ -336,7 +336,7 @@ namespace gta4
 		// do not cull if near enough
 		if (const auto vpscene = game::pViewports; vpscene->sceneviewport)
 		{
-			if (const float& anti_cull_dist = game_settings::get()->nocull_dist_lights._float(); 
+			if (const float& anti_cull_dist = comp_settings::get()->nocull_dist_lights._float(); 
 				anti_cull_dist > 0.0f)
 			{
 				const Vector cam_org = &vpscene->sceneviewport->cameraInv.m[3][0];
@@ -396,7 +396,7 @@ namespace gta4
 
 	int frustum_panes_check_interior_helper(const game::CRenderPhase_frustum* frustum, const Vector* obj_pos)
 	{
-		if (const float& nocull_dist_sphere_interior = game_settings::get()->nocull_dist_sphere_interior._float();
+		if (const float& nocull_dist_sphere_interior = comp_settings::get()->nocull_dist_sphere_interior._float();
 			nocull_dist_sphere_interior > 0.0f)
 		{
 			const float dist_sqr = fabs(frustum->viewpos.DistToSqr(*obj_pos));
@@ -457,7 +457,7 @@ namespace gta4
 	void veh_center_headlight(D3DXMATRIX* some_mtx, D3DXMATRIX* left_light_pos, D3DXMATRIX* right_light_pos, [[maybe_unused]] float* pos, float* light_dir, float* color, float intensity, float radius, [[maybe_unused]] std::int64_t ee, int inter_index, int room_index, int shadow_rel_index, char some_flag)
 	{
 		const auto im = imgui::get();
-		const auto gs = game_settings::get();
+		const auto gs = comp_settings::get();
 
 		const float inner_cone = 0.8f * (1.0f * 20.0f); // *reinterpret_cast<float*>(0x103CC5C) * (*reinterpret_cast<float*>(0x103CC54) * *reinterpret_cast<float*>(0x12E23C8))
 		const float outer_cone = 0.8f * (1.0f * 50.0f); // *reinterpret_cast<float*>(0x103CC5C) * (*reinterpret_cast<float*>(0x103CC58) * *reinterpret_cast<float*>(0x12E23CC))
@@ -511,7 +511,7 @@ namespace gta4
 	void veh_single_headlight_hk(D3DXMATRIX* some_mtx, float* light_pos, float* light_dir, float* color, float intensity, float radius, [[maybe_unused]] float inner_cone_angle, [[maybe_unused]] float outer_cone_angle, int inter_index, int room_index, int shadow_rel_index, char flag1, char flag2)
 	{
 		const auto im = imgui::get();
-		const auto gs = game_settings::get();
+		const auto gs = comp_settings::get();
 
 		const float inner_cone = 0.8f * (1.0f * 20.0f); // *reinterpret_cast<float*>(0x103CC5C) * (*reinterpret_cast<float*>(0x103CC54) * *reinterpret_cast<float*>(0x12E23C8))
 		const float outer_cone = 0.8f * (1.0f * 50.0f); // *reinterpret_cast<float*>(0x103CC5C) * (*reinterpret_cast<float*>(0x103CC58) * *reinterpret_cast<float*>(0x12E23CC))
@@ -530,7 +530,7 @@ namespace gta4
 	void veh_center_rearlight(D3DXMATRIX* some_mtx, D3DXMATRIX* left_light_pos, D3DXMATRIX* right_light_pos, [[maybe_unused]] float* some_vec3, float* color, float intensity, float radius, float inner_cone_angle, float outer_cone_angle, int inter_index, int room_index, int shadow_rel_index, char flag1, char flag2)
 	{
 		//const auto im = imgui::get();
-		const auto gs = game_settings::get();
+		const auto gs = comp_settings::get();
 
 		const float inner_cone = inner_cone_angle * 0.6f + gs->translate_vehicle_rearlight_inner_cone_angle_offset.get_as<float>();
 		const float outer_cone = outer_cone_angle * 0.6f + gs->translate_vehicle_rearlight_outer_cone_angle_offset.get_as<float>();
@@ -584,7 +584,7 @@ namespace gta4
 	void veh_single_rearlight_hk(D3DXMATRIX* some_mtx, float* light_pos, [[maybe_unused]] float* og_light_dir, float* color, float intensity, float radius, float inner_cone_angle, float outer_cone_angle, int inter_index, int room_index, int shadow_rel_index, char flag1, char flag2)
 	{
 		//const auto im = imgui::get();
-		const auto gs = game_settings::get();
+		const auto gs = comp_settings::get();
 
 		const float inner_cone = inner_cone_angle * 0.6f + gs->translate_vehicle_rearlight_inner_cone_angle_offset.get_as<float>();
 		const float outer_cone = outer_cone_angle * 0.6f + gs->translate_vehicle_rearlight_outer_cone_angle_offset.get_as<float>();
@@ -608,7 +608,7 @@ namespace gta4
 	void veh_vshaped_siren_fake_light_hk(int unk_flag, game::eLightType type, int flag, float* dir, float* otherdir, float* pos, float* color, float intensity, int tex_hash, int txd_hash, float radius, float inner_cone, float outer_cone, int inter_index, int room_index, int shadow_rel_index)
 	{
 		//const auto im = imgui::get();
-		const auto gs = game_settings::get();
+		const auto gs = comp_settings::get();
 
 		//pos[0] += im->m_debug_vector2.x;
 		//pos[1] += im->m_debug_vector2.y;
@@ -629,7 +629,7 @@ namespace gta4
 		float* light_direction)
 	{
 		//const auto im = imgui::get();
-		const auto gs = game_settings::get();
+		const auto gs = comp_settings::get();
 
 		Vector color = 
 		{

@@ -1,7 +1,7 @@
 #include "std_include.hpp"
 #include "remix_vars.hpp"
 
-#include "game_settings.hpp"
+#include "comp_settings.hpp"
 #include "imgui.hpp"
 #include "timecycle.hpp"
 #include "shared/common/remix_api.hpp"
@@ -545,13 +545,13 @@ namespace gta4
 	// Called on d3d9ex::D3D9Device::EndScene
 	void remix_vars::on_client_frame()
 	{
-		const auto gs = game_settings::get();
+		const auto gs = comp_settings::get();
 		if (shared::common::remix_api::is_initialized())
 		{
 			if (game::is_in_game)
 			{
 				// called in gta4::on_begin_scene_cb() otherwise
-				if (game_settings::get()->timecycle_set_on_endscene.get_as<bool>()) {
+				if (comp_settings::get()->timecycle_set_on_endscene.get_as<bool>()) {
 					timecycle::translate_and_apply_timecycle_settings();
 				}
 

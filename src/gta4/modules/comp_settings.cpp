@@ -1,9 +1,9 @@
 #include "std_include.hpp"
-#include "game_settings.hpp"
+#include "comp_settings.hpp"
 #include "shared/common/toml_ext.hpp"
 
 #define CATCH_ERR_PRINT	catch (toml::type_error& err) { \
-		shared::common::log("GameSettings", std::format("{}", err.what()), shared::common::LOG_TYPE::LOG_TYPE_ERROR, true); }
+		shared::common::log("CompSettings", std::format("{}", err.what()), shared::common::LOG_TYPE::LOG_TYPE_ERROR, true); }
 
 namespace gta4
 {
@@ -12,9 +12,9 @@ namespace gta4
 		return std::string(std::to_string(COMP_MOD_VERSION_MAJOR) + "." + std::to_string(COMP_MOD_VERSION_MINOR) + "." + std::to_string(COMP_MOD_VERSION_PATCH));
 	}
 
-	void game_settings::write_toml()
+	void comp_settings::write_toml()
 	{
-		const std::string file_path = shared::globals::root_path + "\\rtx_comp\\game_settings.toml";
+		const std::string file_path = shared::globals::root_path + "\\rtx_comp\\comp_settings.toml";
 		std::filesystem::create_directories(std::filesystem::path(file_path).parent_path());
 
 		std::ofstream file;
@@ -41,19 +41,19 @@ namespace gta4
 		file.close();
 	}
 
-	bool game_settings::parse_toml()
+	bool comp_settings::parse_toml()
 	{
 
 #ifndef asd // DEBUG
 		std::ifstream file;
-		if (shared::utils::open_file_homepath("rtx_comp", "game_settings.toml", file))
+		if (shared::utils::open_file_homepath("rtx_comp", "comp_settings.toml", file))
 		{
 			// file exists
 			file.close();
 
 			try
 			{
-				auto config = toml::parse("rtx_comp\\game_settings.toml");
+				auto config = toml::parse("rtx_comp\\comp_settings.toml");
 
 				if (config.contains("CreatedOnCompVersion"))
 				{
@@ -97,16 +97,16 @@ namespace gta4
 										continue;
 									}
 
-									TOML_ERROR("[GameSettings] #to_vec", val, "expected float but got value_t of => %d ", val.type());
+									TOML_ERROR("[CompSettings] #to_vec", val, "expected float but got value_t of => %d ", val.type());
 								}
 
 								return result;
 							}
 
-							TOML_ERROR("[GameSettings] #to_vec", entry, "unexpected array size of => %d ", entry.as_array().size());
+							TOML_ERROR("[CompSettings] #to_vec", entry, "unexpected array size of => %d ", entry.as_array().size());
 						}
 
-						TOML_ERROR("[GameSettings] #to_vec", entry, "expected a vector but got value_t => %d ", entry.type());
+						TOML_ERROR("[CompSettings] #to_vec", entry, "expected a vector but got value_t => %d ", entry.type());
 
 						switch (type)
 						{
@@ -291,8 +291,8 @@ namespace gta4
 
 			catch (const toml::syntax_error& err)
 			{
-				shared::common::log("GameSettings", std::format("{}", err.what()), shared::common::LOG_TYPE::LOG_TYPE_ERROR, true);
-				shared::common::log("GameSettings", "Not writing defaults! Please check 'game_settings.toml' or remove the file to re-generate it on next startup!", shared::common::LOG_TYPE::LOG_TYPE_ERROR, true);
+				shared::common::log("CompSettings", std::format("{}", err.what()), shared::common::LOG_TYPE::LOG_TYPE_ERROR, true);
+				shared::common::log("CompSettings", "Not writing defaults! Please check 'comp_settings.toml' or remove the file to re-generate it on next startup!", shared::common::LOG_TYPE::LOG_TYPE_ERROR, true);
 				return false;
 			}
 		}
@@ -303,12 +303,12 @@ namespace gta4
 		return true;
 	}
 
-	game_settings::game_settings()
+	comp_settings::comp_settings()
 	{
 		parse_toml();
 
 		// -----
 		m_initialized = true;
-		shared::common::log("GameSettings", "Module initialized.", shared::common::LOG_TYPE::LOG_TYPE_DEFAULT, false);
+		shared::common::log("CompSettings", "Module initialized.", shared::common::LOG_TYPE::LOG_TYPE_DEFAULT, false);
 	}
 }

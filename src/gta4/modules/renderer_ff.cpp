@@ -1,7 +1,7 @@
 #include "std_include.hpp"
 #include "renderer_ff.hpp"
 
-#include "game_settings.hpp"
+#include "comp_settings.hpp"
 #include "imgui.hpp"
 
 namespace gta4
@@ -41,7 +41,7 @@ namespace gta4
 	void renderer_ff::on_ff_emissives(IDirect3DDevice9* dev, drawcall_mod_context& ctx)
 	{
 		const auto im = imgui::get();
-		const auto gs = game_settings::get();
+		const auto gs = comp_settings::get();
 
 		if (im->m_dbg_emissive_ff_do_not_render) 
 		{
@@ -143,7 +143,7 @@ namespace gta4
 	void renderer_ff::on_ff_emissives_alpha(IDirect3DDevice9* dev, drawcall_mod_context& ctx)
 	{
 		const auto im = imgui::get();
-		const auto gs = game_settings::get();
+		const auto gs = comp_settings::get();
 
 		if (im->m_dbg_emissive_ff_alphablend_do_not_render)
 		{
