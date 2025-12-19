@@ -1,6 +1,7 @@
 #include "std_include.hpp"
 
 #include "modules/dinput_hook.hpp"
+#include "modules/game_lights.hpp"
 #include "modules/game_settings.hpp"
 #include "modules/imgui.hpp"
 #include "modules/map_settings.hpp"
@@ -10,6 +11,7 @@
 #include "modules/remix_vars.hpp"
 #include "modules/renderer.hpp"
 #include "modules/renderer_ff.hpp"
+#include "modules/timecycle.hpp"
 #include "shared/common/flags.hpp"
 #include "shared/common/remix_api.hpp"
 
@@ -82,7 +84,7 @@ namespace gta4
 
 		// called in remix_vars::on_client_frame() otherwise
 		if (!game_settings::get()->timecycle_set_on_endscene.get_as<bool>()) {
-			remix_vars::translate_and_apply_timecycle_settings();
+			timecycle::translate_and_apply_timecycle_settings();
 		}
 	}
 
@@ -656,7 +658,9 @@ namespace gta4
 		shared::common::loader::module_loader::register_module(std::make_unique<renderer_ff>());
 		shared::common::loader::module_loader::register_module(std::make_unique<dinput>());
 		shared::common::loader::module_loader::register_module(std::make_unique<remix_lights>());
+		shared::common::loader::module_loader::register_module(std::make_unique<game_lights>());
 		shared::common::loader::module_loader::register_module(std::make_unique<map_settings>());
+		shared::common::loader::module_loader::register_module(std::make_unique<timecycle>());
 		shared::common::loader::module_loader::register_module(std::make_unique<remix_markers>());
 		shared::common::loader::module_loader::register_module(std::make_unique<natives>());
 		shared::common::loader::module_loader::register_module(std::make_unique<remix_vars>());
