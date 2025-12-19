@@ -111,6 +111,7 @@ namespace gta4
 		std::unordered_map<int, std::string> preset_list;
 
 		bool m_dbg_visualize_api_lights = false;
+		float m_dbg_visualize_api_lights_3d_distance = 20.0f;
 		bool m_dbg_visualize_api_light_hashes = false;
 		bool m_dbg_visualize_api_light_unstable_hashes = false; // enabling this will also show unstable hashes
 		bool m_dbg_disable_ignore_light_hash_logic = false; // disables the map_settings logic that ignores light translation based on a list of hashes

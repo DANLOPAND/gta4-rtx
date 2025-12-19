@@ -2,14 +2,12 @@
 #include "remix_lights.hpp"
 
 #include "comp_settings.hpp"
-#include "imgui.hpp"
+#include "game_lights.hpp"
 #include "map_settings.hpp"
 #include "shared/common/remix_api.hpp"
 
 namespace gta4
 {
-	// ----
-
 	const Vector& remix_lights::get_light_position(const game::CLightSource& def, const map_settings::light_override_s* lov) {
 		return lov && lov->_use_pos ? lov->pos : def.mPosition;
 	}
@@ -57,10 +55,8 @@ namespace gta4
 	 */
 	bool remix_lights::spawn_or_update_remix_sphere_light(remix_light_def& light, bool update)
 	{
-		//const auto im = imgui::get();
 		const auto gs = comp_settings::get();
 		auto msov = map_settings::get_map_settings().light_overrides;
-		//const bool has_override = msov.contains(light.m_hash);
 
 		map_settings::light_override_s* lov = nullptr;
 		if (const auto it = msov.find(light.m_hash); it != msov.end()) {
@@ -74,28 +70,28 @@ namespace gta4
 		light.m_updateframe = m_updateframe;
 
 		const auto& def = light.m_def;
-		const auto is_spotlight = get_light_type(def, lov); //def.mType == game::LT_SPOT;
+		const auto is_spotlight = get_light_type(def, lov);
 
 		light.m_ext.sType = REMIXAPI_STRUCT_TYPE_LIGHT_INFO_SPHERE_EXT;
 		light.m_ext.pNext = nullptr;
-		light.m_ext.position = get_light_position(def, lov).ToRemixFloat3D();//has_override && lov->_use_pos ? lov->pos.ToRemixFloat3D() : def.mPosition.ToRemixFloat3D();
+		light.m_ext.position = get_light_position(def, lov).ToRemixFloat3D();
 
 		// scale down lights with larger radii (eg. own vehicle headlight (75 rad))
-		light.m_ext.radius = get_light_radius(def, lov) * gs->translate_game_light_radius_scalar.get_as<float>() * 0.01f; //20.0f * (1.0f - exp(-(has_override && lov->_use_radius ? lov->radius : light.m_def.mRadius) / 20.0f)) * gs->translate_game_light_radius_scalar.get_as<float>() * 0.01f;
-		light.m_ext.shaping_hasvalue = is_spotlight; //has_override && lov->_use_light_type ? lov->light_type : is_spotlight;
+		light.m_ext.radius = get_light_radius(def, lov) * gs->translate_game_light_radius_scalar.get_as<float>() * 0.01f;
+		light.m_ext.shaping_hasvalue = is_spotlight;
 		light.m_ext.shaping_value = {};
-		light.m_ext.shaping_value.direction = get_light_dir(def, lov).ToRemixFloat3D(); //has_override && lov->_use_dir ? lov->dir.ToRemixFloat3D() : def.mDirection.ToRemixFloat3D();
+		light.m_ext.shaping_value.direction = get_light_dir(def, lov).ToRemixFloat3D();
 
-		//const float innerConeDegrees = RAD2DEG(def.mOuterConeAngle);  // "outer" param → actual inner cone (smaller)
-		const float outerConeDegrees = RAD2DEG(get_light_outer_cone_angle(def, lov)); //RAD2DEG(has_override ? lov->outer_cone_angle : def.mInnerConeAngle);  // "inner" param → outer cone (larger)
-		const float coneSoftness = std::cos(get_light_inner_cone_angle(def, lov) * 0.5f) - std::cos(get_light_outer_cone_angle(def, lov) * 0.5f); //std::cos((has_override ? lov->inner_cone_angle : def.mOuterConeAngle) * 0.5f) - std::cos((has_override ? lov->outer_cone_angle : def.mInnerConeAngle) * 0.5f);
+		// "outer" param → actual inner cone (smaller)
+		const float outerConeDegrees = RAD2DEG(get_light_outer_cone_angle(def, lov)); // "inner" param → outer cone (larger)
+		const float coneSoftness = std::cos(get_light_inner_cone_angle(def, lov) * 0.5f) - std::cos(get_light_outer_cone_angle(def, lov) * 0.5f);
 
 		light.m_ext.shaping_value.coneAngleDegrees = outerConeDegrees + gs->translate_game_light_angle_offset.get_as<float>();
 		light.m_ext.shaping_value.coneSoftness = coneSoftness + gs->translate_game_light_softness_offset.get_as<float>();
 		light.m_ext.shaping_value.focusExponent = 0.0f;
 
 		light.m_ext.volumetricRadianceScale = 
-			   get_light_volumetric_scale(def, lov) //(has_override && lov->_use_volumetric_scale ? lov->volumetric_scale : def.mVolumeScale)
+			   get_light_volumetric_scale(def, lov)
 			*  (is_spotlight ?
 				  gs->translate_game_light_spotlight_volumetric_radiance_scale.get_as<float>() 
 				: gs->translate_game_light_spherelight_volumetric_radiance_scale.get_as<float>());
@@ -108,8 +104,8 @@ namespace gta4
 		}
 		
 		light.m_info.radiance = (
-			  get_light_intensity(def, lov) //(has_override && lov->_use_intensity ? lov->intensity : def.mIntensity)
-			* get_light_color(def, lov) //(has_override && lov->_use_color ? lov->color : Vector(def.mColor))
+			  get_light_intensity(def, lov)
+			* get_light_color(def, lov)
 			*  gs->translate_game_light_intensity_scalar.get_as<float>()).ToRemixFloat3D();
 
 		const auto& api = shared::common::remix_api::get();
@@ -130,37 +126,20 @@ namespace gta4
 			l.m_hash = hash;
 			l.m_light_num = m_active_light_spawn_tracker++;
 			l.m_is_filler = is_filler;
-			/*m_active_lights.emplace_back(
-				remix_light_def
-				{
-					.m_def = def,
-					.m_hash = hash,
-					.m_light_num = m_active_light_spawn_tracker++,
-				});*/
 
 			// add light with 0 intensity (eg. for debug vizualizations)
 			if (add_but_do_not_draw)
 			{
-				/*if (auto* light = &m_active_lights.back(); light) 
-				{
-					light->m_def.mIntensity = 0.0f;
-					light->m_is_ignored = true;
-				}*/
-
 				l.m_def.mIntensity = 0.0f;
 				l.m_is_ignored = true;
 			}
 
-			// spawn light
-			//if (auto* light = &m_active_lights.back(); light) {
-
-				get()->spawn_or_update_remix_sphere_light(l);
-			//}
+			get()->spawn_or_update_remix_sphere_light(l);
 		}
 	}
 
 	/**
-	 * Destroys a light (remixApi light)
+	 * Destroys a remixApi light
 	 * @param l		The light to destroy
 	 */
 	void remix_lights::destroy_light(remix_light_def& l)
@@ -183,7 +162,7 @@ namespace gta4
 	}
 
 	/**
-	 * Destroys all lights in 'm_map_lights' (remixApi lights) and clears 'm_map_lights'
+	 * Destroys and clears all active remixApi lights
 	 */
 	void remix_lights::destroy_and_clear_all_active_lights()
 	{
@@ -191,330 +170,10 @@ namespace gta4
 		m_active_lights.clear();
 	}
 
-	uint64_t calculate_light_hash(const game::CLightSource& def)
-	{
-		std::uint32_t hash = 0u;
-
-		hash = shared::utils::hash32_combine(hash, def.mPosition.x);
-		hash = shared::utils::hash32_combine(hash, def.mPosition.y);
-		hash = shared::utils::hash32_combine(hash, def.mPosition.z);
-
-		/*if (shared::utils::float_equal(def.mPosition.x, 890.579651f))
-		{
-			int x = 1;
-		}*/
-
-		hash = shared::utils::hash32_combine(hash, def.mFlags);
-		hash = shared::utils::hash32_combine(hash, def.mRoomIndex);
-		//hash = shared::utils::hash32_combine(hash, def.mInteriorIndex); // this changes when starting a new game from an old save
-		hash = shared::utils::hash32_combine(hash, def.mTxdHash);
-
-		//hash = shared::utils::hash32_combine(hash, def.mVolumeSize);
-		//hash = shared::utils::hash32_combine(hash, def.mVolumeScale);
-		//hash = shared::utils::hash32_combine(hash, def.mIntensity);
-		
-		return hash;
-	}
-
-	bool compare_dynamic_light_without_position(const game::CLightSource& l1, const game::CLightSource& l2, float eps = 1.e-6f)
-	{
-		if (shared::utils::float_equal(l1.mIntensity, l2.mIntensity, eps)) {
-			if (shared::utils::float_equal(l1.mInnerConeAngle, l2.mInnerConeAngle, eps)) {
-				if (shared::utils::float_equal(l1.mRadius, l2.mRadius, eps)) {
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
-
 	/**
-	 * Updates all lights in 'm_map_lights'
-	 * Handles Destroying, choreo trigger spawning, tick advancing and updating of remixApi lights
+	 * Draw all active remixApi lights
 	 */
-	void remix_lights::iterate_all_game_lights()
-	{
-		static auto im = imgui::get();
-		static auto gs = comp_settings::get();
-		static auto& api = shared::common::remix_api::get();
 
-		//destroy_and_clear_all_active_lights();
-
-		//if (true)
-		{
-			if (game::g_directionalLights)
-			{
-				auto& def = game::g_directionalLights[0];
-				auto& l = m_distant_light;
-
-				if (l.m_handle)
-				{
-					api.m_bridge.DestroyLight(l.m_handle);
-					l.m_handle = nullptr;
-				}
-
-				l.m_updateframe = m_updateframe;
-
-				l.m_ext.sType = REMIXAPI_STRUCT_TYPE_LIGHT_INFO_DISTANT_EXT;
-				l.m_ext.pNext = nullptr;
-
-				auto dir = def.mDirection; dir.Normalize();
-				l.m_ext.direction = dir.ToRemixFloat3D();
-
-				l.m_ext.angularDiameterDegrees = gs->translate_sunlight_angular_diameter_degrees.get_as<float>();
-				l.m_ext.volumetricRadianceScale = gs->translate_sunlight_volumetric_radiance_base.get_as<float>();
-
-				if (gs->translate_sunlight_timecycle_fogdensity_volumetric_influence_enabled.get_as<bool>()) 
-				{
-					l.m_ext.volumetricRadianceScale += 
-						game::helper_timecycle_current_fog_density * gs->translate_sunlight_timecycle_fogdensity_volumetric_influence_scalar.get_as<float>();
-				}
-
-				l.m_info.sType = REMIXAPI_STRUCT_TYPE_LIGHT_INFO;
-				l.m_info.pNext = &l.m_ext;
-				l.m_info.hash = shared::utils::string_hash64("apilight_distant");
-				l.m_info.radiance = (def.mIntensity * Vector(def.mColor) * gs->translate_sunlight_intensity_scalar.get_as<float>()).ToRemixFloat3D();
-
-				if (api.m_bridge.CreateLight(&l.m_info, &l.m_handle) == REMIXAPI_ERROR_CODE_SUCCESS && l.m_handle) {
-					api.m_bridge.DrawLightInstance(l.m_handle);
-				}
-			}
-		}
-#if 1
-		const auto light_list = game::get_renderLights();
-		const auto light_count = game::get_renderLightsCount();
-
-		const auto& ignored_lights = map_settings::get()->get_map_settings().ignored_lights;
-		const auto& allowed_lights = map_settings::get()->get_map_settings().allow_lights;
-
-		if (comp_settings::get()->translate_game_lights.get_as<bool>() && light_count && light_list)
-		{
-			for (auto i = 0u; i < light_count; i++)
-			{
-				auto& def = light_list[i];
-				const auto hash = calculate_light_hash(def);
-
-				bool is_filler_light = def.mFlags & 0x10;
-
-				bool add_zero_intensity_light = false;
-				bool is_allowed_filler_light = false;
-
-				// debug setting to disable ignore logic (performance impact test)
-				if (!im->m_dbg_disable_ignore_light_hash_logic)
-				{
-					if (ignored_lights.contains(hash))
-					{
-						// we need this light in the active list to visualize it
-						if (im->m_dbg_visualize_api_light_hashes) {
-							add_zero_intensity_light = true;
-						}
-						else {
-							continue;
-						}
-					}
-				}
-
-				// dev setting to test light flags
-				if (im->m_dbg_ignore_lights_with_flag_logic)
-				{
-					if (im->m_dbg_ignore_lights_with_flag_add_second_flag)
-					{
-						if (   def.mFlags & (1u << im->m_dbg_ignore_lights_with_flag_01)
-							&& def.mFlags & (1u << im->m_dbg_ignore_lights_with_flag_02) ) {
-							continue;
-						}
-					}
-					else
-					{
-						if (def.mFlags & (1u << im->m_dbg_ignore_lights_with_flag_01)) {
-							continue;
-						}
-					}
-				}
-
-				// ignore filler light game setting
-				else if (gs->translate_game_lights_ignore_filler_lights.get_as<bool>())
-				{
-					if (is_filler_light)
-					{
-						// check if this filler light is whitelisted
-						if (allowed_lights.contains(hash)) {
-							is_allowed_filler_light = true;
-						}
-
-						// keep vis. working because the user needs to see the hashes to be able to whitelist them
-						else if (im->m_dbg_visualize_api_light_hashes) {
-							add_zero_intensity_light = true;  
-						}
-
-						if (!(is_allowed_filler_light || add_zero_intensity_light)) {
-							continue;
-						}
-					}
-				}
-
-				bool touched_light = false;
-				if (auto it = m_active_lights.find(hash); it != m_active_lights.end()) 
-				{
-					bool should_update = im->m_dbg_visualize_api_light_hashes || it->second.m_def.mFlags & 0x400; // always update if in vis mode
-					it->second.m_is_filler = is_filler_light;
-
-					// check if most important properties changed - position unchanged as matched a hash
-					if (!should_update && compare_dynamic_light_without_position(def, it->second.m_def)) {
-						it->second.m_updateframe = m_updateframe; // light is up to date
-					}
-					else 
-					{
-						it->second.m_def = def;
-						should_update = true; // radius/intensity or something else has changed, update
-					}
-
-					if (should_update || add_zero_intensity_light)
-					{
-						if (add_zero_intensity_light)
-						{
-							it->second.m_def.mIntensity = 0.0f;
-							it->second.m_is_ignored = true;
-						} else {
-							it->second.m_is_ignored = false;
-						}
-
-						it->second.m_is_allowed_filler = is_allowed_filler_light;
-						spawn_or_update_remix_sphere_light(it->second, true);
-					}
-
-					touched_light = true;
-				}
-				else
-				{
-					// search for light with very very similar settings, then check if within a certain distance comp. to last state
-					for (auto& l : m_active_lights) 
-					{
-						// do not try to match an existing light if flag 0x400 (always update)
-						if (l.second.m_def.mFlags & 0x400) {
-							continue;
-						}
-
-						if (l.second.m_updateframe != m_updateframe && // do not recheck already updated lights
-							compare_dynamic_light_without_position(def, l.second.m_def, 0.05f))
-						{
-							if (def.mPosition.DistToSqr(l.second.m_def.mPosition) < 1.0f) // expose this?
-							{
-								l.second.m_def = def;
-								l.second.m_hash = hash; // can be used to check if a light changed its position
-								spawn_or_update_remix_sphere_light(l.second, true);
-								touched_light = true;
-								break;
-							}
-						}
-					}
-				}
-
-				// this is a new light
-				if (!touched_light) {
-					add_light(def, hash, add_zero_intensity_light, is_filler_light);
-				}
-			}
-		}
-		else {
-			destroy_and_clear_all_active_lights();
-		}
-
-		// delete all untouched lights
-		for (auto it = m_active_lights.begin(); it != m_active_lights.end(); )
-		{
-			if (it->second.m_updateframe != m_updateframe) 
-			{
-				destroy_light(it->second);
-				it = m_active_lights.erase(it);
-			}
-			else { ++it; }
-		}
-
-#else
-		// d3d9 lights test
-
-		if (game::g_lightList && game::g_lightCount && *game::g_lightCount)
-		{
-			for (auto i = 0u; i < 7; i++) {
-				shared::globals::d3d_device->LightEnable(i, FALSE);
-			}
-
-			const auto global_scalar = imgui::get()->m_dbg_global_light_intensity_scalar;
-			int lindex = 0;
-
-			for (auto i = 0u; i < *game::g_lightCount && i < 256; i++)
-			{
-				if (lindex > 7) {
-					lindex = 0;
-				}
-
-				auto& def = game::g_lightList[i];
-
-				D3DLIGHT9 light = {};
-				light.Type = (def.mOuterConeAngle > def.mInnerConeAngle) ? D3DLIGHT_SPOT : D3DLIGHT_POINT;
-
-				// Position
-				light.Position.x = def.mPosition.x;
-				light.Position.y = def.mPosition.y;
-				light.Position.z = def.mPosition.z;
-
-				// Direction for spot light
-				if (light.Type == D3DLIGHT_SPOT) {
-					light.Direction.x = def.mDirection.x;
-					light.Direction.y = def.mDirection.y;
-					light.Direction.z = def.mDirection.z;
-
-					// Map 0-1 cone angles to radians (assuming fraction of pi for full cone angles)
-					light.Theta = def.mInnerConeAngle * M_PI;  // Inner full cone angle
-					light.Phi = def.mOuterConeAngle * M_PI;    // Outer full cone angle
-					light.Falloff = 1.0f;  // Standard linear falloff in penumbra
-				}
-
-				// Ignore mTangent as D3DLIGHT9 does not support oriented area lights directly
-
-				// Color and intensity scaling
-				// Assume mColor is RGBA with RGB in [0,1] range, mIntensity is radiance, mRadius is source radius
-				// Scale to effective point light intensity: pi * mIntensity * mRadius^2
-				// This preserves far-field illuminance when converted to small fixed-radius sphere in Remix
-				const float effectiveIntensity = M_PI * def.mIntensity * def.mRadius * def.mRadius * global_scalar;
-
-				light.Diffuse.r = def.mColor.x * effectiveIntensity;
-				light.Diffuse.g = def.mColor.y * effectiveIntensity;
-				light.Diffuse.b = def.mColor.z * effectiveIntensity;
-				light.Diffuse.a = def.mColor.w;  // Usually 1.0
-
-				// Set specular to match diffuse (common for dynamic lights)
-				light.Specular.r = light.Diffuse.r;
-				light.Specular.g = light.Diffuse.g;
-				light.Specular.b = light.Diffuse.b;
-				light.Specular.a = 1.0f;
-
-				// Ambient typically 0 for dynamic lights
-				light.Ambient.r = 0.0f;
-				light.Ambient.g = 0.0f;
-				light.Ambient.b = 0.0f;
-				light.Ambient.a = 1.0f;
-
-				// Attenuation for inverse-square falloff: simulates point light E = I / d^2
-				light.Attenuation0 = 0.0f;
-				light.Attenuation1 = 0.0f;
-				light.Attenuation2 = 1.0f;
-
-				// Large range to effectively make it infinite (end distance computed from attenuation)
-				light.Range = 100000.0f;
-
-				shared::globals::d3d_device->SetLight(lindex, &light);
-				shared::globals::d3d_device->LightEnable(lindex, TRUE);
-
-				lindex++;
-			}
-		}
-#endif
-	}
-
-	// Draw all active map lights
 	void remix_lights::draw_all_active_lights()
 	{
 		for (auto& l : m_active_lights)
@@ -530,8 +189,8 @@ namespace gta4
 
 	void remix_lights::on_client_frame()
 	{
-		static auto rml = remix_lights::get();
-		static auto im = imgui::get();
+		const auto rml = remix_lights::get();
+		const auto gl = game_lights::get();
 
 		// check if paused
 		rml->m_is_paused = *game::CMenuManager__m_MenuActive;
@@ -539,51 +198,19 @@ namespace gta4
 		if (!rml->m_is_paused)
 		{
 			rml->m_updateframe++;
-			rml->iterate_all_game_lights();
+			gl->iterate_all_game_lights();
 		}
 
 		rml->draw_all_active_lights();
-
-		if (im->m_dbg_visualize_api_lights)
-		{
-			Vector player_pos;
-			player_pos = game::FindPlayerCentreOfWorld(&player_pos);
-
-			game::CLightSource* list = game::get_renderLights();
-			const auto count = game::get_renderLightsCount();
-
-			for (auto i = 0u; count; i++)
-			{
-				auto& def = list[i];
-				if (def.mDirection.LengthSqr() == 0.0f) {
-					break;
-				}
-
-				const Vector circle_pos = def.mPosition;
-
-				if (fabs(circle_pos.DistTo(player_pos)) > 20.0f) {
-					continue;
-				}
-
-				const float radius = def.mRadius * (comp_settings::get()->translate_game_light_radius_scalar.get_as<float>() * 0.01f);
-				auto& remixapi = shared::common::remix_api::get();
-
-				remixapi.add_debug_circle(circle_pos, Vector(0.0f, 0.0f, 1.0f), radius, radius * 0.5f, def.mColor, false);
-				remixapi.add_debug_circle_based_on_previous(circle_pos, Vector(0, 0, 90), Vector(1.0f, 1.0f, 1.0f));
-
-				//remixapi.add_debug_circle_based_on_previous(circle_pos, Vector(0, 90, 0), Vector(1.0f, 1.0f, 1.0f));
-				//remixapi.add_debug_circle_based_on_previous(circle_pos, Vector(90, 0, 90), Vector(1.0f, 1.0f, 1.0f));
-			}
-		}
+		gl->draw_debug();
 	}
 
-	// called before map_settings
-	void remix_lights::on_map_load()
+	// not in use
+	void remix_lights::reset()
 	{
 		// reset spawn tracker
 		m_active_light_spawn_tracker = 0u;
 	}
-
 
 	void on_render_light_list_hk()
 	{

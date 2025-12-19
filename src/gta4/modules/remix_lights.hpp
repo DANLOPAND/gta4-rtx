@@ -20,7 +20,7 @@ namespace gta4
 		}
 
 		static void on_client_frame();
-		static void on_map_load();
+		static void reset();
 
 	public:
 		// -----
@@ -66,20 +66,26 @@ namespace gta4
 
 		void destroy_all_lights();
 		void destroy_and_clear_all_active_lights();
-		void iterate_all_game_lights();
 		void draw_all_active_lights();
 
-		size_t get_active_light_count() { return m_active_lights.size(); }
-		//remix_light_def* get_first_active_light() { return !m_active_lights.empty() ? &m_active_lights.front() : nullptr; }
-
-		std::unordered_map<std::uint64_t, remix_light_def>* get_active_lights() {
-			return &m_active_lights;
+		size_t get_active_light_count() const {
+			return m_active_lights.size();
 		}
 
-		static void clear_light_cache() { m_active_lights.clear(); }
+		std::unordered_map<std::uint64_t, remix_light_def>& get_active_lights() {
+			return m_active_lights;
+		}
 
-		remix_distant_light_def* get_distant_light() {
-			return &m_distant_light;
+		static void clear_light_cache() {
+			m_active_lights.clear();
+		}
+
+		remix_distant_light_def& get_distant_light() {
+			return m_distant_light;
+		}
+
+		std::uint32_t get_updateframe() const {
+			return m_updateframe;
 		}
 
 	private:

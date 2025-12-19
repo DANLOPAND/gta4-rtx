@@ -18,6 +18,9 @@ namespace gta4
 			return false;
 		}
 
+		void	draw_debug();
+		void	iterate_all_game_lights();
+
 	private:
 		bool m_initialized = false;
 	};

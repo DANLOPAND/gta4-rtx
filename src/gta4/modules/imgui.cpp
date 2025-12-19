@@ -607,6 +607,7 @@ namespace gta4
 		{
 			ImGui::Spacing(0, TREENODE_SPACING_INSIDE);
 			ImGui::Checkbox("Visualize Api Lights 3D", &im->m_dbg_visualize_api_lights); TT("Visualize all spawned api lights");
+			ImGui::DragFloat("Vis. 3D Light Distance", &im->m_dbg_visualize_api_lights_3d_distance, 0.01f, 1.0f, 50.0f, "%.0f");
 			ImGui::Checkbox("Visualize Unstable Light Hashes", &im->m_dbg_visualize_api_light_unstable_hashes);
 			ImGui::Checkbox("Skip Ignore Light Hash Logic", &im->m_dbg_disable_ignore_light_hash_logic); TT("For performance impact testing");
 
@@ -3077,7 +3078,7 @@ namespace gta4
 
 				if (rml->get_active_light_count())
 				{
-					for (auto& l : *rml->get_active_lights())
+					for (auto& l : rml->get_active_lights())
 					{
 						if (fabs(cam_org.DistToSqr(l.second.m_def.mPosition) < draw_dist * draw_dist))
 						{
