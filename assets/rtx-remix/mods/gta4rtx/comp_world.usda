@@ -3,7 +3,8 @@
     subLayers = [
         @./comp_world_roads.usda@,
         @./comp_world_broken_decals.usda@,
-        @./comp_world_deleted_meshes.usda@
+        @./comp_world_deleted_meshes.usda@,
+        @./comp_world_mesh_fixes.usda@
     ]
     upAxis = "Z"
 )
@@ -660,6 +661,84 @@ over "RootNode"
                 custom float inputs:thin_wall_thickness = 2
             }
         }
+
+        over "mat_172B43773FD7BFAC"
+        {
+            over "Shader"
+            {
+                custom float inputs:metallic_constant = 0.955
+                custom float inputs:reflection_roughness_constant = 0.755
+            }
+        }
+
+        over "mat_CB576B21A23CDC25"
+        {
+            over "Shader"
+            {
+                custom float inputs:metallic_constant = 0.945
+                custom float inputs:reflection_roughness_constant = 0.75
+            }
+        }
+
+        over "mat_B529385D1C2C6275"
+        {
+            over "Shader"
+            {
+                custom float inputs:metallic_constant = 0.98999995
+                custom float inputs:reflection_roughness_constant = 0.465
+            }
+        }
+
+        over "mat_53A16E47AF564742"
+        {
+            over "Shader"
+            {
+                custom float inputs:reflection_roughness_constant = 0.79499996
+            }
+        }
+
+        over "mat_69BF50E179BCF47C"
+        {
+            over "Shader"
+            {
+                custom float inputs:metallic_constant = 0.565
+                custom float inputs:reflection_roughness_constant = 0.71999997
+            }
+        }
+
+        over "mat_98CE9B43DD3D2295"
+        {
+            over "Shader"
+            {
+                custom float inputs:metallic_constant = 0.77
+                custom float inputs:reflection_roughness_constant = 0.65999997
+            }
+        }
+
+        over "mat_6FB829F8D05C6B3D"
+        {
+            over "Shader"
+            {
+                custom float inputs:metallic_constant = 0.825
+                custom float inputs:reflection_roughness_constant = 0.52
+            }
+        }
+
+        over "mat_0C21441F28B38211"
+        {
+            over "Shader"
+            {
+                custom float inputs:reflection_roughness_constant = 1
+            }
+        }
+
+        over "mat_11A808696D2F8760"
+        {
+            over "Shader"
+            {
+                custom float inputs:reflection_roughness_constant = 0.51
+            }
+        }
     }
 
     over "meshes"
@@ -805,6 +884,26 @@ over "RootNode"
             references = None
         )
         {
+        }
+
+        over "mesh_11728CD743410F3A"
+        {
+            over "ref_36da67f6c52c474ca42f2282e899299f"
+            {
+                over "XForms"
+                {
+                    over "World"
+                    {
+                        over "mesh_001"
+                        {
+                            over "mesh_007"
+                            {
+                                uniform bool doubleSided = 0
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

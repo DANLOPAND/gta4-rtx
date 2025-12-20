@@ -132,6 +132,38 @@ over "RootNode"
                 custom bool inputs:thin_walled = 1
             }
         }
+
+        over "mat_6BC36A8D79F2BD63"
+        {
+            over "Shader"
+            {
+                custom float inputs:reflection_roughness_constant = 0.91999996
+            }
+        }
+
+        over "mat_1B52D6F9E01CB231"
+        {
+            over "Shader"
+            {
+                custom float inputs:reflection_roughness_constant = 1
+            }
+        }
+
+        over "mat_4D6EF16A44611F6E"
+        {
+            over "Shader"
+            {
+                custom float inputs:reflection_roughness_constant = 1
+            }
+        }
+
+        over "mat_2919B79864F6CE90"
+        {
+            over "Shader"
+            {
+                custom float inputs:reflection_roughness_constant = 1
+            }
+        }
     }
 
     over "meshes"
