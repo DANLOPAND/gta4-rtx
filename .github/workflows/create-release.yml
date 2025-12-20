@@ -180,10 +180,12 @@ jobs:
         shell: pwsh
         run: |
           $version = "${{ steps.version.outputs.version }}"
-          $tag = "${{ steps.version.outputs.tag }}"
           $zipName = "${{ steps.version.outputs.zip_name }}"
-          $modZipLink = "https://github.com/${{ github.repository }}/releases/download/$tag/$zipName"
-          $installerLink = "https://github.com/${{ github.repository }}/releases/download/$tag/GTAIV-Remix-CompMod-Installer.exe"
+          # Note: We'll use the final tag from check_tag step, but we need to prepare the body before checking tags
+          # So we'll use the base tag here and update links later if needed
+          $baseTag = "${{ steps.version.outputs.tag }}"
+          $modZipLink = "https://github.com/${{ github.repository }}/releases/download/$baseTag/$zipName"
+          $installerLink = "https://github.com/${{ github.repository }}/releases/download/$baseTag/GTAIV-Remix-CompMod-Installer.exe"
 
           $readmePath = ".github/README_INSTALL.md"
           if (-not (Test-Path $readmePath)) {
@@ -193,33 +195,40 @@ jobs:
 
           $readme = Get-Content -Raw -Path $readmePath
 
-          # Replace existing download link line (or any placeholder) with the computed zip link
-          $readme = $readme -replace 'Download\s+\[`?GTAIV-Remix-CompatibilityMod-[^\]]*\.zip`\?\]\([^)]+\)', "Download [`$zipName`]($modZipLink)"
-          $readme = $readme -replace '<LINK_TO_MOD_ZIP>', "[$zipName]($modZipLink)"
-          # Replace installer link (or placeholder)
-          $readme = $readme -replace 'Download\s+\[`?GTAIV-Remix-CompMod-Installer\.exe`\?\]\([^)]+\)', "Download [`GTAIV-Remix-CompMod-Installer.exe`]($installerLink)"
-          $readme = $readme -replace '<LINK_TO_INSTALLER>', "[GTAIV-Remix-CompMod-Installer.exe]($installerLink)"
+          # Replace placeholders with simple markdown links [Name](url) - no backticks
+          $zipLinkReplacement = '[' + $zipName + '](' + $modZipLink + ')'
+          $readme = $readme -replace '<LINK_TO_MOD_ZIP>', $zipLinkReplacement
+          
+          # Replace installer link placeholder
+          $installerLinkReplacement = '[GTAIV-Remix-CompMod-Installer.exe](' + $installerLink + ')'
+          $readme = $readme -replace '<LINK_TO_INSTALLER>', $installerLinkReplacement
 
           $changelog = Get-Content -Raw -Path "changelog.txt"
 
-          $body = "$changelog`n`n---`n`n$readme"
+          # Write body to file to avoid PowerShell parsing backticks when passing between steps
+          $bodyFile = "release_body.txt"
+          $changelog | Out-File -FilePath $bodyFile -Encoding utf8 -NoNewline
+          "`n`n---`n`n" | Out-File -FilePath $bodyFile -Append -Encoding utf8 -NoNewline
+          $readme | Out-File -FilePath $bodyFile -Append -Encoding utf8 -NoNewline
+          
+          Write-Host "Release body written to $bodyFile"
 
-          echo "body<<EOF" >> $env:GITHUB_OUTPUT
-          echo "$body" >> $env:GITHUB_OUTPUT
-          echo "EOF" >> $env:GITHUB_OUTPUT
-
-      - name: Check if tag exists
+      - name: Check if tag exists and generate unique tag
         id: check_tag
         shell: pwsh
         run: |
-          $tag = "${{ steps.version.outputs.tag }}"
+          $baseTag = "${{ steps.version.outputs.tag }}"
+          $tag = $baseTag
           $tagExists = $false
+          $suffix = 1
           
+          # Check if base tag exists
           try {
             $ErrorActionPreference = "Stop"
-            $output = git rev-parse --verify "refs/tags/$tag" 2>&1
+            $output = git rev-parse --verify "refs/tags/$baseTag" 2>&1
             if ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrWhiteSpace($output)) {
               $tagExists = $true
+              Write-Host "Tag $baseTag already exists, will append suffix"
             }
           } catch {
             $tagExists = $false
@@ -227,24 +236,41 @@ jobs:
             $ErrorActionPreference = "Continue"
           }
           
+          # If tag exists, find a unique suffix
           if ($tagExists) {
-            Write-Host "Tag $tag already exists"
-            echo "exists=true" >> $env:GITHUB_OUTPUT
+            do {
+              $tag = "$baseTag-$suffix"
+              $ErrorActionPreference = "SilentlyContinue"
+              $output = git rev-parse --verify "refs/tags/$tag" 2>&1
+              $currentTagExists = ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrWhiteSpace($output))
+              
+              if ($currentTagExists) {
+                $suffix++
+                Write-Host "Tag $tag also exists, trying next suffix..."
+              }
+            } while ($currentTagExists)
+            
+            Write-Host "Will create tag: $tag (original tag $baseTag already exists)"
           } else {
             Write-Host "Tag $tag does not exist, will create it"
-            echo "exists=false" >> $env:GITHUB_OUTPUT
           }
+          
+          echo "tag=$tag" >> $env:GITHUB_OUTPUT
+          echo "exists=$tagExists" >> $env:GITHUB_OUTPUT
           
           # Always exit successfully
           exit 0
 
       - name: Create Git tag
-        if: steps.version.outputs.tag != '' && steps.check_tag.outputs.exists == 'false'
+        if: steps.check_tag.outputs.tag != ''
         shell: pwsh
         run: |
+          $tag = "${{ steps.check_tag.outputs.tag }}"
+          $version = "${{ steps.version.outputs.version }}"
+          
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -a "${{ steps.version.outputs.tag }}" -m "Release ${{ steps.version.outputs.version }}"
+          git tag -a "$tag" -m "Release $version"
           
           # Configure git credential helper to use the token from environment variable
           # Using $env:GITHUB_TOKEN directly to avoid storing in a variable
@@ -258,7 +284,9 @@ jobs:
           git remote set-url origin "https://github.com/$repo.git"
           
           # Push the tag
-          git push origin "${{ steps.version.outputs.tag }}"
+          git push origin "$tag"
+          
+          Write-Host "Created and pushed tag: $tag"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -294,12 +322,36 @@ jobs:
           
           echo "installer_path=$foundPath" >> $env:GITHUB_OUTPUT
 
+      - name: Update release body with final tag
+        id: final_release_body
+        shell: pwsh
+        run: |
+          $finalTag = "${{ steps.check_tag.outputs.tag }}"
+          $baseTag = "${{ steps.version.outputs.tag }}"
+          $bodyFile = "release_body.txt"
+          $finalBodyFile = "release_body_final.txt"
+          
+          # Read body from file (written in previous step) to avoid PowerShell parsing backticks
+          $body = Get-Content -Raw -Path $bodyFile
+          
+          # If tag was modified (suffix added), update the download links
+          if ($finalTag -ne $baseTag) {
+            Write-Host "Tag was modified from $baseTag to $finalTag, updating download links"
+            # Replace old tag in download links with new tag
+            $body = $body -replace [regex]::Escape("releases/download/$baseTag/"), "releases/download/$finalTag/"
+          }
+          
+          # Write final body to file
+          $body | Out-File -FilePath $finalBodyFile -Encoding utf8 -NoNewline
+          
+          Write-Host "Final release body written to $finalBodyFile"
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ steps.version.outputs.tag }}
+          tag_name: ${{ steps.check_tag.outputs.tag }}
           name: Release ${{ steps.version.outputs.version }}
-          body: ${{ steps.release_body.outputs.body }}
+          body_path: release_body_final.txt
           files: |
             ${{ steps.version.outputs.zip_name }}
             ${{ steps.find_installer.outputs.installer_path }}
@@ -317,5 +369,11 @@ jobs:
           }
           if (Test-Path "changelog.txt") {
             Remove-Item -Path "changelog.txt" -Force
+          }
+          if (Test-Path "release_body.txt") {
+            Remove-Item -Path "release_body.txt" -Force
+          }
+          if (Test-Path "release_body_final.txt") {
+            Remove-Item -Path "release_body_final.txt" -Force
           }
 

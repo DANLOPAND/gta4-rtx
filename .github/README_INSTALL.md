@@ -1,8 +1,8 @@
 # Installation:
 
 ### Install using the installer:
-1. Download `<LINK_TO_MOD_ZIP>`
-2. Download `<LINK_TO_INSTALLER>`
+1. Download <LINK_TO_MOD_ZIP>
+2. Download <LINK_TO_INSTALLER>
 
 3. Place both files in the same folder (_no need to copy them to your game folder_) and run `GTAIV-Remix-CompMod-Installer.exe` 
 4. Use the File Dialog to select your `GTAIV.exe` which is located in your GTAIV install folder
@@ -13,7 +13,7 @@
 <br>
 
 ### OR Install manually (no need to do this if you've used the installer):
-1. Download `<LINK_TO_MOD_ZIP>`
+1. Download <LINK_TO_MOD_ZIP>
 
 3. Open the zip and extract all files contained inside the `GTAIV-Remix-CompatibilityMod` folder into your GTAIV directory (next to the `GTAIV.exe`). Overwrite all when prompted.
 4. If you want to use FusionFix or have it installed already, it's definitely recommended to install my custom fork of [FusionFix](https://github.com/xoxor4d/GTAIV.EFLC.FusionFix.RTXRemix/releases/tag/4) because the original, unmodified version has a few incompatibilities with RTX Remix.  
@@ -77,6 +77,6 @@ You can find the files inside `_installer_options/FusionFix_RTXRemixFork`. Extra
 
   ## Notes
   - The release includes a custom remix runtime build that contains a few necessary changes.
-     Current active branch is this one: https://github.com/xoxor4d/dxvk-remix/tree/game/gta4_rebase5
+     Current active branch is this one: https://github.com/xoxor4d/dxvk-remix/tree/game/gta4_rebase6
 
 
