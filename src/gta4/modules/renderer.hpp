@@ -632,12 +632,12 @@ namespace gta4
 
 		enum eWetnessFlags : uint8_t
 		{
-			WETNESS_FLAG_ENABLE_PUDDLES = 1 << 0,
+			WETNESS_FLAG_ENABLE_VARIATION = 1 << 0,
 			WETNESS_FLAG_ENABLE_RAINDROPS = 1 << 1,				// either expensive or normal raindrops
 			WETNESS_FLAG_USE_LOCAL_COORDINATES = 1 << 2,		// uses world position but transformed to object local space
 			WETNESS_FLAG_ENABLE_EXP_RAINDROPS = 1 << 3,			// either expensive or normal raindrops
-			WETNESS_FLAG_RAINDROPS_HALF_DENSITY = 1 << 4,
-			WETNESS_FLAG_TEMP_05 = 1 << 5,
+			WETNESS_FLAG_RAINDROPS_HALF_DENSITY = 1 << 4,		// raindrops with half density
+			WETNESS_FLAG_ENABLE_PUDDLE_LAYER = 1 << 5,			// adds a puddle layer to wet surfaces 
 			WETNESS_FLAG_TEMP_06 = 1 << 6,
 			WETNESS_FLAG_TEMP_07 = 1 << 7,
 			WETNESS_FLAG_NONE = 0u

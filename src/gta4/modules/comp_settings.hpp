@@ -913,9 +913,15 @@ namespace gta4
 				0.65f
 			};
 
-			variable timecycle_wetness_world_puddles_enable = {
-				"timecycle_wetness_world_puddles_enable",
-				("Enables Puddle logic on World Surfaces."),
+			variable timecycle_wetness_world_variation_enable = {
+				"timecycle_wetness_world_variation_enable",
+				("Enables some roughness variation on wet world surfaces."),
+				true
+			};
+
+			variable timecycle_wetness_world_puddle_layer_enable = {
+				"timecycle_wetness_world_puddle_layer_enable",
+				("Enables an additional puddle layer on wet world surfaces."),
 				true
 			};
 

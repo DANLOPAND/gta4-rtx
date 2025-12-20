@@ -2301,8 +2301,13 @@ namespace gta4
 									}
 								}
 
-								if (gs->timecycle_wetness_world_puddles_enable.get_as<bool>()) {
-									rain_flags |= WETNESS_FLAG_ENABLE_PUDDLES;
+								if (gs->timecycle_wetness_world_variation_enable.get_as<bool>()) {
+									rain_flags |= WETNESS_FLAG_ENABLE_VARIATION;
+								}
+
+
+								if (gs->timecycle_wetness_world_puddle_layer_enable.get_as<bool>()) {
+									rain_flags |= WETNESS_FLAG_ENABLE_PUDDLE_LAYER;
 								}
 							}
 							

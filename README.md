@@ -43,13 +43,13 @@ It does __NOT__ come with enhanced assets. That means no PBR materials nor highe
 
 <br>
 
-There are obvious drawbacks, and things that will just not work with such a new title, so don't expect this to be perfect.  
+There are obvious drawbacks, and things that will not work with such a new title, don't expect this to be perfect.  
 RTX Remix has a certain overhead because of how it works and intercepts the game's draw calls.  
 
 You'll experience CPU bottlenecks because of the amount of detailed meshes the game is rendering,  
 which means that the performance you'll see in certain places is not entirely due to pathtracing.  
 
-The mod comes with a custom [Remix Runtime](https://github.com/xoxor4d/dxvk-remix/tree/game/gta4_rebase5) required for a few game specific features   
+The mod comes with a custom [Remix Runtime](https://github.com/xoxor4d/dxvk-remix/tree/game/gta4_rebase6) required for a few game specific features   
 and with [Ultimate ASI Loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases/tag/v9.0.0) to load the Compatibility Mod itself. 
 
 </div>
@@ -64,7 +64,9 @@ and with [Ultimate ASI Loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader
 - Ability to create overrides for translated game lights (change position, color, intensity etc.)
 - Vehicles now feature two headlights and two rear lights instead of a single, centered ones
 - Dynamic emissive surfaces work (vehicle lights, building-windows, shops etc.)
-- Dynamic wetness that works similar to the original game (only outdoors and with falloff on angled surfaces + raindrops)
+- Dynamic wetness that works similar to the original game  
+  (only outdoors and with falloff on angled surfaces + raindroplets/impacts)
+- Raindroplets on vehicles and character clothing
 - Working vehicle dirt and livery
 - Modification of remix runtime variables based on current timecycle settings
 - Mobilephone works (but it is 3D and currently scales with the camera fov)
@@ -116,12 +118,12 @@ and with [Ultimate ASI Loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader
 <br>
 
 > [!TIP]  
-> **More in-depth guides, information about usage and remix runtime changes can be found in the [[Wiki]](https://github.com/xoxor4d/gta4-rtx/wiki)**
+> **Troubleshooting / in-depth guides, usage information and remix runtime changes can be found in the [[Wiki]](https://github.com/xoxor4d/gta4-rtx/wiki)**
 
 <br>
 
 ## Compiling
-- Clone the repository `git clone --recurse-submodules <git URL>`
+- Clone the repository `git clone --recurse-submodules https://github.com/xoxor4d/gta4-rtx.git`
 - Optional: Setup a global path variable named `GTA4_ROOT` that points to your game folder (where GTAIV.exe is located)
 - Run `generate-buildfiles_vs22.bat` to generate VS project files
 - Compile the mod

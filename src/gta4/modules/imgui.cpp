@@ -1546,7 +1546,8 @@ namespace gta4
 				compsettings_float_widget("Min Surface Z-Normal", gs->timecycle_wetness_world_z_normal, 0.0f, 1.0f, 0.005f);
 				compsettings_float_widget("Blending Strength", gs->timecycle_wetness_world_blending, 0.0f, 1.0f, 0.005f);
 
-				compsettings_bool_widget("Enable Puddles", gs->timecycle_wetness_world_puddles_enable);
+				compsettings_bool_widget("Enable Wetness Variation", gs->timecycle_wetness_world_variation_enable);
+				compsettings_bool_widget("Enable Puddle Layer", gs->timecycle_wetness_world_puddle_layer_enable);
 				compsettings_bool_widget("Enable World Raindrops", gs->timecycle_wetness_world_raindrop_enable);
 				compsettings_float_widget("World Raindrop Scale", gs->timecycle_wetness_world_raindrop_scalar, 0.0f, 10.0f, 0.005f);
 				ImGui::PopID();
@@ -1643,7 +1644,8 @@ namespace gta4
 			ImGui::TextUnformatted("::  World");
 			ImGui::PopFont();
 			ImGui::PushID("world");
-			compsettings_bool_widget("Enable Puddles", gs->timecycle_wetness_world_puddles_enable);
+			compsettings_bool_widget("Enable Wetness Variation", gs->timecycle_wetness_world_variation_enable);
+			compsettings_bool_widget("Enable Puddle Layer", gs->timecycle_wetness_world_puddle_layer_enable);
 			compsettings_bool_widget("Enable World Raindrops", gs->timecycle_wetness_world_raindrop_enable);
 			compsettings_float_widget("World Raindrop Scale", gs->timecycle_wetness_world_raindrop_scalar, 0.0f, 10.0f, 0.005f);
 			ImGui::PopID();
@@ -1719,7 +1721,7 @@ namespace gta4
 		// gs
 		{
 			static float cont_quick_utilities_height = 0.0f;
-			cont_quick_utilities_height = ImGui::Widget_ContainerWithCollapsingTitle("Game Settings", cont_quick_utilities_height, wip_gs_container,
+			cont_quick_utilities_height = ImGui::Widget_ContainerWithCollapsingTitle("Comp Settings", cont_quick_utilities_height, wip_gs_container,
 				true, ICON_FA_CAMERA, &ImGuiCol_ContainerBackground, &ImGuiCol_ContainerBorder);
 		}
 	}
