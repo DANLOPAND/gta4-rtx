@@ -21,62 +21,25 @@ You can find the files inside `_installer_options/FusionFix_RTXRemixFork`. Extra
 
 <br>
 
-## Usage and general Info
-- Run the game like normal or use the provided batch files (mentioned further down) if you notice heavy stuttering.
+# Usage and general Info
+- Run the game like normal or use the provided batch files (mentioned in the Wiki further down) if you notice heavy stuttering.
 
 - It's recommended to adjust distance and quality sliders in the GTA4 **graphic options** (higher values => earlier CPU bottleneck).
-   Try 30 for view distance and 50 for quality and adjust from there. The first launch might cause problems, simply re-try a second time.
+   Try 30 for view distance and 40 for quality and adjust from there. The first launch might cause problems, simply re-try a second time.
 
   > Press Alt + X to open the Remix menu
   > Press F4 to open the Compatibility Mod menu
 
 <br>
 
-## Troubleshooting / Tips
-
-- **Running Windowed**
-  Open the `commandline.txt` in the main game folder and add `-windowed`
-  
-  **If using FF:** Adjust the Borderless setting in the game options to your liking  
-  (`plugins/GTAIV.EFLC.FusionFix.cfg` -> `BorderlessWindowed = 0/1`)
+> [!Important]
+> **Troubleshooting / Guides** -- Look into the **Wiki** if you are having issues:  
+> https://github.com/xoxor4d/gta4-rtx/wiki/Troubleshooting---Guides
 
 <br>
 
-- **Forcing a Resolution (if something goes wrong with resolution selection)**
-  Either go to your GTAIV folder and open `rtx_comp/game_settings.toml` (after running the game once)
-  > - Set `manual_game_resolution_enabled` to `true`
-  > - Adjust the resolution using `manual_game_resolution = [ .. ]`
-  
-  OR Open the `commandline.txt` in the main game folder and add `-width 1920` and `-height 1080` (adjust for your resolution)
-
-<br>
-
-- **Crashing on startup or similar**
-  Please try the following before creating an issue on GitHub:
-  1) Make sure that you try the mod on a fresh, clean install - do not install FusionFix before installing the mod
-  2) Try to install the game in a path that is not inside `Program Files`
-  3) Make sure that you have no custom launch arguments for GTAIV defined in steam
-
-<br>
-
-## Issues / Performance / Tweaks
-- **Stuttering**
-  If you notice heavy stuttering, launch the game with the included `_LaunchWithProcessorAffinity_2Cores_GTA4.bat`
-  Doing this will assign 2 cores to GTA4 and the rest to Remix. 
-  If you want a 50/50 split, use `_LaunchWithProcessorAffinity_Half_GTA4__Half_Remix.bat`
-
-- **Lower Pathtracing settings**
-  Open the Remix menu by pressing `Alt + X` and use `Graphics Settings Menu` at the top. 
-  Switch to the `Graphics` tab and adjust the `Graphics Preset` dropdown to adjust various quality settings
-
-- **Alpha Settings for Trees**
-  Open the CompMod menu by pressing `F4` and open the `Rendering Related Settings` container under the `Game Settings` tab. 
-  Increasing the `Tree Alpha Cutout Value` value will improve performance but will make leafs look more blocky.
-  
-<br>
-
-  ## Notes
-  - The release includes a custom remix runtime build that contains a few necessary changes.
-     Current active branch is this one: https://github.com/xoxor4d/dxvk-remix/tree/game/gta4_rebase6
+> [!NOTE]  
+> The release includes a custom remix runtime build that contains a few necessary changes. Info about the changes can be found here:  
+> https://github.com/xoxor4d/gta4-rtx/wiki#remix-runtime-changes-and-differences-in-usage
 
 
