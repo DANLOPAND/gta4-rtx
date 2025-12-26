@@ -336,15 +336,30 @@ namespace gta4
 		// do not cull if near enough
 		if (const auto vpscene = game::pViewports; vpscene->sceneviewport)
 		{
+			const auto n = natives::get();
+
 			if (const float& anti_cull_dist = comp_settings::get()->nocull_dist_lights._float(); 
 				anti_cull_dist > 0.0f)
 			{
 				const Vector cam_org = &vpscene->sceneviewport->cameraInv.m[3][0];
 				const float dist_sqr = fabs(cam_org.DistToSqr(Vector(orgX, orgY, orgZ)));
 
+				bool use_original_code = false;
+
 				// do not cull if near
-				if (dist_sqr < anti_cull_dist * anti_cull_dist) {
-					return 2;
+				if (dist_sqr < anti_cull_dist * anti_cull_dist) 
+				{
+					// fix issue where cherise mission never ends because char never despawns when anticull dist is too large
+					if (fabs(cam_org.DistToSqr(Vector(-328.75f, 1610.53f, 20.43f))) < 4.0f)
+					{
+						if (n->HaveAnimsLoaded((char*)"misscherise")) {
+							use_original_code = true;
+						}
+					}
+					
+					if (!use_original_code) {
+						return 2;
+					}
 				}
 			}
 		}
@@ -481,7 +496,7 @@ namespace gta4
 		// extended anti culling for objects defined via map_settings - helpful for multi-story buildings where each story is a single obj
 		shared::utils::hook(game::retn_addr__extended_anti_culling_check_stub - 5u, extended_anticull_stub, HOOK_JUMP).install()->quick(); // 0xAE8735
 
-		// light culling check 0xABD093 - detour frustum check function
+		// light culling check 0xABD093 - detour frustum check function - can lead to issues when a script waits for certain objects to culled?
 		shared::utils::hook::detour(game::hk_addr__frustum_check, &frustum_planes_check_hk, nullptr); // 0x431E40
 
 		// reduce interior culling
