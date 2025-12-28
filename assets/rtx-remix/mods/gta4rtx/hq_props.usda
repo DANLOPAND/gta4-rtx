@@ -1,6 +1,7 @@
 #usda 1.0
 (
     subLayers = [
+        @./hq_props_broker_safehouse.usda@,
         @./hq_props_tlad_safehouse.usda@,
         @./hq_props_tbogt_club.usda@
     ]

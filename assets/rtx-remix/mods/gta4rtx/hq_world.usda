@@ -1,5 +1,8 @@
 #usda 1.0
 (
+    subLayers = [
+        @./hq_world_broker_safehouse.usda@
+    ]
     upAxis = "Z"
 )
 

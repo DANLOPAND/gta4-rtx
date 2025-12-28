@@ -164,10 +164,351 @@ over "RootNode"
                 custom float inputs:reflection_roughness_constant = 1
             }
         }
+
+        over "mat_3CD5EB8D8A4B84BA"
+        {
+            over "Shader"
+            {
+                custom float inputs:reflection_roughness_constant = 0.275
+            }
+        }
+
+        over "mat_38C96260D4802A43"
+        {
+            over "Shader"
+            {
+                custom bool inputs:blend_enabled = 0
+                custom int inputs:blend_type = 3
+                custom asset inputs:normalmap_texture = @./assets/prop_textures/lamps/tlad_safehouse_hanging_fabric/Fabric_Jute_001_normal_OTH_Normal.n.rtex.dds@
+                custom float inputs:reflection_roughness_constant = 0.815
+                custom float inputs:subsurface_measurement_distance = 2.56
+                custom color3f inputs:subsurface_single_scattering_albedo = (0.9266409, 0.5562994, 0.26475453)
+                custom color3f inputs:subsurface_transmittance_color = (0.8687259, 0.80487746, 0.7312056)
+                custom float inputs:subsurface_volumetric_anisotropy = 0.80189997
+                custom bool inputs:use_legacy_alpha_state = 0
+            }
+        }
+
+        over "mat_032BA462D9087885"
+        {
+            over "Shader"
+            {
+                custom float inputs:metallic_constant = 0
+                custom float inputs:reflection_roughness_constant = 0.13499999
+            }
+        }
+
+        over "mat_420A183EDE3626DA"
+        {
+            over "Shader"
+            {
+                custom float inputs:metallic_constant = 0
+                custom float inputs:reflection_roughness_constant = 0
+            }
+        }
+
+        over "mat_4A4D6AA863871AA5"
+        {
+            over "Shader"
+            {
+                custom float inputs:metallic_constant = 0.905
+                custom float inputs:reflection_roughness_constant = 0.17999999
+            }
+        }
+
+        over "mat_9B91C9054587E587"
+        {
+            over "Shader"
+            {
+                custom float inputs:reflection_roughness_constant = 0.895
+            }
+        }
+
+        over "mat_C9499DE4EF0C5B62"
+        {
+            over "Shader"
+            {
+                custom bool inputs:blend_enabled = 0
+                custom int inputs:blend_type = 0
+                custom asset inputs:normalmap_texture = @./assets/prop_textures/lamps/tlad_safehouse_hanging_fabric/Fabric_Jute_001_normal_OTH_Normal.n.rtex.dds@
+                custom float inputs:reflection_roughness_constant = 0.83
+                custom float inputs:subsurface_measurement_distance = 9.92
+                custom color3f inputs:subsurface_single_scattering_albedo = (0.9227799, 0.88967735, 0.84795994)
+                custom color3f inputs:subsurface_transmittance_color = (0.8880309, 0.8136189, 0.6240217)
+                custom float inputs:subsurface_volumetric_anisotropy = 0.6534
+                custom bool inputs:use_legacy_alpha_state = 0
+            }
+        }
+
+        over "mat_959F457B4FA9E2FF"
+        {
+            over "Shader"
+            {
+                custom float inputs:metallic_constant = 0
+                custom float inputs:reflection_roughness_constant = 0.24
+            }
+        }
+
+        over "mat_F7C881A5B07C855B"
+        {
+            over "Shader"
+            {
+                custom float inputs:reflection_roughness_constant = 0.45999998
+            }
+        }
+
+        over "mat_A671F8B0EE715408"
+        {
+            over "Shader"
+            {
+                custom float inputs:reflection_roughness_constant = 0.815
+            }
+        }
+
+        over "mat_7286EF96C19A67B4"
+        {
+            over "Shader"
+            {
+                custom float inputs:reflection_roughness_constant = 0.96
+            }
+        }
+
+        over "mat_C3A319E543AE4531"
+        {
+            over "Shader"
+            {
+                custom float inputs:reflection_roughness_constant = 0.295
+            }
+        }
+
+        over "mat_EF21F56900F27A2B"
+        {
+            over "Shader"
+            {
+                custom float inputs:reflection_roughness_constant = 0.775
+            }
+        }
+
+        over "mat_D3285FB347C17160"
+        {
+            over "Shader"
+            {
+                custom float inputs:reflection_roughness_constant = 0.79999995
+            }
+        }
+
+        over "mat_9CC621E17C61CA0D"
+        {
+            over "Shader"
+            {
+                custom float inputs:reflection_roughness_constant = 0.72999996
+            }
+        }
+
+        over "mat_A483760EC82E1D65"
+        {
+            over "Shader"
+            {
+                custom float inputs:reflection_roughness_constant = 0.77
+                custom float inputs:subsurface_measurement_distance = 9.44
+                custom color3f inputs:subsurface_single_scattering_albedo = (0.9266409, 0.8933084, 0.8586634)
+                custom color3f inputs:subsurface_transmittance_color = (0.9189189, 0.9118229, 0.8195763)
+                custom float inputs:subsurface_volumetric_anisotropy = 0.5049
+            }
+        }
+
+        over "mat_8EBDAA321A9E2DD2" (
+            references = @./materials/AperturePBR_Translucent.usda@</Looks/mat_AperturePBR_Translucent>
+        )
+        {
+            over "Shader"
+            {
+                custom float inputs:ior_constant = 1.25
+                custom bool inputs:thin_walled = 0
+                custom color3f inputs:transmittance_color = (0.2535548, 0.53281856, 0.11520401)
+                custom float inputs:transmittance_measurement_distance = 0.2
+            }
+        }
+
+        over "mat_0BBE8161D42E1984"
+        {
+            over "Shader"
+            {
+                custom float inputs:reflection_roughness_constant = 0.655
+            }
+        }
+
+        over "mat_DF6FC9D4D00E8CB8"
+        {
+            over "Shader"
+            {
+                custom asset inputs:normalmap_texture = @@
+                custom float inputs:reflection_roughness_constant = 0.98999995
+            }
+        }
+
+        over "mat_340F980F210B6551"
+        {
+            over "Shader"
+            {
+                custom float inputs:metallic_constant = 0.715
+                custom float inputs:reflection_roughness_constant = 0.275
+            }
+        }
+
+        over "mat_A69044022A5AC269"
+        {
+            over "Shader"
+            {
+                custom float inputs:metallic_constant = 0.84999996
+                custom float inputs:reflection_roughness_constant = 0.45999998
+            }
+        }
+
+        over "mat_85D10BFB247689C0"
+        {
+            over "Shader"
+            {
+                custom float inputs:reflection_roughness_constant = 0.84
+            }
+        }
+
+        over "mat_19163B8EE70D5433"
+        {
+            over "Shader"
+            {
+                custom float inputs:reflection_roughness_constant = 0.90999997
+            }
+        }
+
+        over "mat_620797930AB0991A"
+        {
+            over "Shader"
+            {
+                custom float inputs:reflection_roughness_constant = 0.715
+            }
+        }
+
+        over "mat_A04252A441E6FFDD"
+        {
+            over "Shader"
+            {
+                custom float inputs:metallic_constant = 0.565
+                custom float inputs:reflection_roughness_constant = 0.615
+            }
+        }
+
+        over "mat_899F61499FBC6A92"
+        {
+            over "Shader"
+            {
+                custom float inputs:metallic_constant = 0
+                custom float inputs:reflection_roughness_constant = 0.77
+            }
+        }
+
+        over "mat_0B8FB174134E4758"
+        {
+            over "Shader"
+            {
+                custom float inputs:reflection_roughness_constant = 0.9
+            }
+        }
+
+        over "mat_2A33EA8573BFD6E6"
+        {
+            over "Shader"
+            {
+                custom float inputs:metallic_constant = 0.61
+                custom float inputs:reflection_roughness_constant = 0.255
+            }
+        }
+
+        over "mat_3D64173EF59B2CB8"
+        {
+            over "Shader"
+            {
+                custom float inputs:reflection_roughness_constant = 0.35
+            }
+        }
+
+        over "mat_52A57A12FA17B091"
+        {
+            over "Shader"
+            {
+                custom float inputs:reflection_roughness_constant = 0.755
+            }
+        }
+
+        over "mat_DD93A8EEF04F3C8A"
+        {
+            over "Shader"
+            {
+                custom float inputs:reflection_roughness_constant = 0.91999996
+            }
+        }
+
+        over "mat_08A6811DEFA12B42"
+        {
+            over "Shader"
+            {
+                custom float inputs:reflection_roughness_constant = 0.805
+            }
+        }
+
+        over "mat_DAE292C3956FDE56"
+        {
+            over "Shader"
+            {
+                custom float inputs:reflection_roughness_constant = 0.39
+            }
+        }
+
+        over "mat_8708BA1E0D0FDCF0"
+        {
+            over "Shader"
+            {
+                custom float inputs:metallic_constant = 0
+                custom float inputs:reflection_roughness_constant = 0.13499999
+            }
+        }
+
+        over "mat_16F8E24D8C5F3EDA"
+        {
+            over "Shader"
+            {
+                custom float inputs:reflection_roughness_constant = 0.475
+            }
+        }
+
+        over "mat_8E38AEE420318AC5"
+        {
+            over "Shader"
+            {
+                custom float inputs:reflection_roughness_constant = 0.96999997
+            }
+        }
     }
 
     over "meshes"
     {
+        over "mesh_BFF7EA6E60CBC789"
+        {
+            over "mesh"
+            {
+                custom uniform bool remix_category:decal_Static = 0
+                custom uniform bool remix_category:world_ui = 0
+            }
+        }
+
+        over "mesh_62606005DFA63185"
+        {
+            over "mesh"
+            {
+                custom uniform bool remix_category:decal_Static = 0
+                custom uniform bool remix_category:world_ui = 0
+            }
+        }
     }
 }
 

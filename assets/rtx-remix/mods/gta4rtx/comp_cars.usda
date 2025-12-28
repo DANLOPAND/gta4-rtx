@@ -36,7 +36,10 @@ over "RootNode"
         {
             over "Shader"
             {
-                custom float inputs:reflection_roughness_constant = 0.415
+                asset inputs:diffuse_texture = @./assets/vehicle/2C890F4B7E13EB61_util/2C890F4B7E13EB61_car_util_albedo.a.rtex.dds@
+                custom asset inputs:metallic_texture = @./assets/vehicle/2C890F4B7E13EB61_util/2C890F4B7E13EB61_car_util_metal.m.rtex.dds@
+                custom float inputs:reflection_roughness_constant = 0.405
+                custom asset inputs:reflectionroughness_texture = @./assets/vehicle/2C890F4B7E13EB61_util/2C890F4B7E13EB61_car_util_roughness.r.rtex.dds@
             }
         }
 
@@ -100,6 +103,27 @@ over "RootNode"
             over "Shader"
             {
                 custom bool inputs:use_legacy_alpha_state = 0
+            }
+        }
+
+        over "mat_000000005762D878"
+        {
+            over "Shader"
+            {
+                custom color3f inputs:emissive_color_constant = (1, 0, 0)
+                custom float inputs:emissive_intensity = 1
+                custom bool inputs:enable_emission = 0
+                custom float inputs:metallic_constant = 0
+                custom float inputs:reflection_roughness_constant = 0.5
+            }
+        }
+
+        over "mat_0F2B5F6FA3377C5C"
+        {
+            over "Shader"
+            {
+                custom float inputs:metallic_constant = 1
+                custom float inputs:reflection_roughness_constant = 0.105
             }
         }
     }

@@ -140,6 +140,7 @@ over "RootNode"
                                 float primvars:particle:collisionRestitution = 0
                                 float primvars:particle:collisionThickness = 0.001
                                 bool primvars:particle:enableCollisionDetection = 1
+                                bool primvars:particle:enableCollisionDetectionTLAS = 1
                                 bool primvars:particle:enableMotionTrail = 1
                                 float primvars:particle:gravityForce = -250
                                 bool primvars:particle:hideEmitter = 1
@@ -220,6 +221,7 @@ over "RootNode"
                                 float primvars:particle:collisionRestitution = 0
                                 float primvars:particle:collisionThickness = 0.001
                                 bool primvars:particle:enableCollisionDetection = 1
+                                bool primvars:particle:enableCollisionDetectionTLAS = 1
                                 bool primvars:particle:enableMotionTrail = 1
                                 float primvars:particle:gravityForce = -250
                                 bool primvars:particle:hideEmitter = 1
@@ -300,6 +302,7 @@ over "RootNode"
                                 float primvars:particle:collisionRestitution = 0
                                 float primvars:particle:collisionThickness = 0.001
                                 bool primvars:particle:enableCollisionDetection = 1
+                                bool primvars:particle:enableCollisionDetectionTLAS = 1
                                 bool primvars:particle:enableMotionTrail = 1
                                 float primvars:particle:gravityForce = -250
                                 bool primvars:particle:hideEmitter = 1
@@ -380,6 +383,7 @@ over "RootNode"
                                 float primvars:particle:collisionRestitution = 0
                                 float primvars:particle:collisionThickness = 0.001
                                 bool primvars:particle:enableCollisionDetection = 1
+                                bool primvars:particle:enableCollisionDetectionTLAS = 1
                                 bool primvars:particle:enableMotionTrail = 1
                                 float primvars:particle:gravityForce = -250
                                 bool primvars:particle:hideEmitter = 1
