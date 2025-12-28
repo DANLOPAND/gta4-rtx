@@ -593,7 +593,7 @@ namespace gta4
 		// imgui dev - ignore shaders
 		ctx.modifiers.do_not_render = debug_ignore_shader_logic(ctx.info.shader_name);
 
-#if DEBUG
+#if 0 // DEBUG
 		if (ctx.modifiers.do_not_render) 
 		{
 			int break_me = 1; // can be used to break on ignored shaders
@@ -1048,7 +1048,7 @@ namespace gta4
 						is_dirt = arg3 == 6 && arg1 == 1;
 					}
 
-#if DEBUG
+#if 0 //DEBUG
 					if (pidx == GTA_VEHICLE_PAINT1 || pidx == GTA_VEHICLE_PAINT2 || pidx == GTA_VEHICLE_PAINT3)
 					{
 						if (arg3 == 6 && arg1 == 0) 
@@ -2204,12 +2204,44 @@ namespace gta4
 				}
 			}
 
-			if ((gs->timecycle_wetness_enabled.get_as<bool>() && *game::pTimeCycleWetnessChange > 0.0f) || im->m_dbg_global_wetness_override)
+			if (im->m_dbg_toggle_ff) {
+				render_with_ff = false;
+			}
+
+			if (render_with_ff)
+			{
+				if (im->m_dbg_do_not_render_ff) {
+					ctx.modifiers.do_not_render = true;
+				}
+
+				ctx.save_vs(dev);
+				dev->SetVertexShader(nullptr);
+			}
+
+			if ((gs->timecycle_wetness_enabled.get_as<bool>() && *game::pTimeCycleWetnessChange > 0.0f) || im->m_dbg_global_wetness_override || im->m_dbg_visualize_stencil_state)
 			{
 				// check for stencil
 				DWORD stencil_ref = 0u, stencil_enabled = 0u;
 				dev->GetRenderState(D3DRS_STENCILREF, &stencil_ref);
 				dev->GetRenderState(D3DRS_STENCILENABLE, &stencil_enabled); 
+
+				if (im->m_dbg_visualize_stencil_state)
+				{
+					DWORD stencil_mask = 0u;
+					dev->GetRenderState(D3DRS_STENCILMASK, &stencil_mask);
+
+					imgui::visualized_stencil_state_s vis = {};
+					vis.pos.x = game::pCurrentWorldTransform->m[3][0];
+					vis.pos.y = game::pCurrentWorldTransform->m[3][1];
+					vis.pos.z = game::pCurrentWorldTransform->m[3][2];
+
+					vis.stencil_enable = stencil_enabled;
+					vis.stencil_ref = stencil_ref;
+					vis.stencil_mask = stencil_mask;
+					vis.shader_name = ctx.info.shader_name;
+
+					im->visualized_stencil_states.emplace_back(std::move(vis));
+				}
 
 				//DWORD stencil_mask = 0u, stencil_writemask = 0u;
 				//dev->GetRenderState(D3DRS_STENCILMASK, &stencil_mask);
@@ -2282,7 +2314,7 @@ namespace gta4
 
 							if (pidx == GTA_PED_REFLECT)
 							{
-								if (gs->timecycle_wetness_ped_raindrop_enable.get_as<bool>()) 
+								if (gs->timecycle_wetness_ped_raindrop_enable._bool())
 								{
 									if (should_apply_heavy_raindrops()) {
 										rain_flags |= renderer::WETNESS_FLAG_ENABLE_EXP_RAINDROPS | renderer::WETNESS_FLAG_USE_LOCAL_COORDINATES;
@@ -2291,7 +2323,7 @@ namespace gta4
 							}
 							else // world surfs
 							{
-								if (gs->timecycle_wetness_world_raindrop_enable.get_as<bool>()) 
+								if (gs->timecycle_wetness_world_raindrop_enable._bool())
 								{
 									if (should_apply_heavy_raindrops()) {
 										rain_flags |= WETNESS_FLAG_ENABLE_RAINDROPS;
@@ -2301,13 +2333,37 @@ namespace gta4
 									}
 								}
 
-								if (gs->timecycle_wetness_world_variation_enable.get_as<bool>()) {
+								if (gs->timecycle_wetness_world_variation_enable._bool()) {
 									rain_flags |= WETNESS_FLAG_ENABLE_VARIATION;
 								}
 
 
-								if (gs->timecycle_wetness_world_puddle_layer_enable.get_as<bool>()) {
+								if (gs->timecycle_wetness_world_puddle_layer_enable._bool()) {
 									rain_flags |= WETNESS_FLAG_ENABLE_PUDDLE_LAYER;
+								}
+
+								// only do occlusion tests on FF rendered surfs (mostly static)
+								if (gs->timecycle_wetness_world_occlusion_check_enable._bool() && render_with_ff) 
+								{
+									bool allow_occ_test = true;
+
+									if (!im->m_dbg_global_wetness_occl_allow_on_ignored)
+									{
+										if (   pidx == GTA_EMISSIVE || pidx == GTA_EMISSIVENIGHT || pidx == GTA_EMISSIVENIGHT_ALPHA 
+											|| pidx == GTA_EMISSIVESTRONG || pidx == GTA_EMISSIVESTRONG_ALPHA || pidx == GTA_EMISSIVE_ALPHA
+											|| pidx == GTA_HAIR_SORTED_ALPHA_EXPENSIVE || pidx == GTA_RADAR || pidx == GTA_EMISSIVENIGHT || pidx == GTA_EMISSIVENIGHT
+											|| pidx == GTA_TREES || pidx == GTA_WIRE
+											)
+										{
+											allow_occ_test = false;
+										}
+									}
+
+									if (allow_occ_test) 
+									{
+										rain_flags |= WETNESS_FLAG_ENABLE_OCCLUSION_TEST | 
+											(gs->timecycle_wetness_world_occlusion_smoothing_enable._bool() ? WETNESS_FLAG_ENABLE_OCCLUSION_SMOOTHING : WETNESS_FLAG_NONE);
+									}
 								}
 							}
 							
@@ -2325,19 +2381,7 @@ namespace gta4
 				}
 			}
 
-			if (im->m_dbg_toggle_ff) {
-				render_with_ff = false;
-			}
-
-			if (render_with_ff)
-			{
-				if (im->m_dbg_do_not_render_ff) {
-					ctx.modifiers.do_not_render = true;
-				}
-
-				ctx.save_vs(dev);
-				dev->SetVertexShader(nullptr);
-			}
+			
 
 			if (im->m_dbg_only_render_static && !g_is_rendering_static) 
 			{

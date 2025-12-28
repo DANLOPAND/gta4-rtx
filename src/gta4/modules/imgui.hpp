@@ -102,6 +102,7 @@ namespace gta4
 
 		bool m_dbg_global_wetness_override = false;
 		float m_dbg_global_wetness = 0.0f;
+		bool m_dbg_global_wetness_occl_allow_on_ignored = false;
 
 		bool m_dbg_custom_veh_headlight_enabled = false;
 		Vector m_dbg_custom_veh_headlight_color = { 1.0f, 0.0f, 0.0f };
@@ -117,7 +118,7 @@ namespace gta4
 		bool m_dbg_disable_ignore_light_hash_logic = false; // disables the map_settings logic that ignores light translation based on a list of hashes
 		float m_dbg_visualize_api_light_hashes_distance = 8.0f;
 
-		bool m_dbg_visualize_decal_renderstates = false;
+		// --
 
 		struct visualized_decal_rs_s
 		{
@@ -131,6 +132,22 @@ namespace gta4
 			std::string_view tss_alphaarg2;
 		};
 		std::vector<visualized_decal_rs_s> visualized_decal_renderstates;
+		bool m_dbg_visualize_decal_renderstates = false;
+
+		// --
+
+		
+		struct visualized_stencil_state_s
+		{
+			Vector pos;
+			bool stencil_enable = false;
+			DWORD stencil_ref = 0u;
+			DWORD stencil_mask = 0u;
+			std::string_view shader_name;
+		};
+		std::vector<visualized_stencil_state_s> visualized_stencil_states;
+		bool m_dbg_visualize_stencil_state = false;
+		float m_dbg_visualize_distance = 20.0f;
 
 		// --
 

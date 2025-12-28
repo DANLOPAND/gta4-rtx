@@ -245,6 +245,8 @@ namespace gta4
 				ASSIGN(timecycle_wetness_world_puddle_layer_enable);
 				ASSIGN(timecycle_wetness_world_raindrop_enable);
 				ASSIGN(timecycle_wetness_world_raindrop_scalar);
+				ASSIGN(timecycle_wetness_world_occlusion_check_enable);
+				ASSIGN(timecycle_wetness_world_occlusion_smoothing_enable);
 
 				ASSIGN(timecycle_wetness_ped_raindrop_enable);
 				ASSIGN(timecycle_wetness_ped_raindrop_scalar);

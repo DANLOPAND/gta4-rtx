@@ -938,6 +938,18 @@ namespace gta4
 				0.23f
 			};
 
+			variable timecycle_wetness_world_occlusion_check_enable = {
+				"timecycle_wetness_world_occlusion_check_enable",
+				("Enables occlusion check on world surfaces (check if something above is covering a surface)"),
+				true
+			};
+
+			variable timecycle_wetness_world_occlusion_smoothing_enable = {
+				"timecycle_wetness_world_occlusion_smoothing_enable",
+				("Smoothes occlusion test edges. Requires DLSS-RR to be on to look good. Creates a hard cutoff when turned off."),
+				true
+			};
+
 			// -----
 
 			variable timecycle_wetness_ped_raindrop_enable = {

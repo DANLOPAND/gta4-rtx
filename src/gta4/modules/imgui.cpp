@@ -752,6 +752,8 @@ namespace gta4
 		{
 			ImGui::Spacing(0, TREENODE_SPACING_INSIDE);
 			ImGui::Checkbox("Visualize Decal Renderstates", &im->m_dbg_visualize_decal_renderstates); TT("Visualize renderstates of nearby decal surfaces.");
+			ImGui::Checkbox("Visualize Stencil States", &im->m_dbg_visualize_stencil_state); TT("Visualize stencil states of nearby surfaces.");
+			ImGui::DragFloat("Visualize Dist", &im->m_dbg_visualize_distance, 0.1f);
 
 			if (static auto debug_model_hash = shared::common::flags::has_flag("debug_model_hash"); debug_model_hash)
 			{
@@ -834,12 +836,17 @@ namespace gta4
 			ImGui::Text("Clock Hour: %d", *game::m_game_clock_hours);
 			ImGui::Text("Clock Minutes: %d", *game::m_game_clock_minutes);
 
+			ImGui::Spacing(0, 8.0f);
+			ImGui::Separator();
+
 			ImGui::Checkbox("Override Global Wetness Scale", &im->m_dbg_global_wetness_override);
 			ImGui::BeginDisabled(!im->m_dbg_global_wetness_override);
 			{
 				ImGui::SliderFloat("Global Wetness", &im->m_dbg_global_wetness, 0, 1, "%.2f", ImGuiSliderFlags_AlwaysClamp);
 				ImGui::EndDisabled();
 			}
+
+			ImGui::Checkbox("Wetness OcclTest Allow on Ignored", &im->m_dbg_global_wetness_occl_allow_on_ignored); TT("Allows occlusion tests on ignored surfaces.");
 
 			ImGui::TreePop();
 		}
@@ -1550,6 +1557,10 @@ namespace gta4
 				compsettings_bool_widget("Enable Puddle Layer", gs->timecycle_wetness_world_puddle_layer_enable);
 				compsettings_bool_widget("Enable World Raindrops", gs->timecycle_wetness_world_raindrop_enable);
 				compsettings_float_widget("World Raindrop Scale", gs->timecycle_wetness_world_raindrop_scalar, 0.0f, 10.0f, 0.005f);
+
+				ImGui::Spacing(0, 4.0f);
+				compsettings_bool_widget("Enable World Occlusion Check", gs->timecycle_wetness_world_occlusion_check_enable);
+				compsettings_bool_widget("Enable Occlusion Smoothing", gs->timecycle_wetness_world_occlusion_smoothing_enable);
 				ImGui::PopID();
 
 
@@ -1648,6 +1659,10 @@ namespace gta4
 			compsettings_bool_widget("Enable Puddle Layer", gs->timecycle_wetness_world_puddle_layer_enable);
 			compsettings_bool_widget("Enable World Raindrops", gs->timecycle_wetness_world_raindrop_enable);
 			compsettings_float_widget("World Raindrop Scale", gs->timecycle_wetness_world_raindrop_scalar, 0.0f, 10.0f, 0.005f);
+
+			ImGui::Spacing(0, 4.0f);
+			compsettings_bool_widget("Enable World Occlusion Check", gs->timecycle_wetness_world_occlusion_check_enable);
+			compsettings_bool_widget("Enable Occlusion Smoothing", gs->timecycle_wetness_world_occlusion_smoothing_enable);
 			ImGui::PopID();
 
 
@@ -3184,7 +3199,7 @@ namespace gta4
 			const auto vp = game::pViewports;
 			if (vp->sceneviewport)
 			{
-				const float draw_dist = 20.0f;
+				const float draw_dist = im->m_dbg_visualize_distance;
 
 				ImVec2 viewport_pos = {};
 				const Vector cam_org = &vp->sceneviewport->cameraInv.m[3][0];
@@ -3212,6 +3227,39 @@ namespace gta4
 				}
 
 				visualized_decal_renderstates.clear();
+			}
+		}
+
+		if (m_dbg_visualize_stencil_state)
+		{
+			const auto vp = game::pViewports;
+			if (vp->sceneviewport)
+			{
+				const float draw_dist = im->m_dbg_visualize_distance;
+
+				ImVec2 viewport_pos = {};
+				const Vector cam_org = &vp->sceneviewport->cameraInv.m[3][0];
+
+				for (auto& l : visualized_stencil_states)
+				{
+					if (fabs(cam_org.DistToSqr(l.pos) < draw_dist * draw_dist))
+					{
+						if (w2s(l.pos, viewport_pos))
+						{
+							std::ostringstream oss;
+							oss << "[ENABLED] " << (l.stencil_enable ? "true" : "false") << "\n"
+								<< "[REF] " << l.stencil_ref << "\n"
+								<< "[MASK] " << l.stencil_mask << "\n"
+								<< "[SHADER] " << l.shader_name;
+
+							ImGui::GetBackgroundDrawList()->AddText(viewport_pos,
+								ImGui::GetColorU32(ImGuiCol_Text),
+								oss.str().c_str());
+						}
+					}
+				}
+
+				visualized_stencil_states.clear();
 			}
 		}
 

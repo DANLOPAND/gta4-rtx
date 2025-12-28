@@ -638,8 +638,8 @@ namespace gta4
 			WETNESS_FLAG_ENABLE_EXP_RAINDROPS = 1 << 3,			// either expensive or normal raindrops
 			WETNESS_FLAG_RAINDROPS_HALF_DENSITY = 1 << 4,		// raindrops with half density
 			WETNESS_FLAG_ENABLE_PUDDLE_LAYER = 1 << 5,			// adds a puddle layer to wet surfaces 
-			WETNESS_FLAG_TEMP_06 = 1 << 6,
-			WETNESS_FLAG_TEMP_07 = 1 << 7,
+			WETNESS_FLAG_ENABLE_OCCLUSION_TEST = 1 << 6,		// test if something is covering this surface
+			WETNESS_FLAG_ENABLE_OCCLUSION_SMOOTHING = 1 << 7,	// smooth occlusion edges - needs DLSS RR
 			WETNESS_FLAG_NONE = 0u
 		};
 
