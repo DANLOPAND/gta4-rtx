@@ -12,7 +12,7 @@ over "RootNode"
         )
         {
             def Xform "ref_66be401818aa4baabd2c65b9dc2141f1" (
-                prepend references = @./assets/props/broker_safehouse/rug01/rug01.usd@
+                prepend references = @./assets/props/brokerSH/rug01/rug01.usd@
             )
             {
                 custom bool IsRemixRef = 1
@@ -49,9 +49,9 @@ over "RootNode"
                                 {
                                     custom float inputs:displace_in = 0.0015
                                     custom float inputs:displace_out = 0.002
-                                    custom asset inputs:height_texture = @./assets/props/broker_safehouse/rug01/textures/broker_rug01_persian_rug01_height.h.rtex.dds@
-                                    custom asset inputs:normalmap_texture = @./assets/props/broker_safehouse/rug01/textures/broker_rug01_persian_rug01_normal_dx_OTH_Normal.n.rtex.dds@
-                                    asset inputs:reflectionroughness_texture = @./assets/props/broker_safehouse/rug01/textures/broker_rug01_persian_rug01_roughness.r.rtex.dds@
+                                    custom asset inputs:height_texture = @./assets/props/brokerSH/rug01/textures/broker_rug01_persian_rug01_height.h.rtex.dds@
+                                    custom asset inputs:normalmap_texture = @./assets/props/brokerSH/rug01/textures/broker_rug01_persian_rug01_normal_dx_OTH_Normal.n.rtex.dds@
+                                    asset inputs:reflectionroughness_texture = @./assets/props/brokerSH/rug01/textures/broker_rug01_persian_rug01_roughness.r.rtex.dds@
                                 }
                             }
                         }
@@ -71,7 +71,7 @@ over "RootNode"
         )
         {
             def Xform "ref_96fde7c4722841ac8a292c686325b50f" (
-                prepend references = @./assets/props/broker_safehouse/rug01/rug01.usd@
+                prepend references = @./assets/props/brokerSH/rug01/rug01.usd@
             )
             {
                 custom bool IsRemixRef = 1
@@ -108,11 +108,11 @@ over "RootNode"
                             {
                                 over "Shader"
                                 {
-                                    asset inputs:diffuse_texture = @./assets/props/broker_safehouse/rug01/textures/689CFBF8190A0159_for_CBFA9BB57D58E38F_albedo.a.rtex.dds@
+                                    asset inputs:diffuse_texture = @./assets/props/brokerSH/rug01/textures/689CFBF8190A0159_for_CBFA9BB57D58E38F_albedo.a.rtex.dds@
                                     custom float inputs:displace_in = 0.001
                                     custom float inputs:displace_out = 0.005
-                                    custom asset inputs:height_texture = @./assets/props/broker_safehouse/rug01/textures/broker_rug01_persian_rug01_height.h.rtex.dds@
-                                    custom asset inputs:normalmap_texture = @./assets/props/broker_safehouse/rug01/textures/broker_rug01_persian_rug01_normal_dx_OTH_Normal.n.rtex.dds@
+                                    custom asset inputs:height_texture = @./assets/props/brokerSH/rug01/textures/broker_rug01_persian_rug01_height.h.rtex.dds@
+                                    custom asset inputs:normalmap_texture = @./assets/props/brokerSH/rug01/textures/broker_rug01_persian_rug01_normal_dx_OTH_Normal.n.rtex.dds@
                                 }
                             }
                         }
@@ -126,7 +126,7 @@ over "RootNode"
         )
         {
             def Xform "ref_a0df6c1ef4b24f26abd9dbda9abda875" (
-                prepend references = @./assets/prop_textures/broker_safehouse/blue_couch/inst_735C4223895FEFF7_fix.usda@
+                prepend references = @./assets/ptex/brokerSH/blue_couch/inst_735C4223895FEFF7_fix.usda@
             )
             {
                 custom bool IsRemixRef = 1
@@ -153,9 +153,9 @@ over "RootNode"
                             {
                                 over "Shader"
                                 {
-                                    custom asset inputs:diffuse_texture = @./assets/prop_textures/broker_safehouse/blue_couch/textures/blue_couch_mat_50E98341E0B33BE1_albedo.a.rtex.dds@
-                                    custom asset inputs:normalmap_texture = @./assets/prop_textures/broker_safehouse/blue_couch/textures/blue_couch_mat_50E98341E0B33BE1_normal_dx_OTH_Normal.n.rtex.dds@
-                                    custom asset inputs:reflectionroughness_texture = @./assets/prop_textures/broker_safehouse/blue_couch/textures/blue_couch_mat_50E98341E0B33BE1_roughness.r.rtex.dds@
+                                    custom asset inputs:diffuse_texture = @./assets/ptex/brokerSH/blue_couch/textures/blue_couch_mat_50E98341E0B33BE1_albedo.a.rtex.dds@
+                                    custom asset inputs:normalmap_texture = @./assets/ptex/brokerSH/blue_couch/textures/blue_couch_mat_50E98341E0B33BE1_normal_dx_OTH_Normal.n.rtex.dds@
+                                    custom asset inputs:reflectionroughness_texture = @./assets/ptex/brokerSH/blue_couch/textures/blue_couch_mat_50E98341E0B33BE1_roughness.r.rtex.dds@
                                 }
                             }
                         }
@@ -169,7 +169,7 @@ over "RootNode"
         )
         {
             def Xform "ref_fef4181c988d481c8615817a2983c940" (
-                prepend references = @./assets/prop_textures/broker_safehouse/paper_box02/inst_73B5B368B68DFB0B_center_fix.usda@
+                prepend references = @./assets/ptex/brokerSH/paper_box02/inst_73B5B368B68DFB0B_center_fix.usda@
             )
             {
                 custom bool IsRemixRef = 1
@@ -201,10 +201,10 @@ over "RootNode"
                             {
                                 over "Shader"
                                 {
-                                    custom asset inputs:diffuse_texture = @./assets/prop_textures/broker_safehouse/paper_box02/textures/F27D40777A99D1E3_03_albedo.a.rtex.dds@
-                                    custom asset inputs:normalmap_texture = @./assets/prop_textures/broker_safehouse/paper_box02/textures/F27D40777A99D1E3_03_normal_dx_OTH_Normal.n.rtex.dds@
+                                    custom asset inputs:diffuse_texture = @./assets/ptex/brokerSH/paper_box02/textures/F27D40777A99D1E3_03_albedo.a.rtex.dds@
+                                    custom asset inputs:normalmap_texture = @./assets/ptex/brokerSH/paper_box02/textures/F27D40777A99D1E3_03_normal_dx_OTH_Normal.n.rtex.dds@
                                     custom float inputs:reflection_roughness_constant = 0.585
-                                    custom asset inputs:reflectionroughness_texture = @./assets/prop_textures/broker_safehouse/paper_box02/textures/F27D40777A99D1E3_03_roughness.r.rtex.dds@
+                                    custom asset inputs:reflectionroughness_texture = @./assets/ptex/brokerSH/paper_box02/textures/F27D40777A99D1E3_03_roughness.r.rtex.dds@
                                 }
                             }
                         }
@@ -218,7 +218,7 @@ over "RootNode"
         )
         {
             def Xform "ref_32a54086b4eb445ea22cfdc025b7109a" (
-                prepend references = @./assets/props/broker_safehouse/trashbag01/trashbag01.usda@
+                prepend references = @./assets/props/brokerSH/trashbag01/trashbag01.usda@
             )
             {
                 custom bool IsRemixRef = 1
@@ -250,10 +250,10 @@ over "RootNode"
                             {
                                 over "Shader"
                                 {
-                                    custom asset inputs:diffuse_texture = @./assets/props/broker_safehouse/trashbag01/textures/broker_trashbag01_mtl_trashbag_black_albedo.a.rtex.dds@
+                                    custom asset inputs:diffuse_texture = @./assets/props/brokerSH/trashbag01/textures/broker_trashbag01_mtl_trashbag_black_albedo.a.rtex.dds@
                                     custom float inputs:metallic_constant = 0.114999995
-                                    custom asset inputs:normalmap_texture = @./assets/props/broker_safehouse/trashbag01/textures/broker_trashbag01_mtl_trashbag_black_normal_dx_OTH_Normal.n.rtex.dds@
-                                    custom asset inputs:reflectionroughness_texture = @./assets/props/broker_safehouse/trashbag01/textures/broker_trashbag01_mtl_trashbag_black_roughness.r.rtex.dds@
+                                    custom asset inputs:normalmap_texture = @./assets/props/brokerSH/trashbag01/textures/broker_trashbag01_mtl_trashbag_black_normal_dx_OTH_Normal.n.rtex.dds@
+                                    custom asset inputs:reflectionroughness_texture = @./assets/props/brokerSH/trashbag01/textures/broker_trashbag01_mtl_trashbag_black_roughness.r.rtex.dds@
                                     custom float inputs:subsurface_measurement_distance = 9.5199995
                                     custom color3f inputs:subsurface_single_scattering_albedo = (0.9205289, 0.95366794, 0.9456068)
                                     custom color3f inputs:subsurface_transmittance_color = (0.9189097, 0.9189151, 0.9189189)
@@ -271,7 +271,7 @@ over "RootNode"
         )
         {
             def Xform "ref_bac5bdacc7c8493898861093634711fe" (
-                prepend references = @./assets/props/broker_safehouse/trashbag01/trashbag02.usda@
+                prepend references = @./assets/props/brokerSH/trashbag01/trashbag02.usda@
             )
             {
                 custom bool IsRemixRef = 1
@@ -303,10 +303,10 @@ over "RootNode"
                             {
                                 over "Shader"
                                 {
-                                    custom asset inputs:diffuse_texture = @./assets/props/broker_safehouse/trashbag01/textures/broker_trashbag02_mtl_trashbag_black_02_albedo.a.rtex.dds@
+                                    custom asset inputs:diffuse_texture = @./assets/props/brokerSH/trashbag01/textures/broker_trashbag02_mtl_trashbag_black_02_albedo.a.rtex.dds@
                                     custom float inputs:metallic_constant = 0.1
-                                    custom asset inputs:normalmap_texture = @./assets/props/broker_safehouse/trashbag01/textures/broker_trashbag02_mtl_trashbag_black_02_normal_dx_OTH_Normal.n.rtex.dds@
-                                    custom asset inputs:reflectionroughness_texture = @./assets/props/broker_safehouse/trashbag01/textures/broker_trashbag02_mtl_trashbag_black_02_roughness.r.rtex.dds@
+                                    custom asset inputs:normalmap_texture = @./assets/props/brokerSH/trashbag01/textures/broker_trashbag02_mtl_trashbag_black_02_normal_dx_OTH_Normal.n.rtex.dds@
+                                    custom asset inputs:reflectionroughness_texture = @./assets/props/brokerSH/trashbag01/textures/broker_trashbag02_mtl_trashbag_black_02_roughness.r.rtex.dds@
                                 }
                             }
                         }
@@ -320,7 +320,7 @@ over "RootNode"
         )
         {
             def Xform "ref_71a56a7624654926b70b6534d38e3b5d" (
-                prepend references = @./assets/props/broker_safehouse/trashbag01/trashbag02.usda@
+                prepend references = @./assets/props/brokerSH/trashbag01/trashbag02.usda@
             )
             {
                 custom bool IsRemixRef = 1
@@ -352,9 +352,9 @@ over "RootNode"
                             {
                                 over "Shader"
                                 {
-                                    custom asset inputs:diffuse_texture = @./assets/props/broker_safehouse/trashbag01/textures/broker_trashbag02_mtl_trashbag_black_02_albedo.a.rtex.dds@
-                                    custom asset inputs:normalmap_texture = @./assets/props/broker_safehouse/trashbag01/textures/broker_trashbag02_mtl_trashbag_black_02_normal_dx_OTH_Normal.n.rtex.dds@
-                                    custom asset inputs:reflectionroughness_texture = @./assets/props/broker_safehouse/trashbag01/textures/broker_trashbag02_mtl_trashbag_black_02_roughness.r.rtex.dds@
+                                    custom asset inputs:diffuse_texture = @./assets/props/brokerSH/trashbag01/textures/broker_trashbag02_mtl_trashbag_black_02_albedo.a.rtex.dds@
+                                    custom asset inputs:normalmap_texture = @./assets/props/brokerSH/trashbag01/textures/broker_trashbag02_mtl_trashbag_black_02_normal_dx_OTH_Normal.n.rtex.dds@
+                                    custom asset inputs:reflectionroughness_texture = @./assets/props/brokerSH/trashbag01/textures/broker_trashbag02_mtl_trashbag_black_02_roughness.r.rtex.dds@
                                 }
                             }
                         }
@@ -370,9 +370,9 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/props/broker_safehouse/blue_door/F90285F14A5AFE42_blue_wood_door_albedo.a.rtex.dds@
-                custom asset inputs:normalmap_texture = @./assets/props/broker_safehouse/blue_door/F90285F14A5AFE42_blue_wood_door_normal_dx_OTH_Normal.n.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/props/broker_safehouse/blue_door/F90285F14A5AFE42_blue_wood_door_roughness.r.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/props/brokerSH/blue_door/F90285F14A5AFE42_blue_wood_door_albedo.a.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/props/brokerSH/blue_door/F90285F14A5AFE42_blue_wood_door_normal_dx_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/props/brokerSH/blue_door/F90285F14A5AFE42_blue_wood_door_roughness.r.rtex.dds@
             }
         }
 
@@ -382,8 +382,8 @@ over "RootNode"
             {
                 custom float inputs:displace_in = 0.002
                 custom float inputs:displace_out = 0.005
-                custom asset inputs:height_texture = @./assets/props/broker_safehouse/rug01/textures/broker_rug01_persian_rug01_height.h.rtex.dds@
-                custom asset inputs:normalmap_texture = @./assets/props/broker_safehouse/rug01/textures/broker_rug01_persian_rug01_normal_dx_OTH_Normal.n.rtex.dds@
+                custom asset inputs:height_texture = @./assets/props/brokerSH/rug01/textures/broker_rug01_persian_rug01_height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/props/brokerSH/rug01/textures/broker_rug01_persian_rug01_normal_dx_OTH_Normal.n.rtex.dds@
                 custom float inputs:reflection_roughness_constant = 0.765
                 custom asset inputs:reflectionroughness_texture = @@
             }
@@ -393,8 +393,8 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/prop_textures/broker_safehouse/poster/C3A319E543AE4531_albedo.a.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/prop_textures/broker_safehouse/poster/C3A319E543AE4531_roughness.r.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/ptex/brokerSH/poster/C3A319E543AE4531_albedo.a.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/ptex/brokerSH/poster/C3A319E543AE4531_roughness.r.rtex.dds@
             }
         }
 
@@ -402,10 +402,10 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/prop_textures/broker_safehouse/poster/7286EF96C19A67B4_albedo.a.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/ptex/brokerSH/poster/7286EF96C19A67B4_albedo.a.rtex.dds@
                 custom int inputs:filter_mode = 1
                 custom bool inputs:preload_textures = 0
-                custom asset inputs:reflectionroughness_texture = @./assets/prop_textures/broker_safehouse/poster/generic_poster_2x1_roughness.r.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/ptex/brokerSH/poster/generic_poster_2x1_roughness.r.rtex.dds@
             }
         }
 
@@ -413,8 +413,8 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/prop_textures/broker_safehouse/poster/A671F8B0EE715408_albedo.a.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/prop_textures/broker_safehouse/poster/A671F8B0EE715408_roughness.r.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/ptex/brokerSH/poster/A671F8B0EE715408_albedo.a.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/ptex/brokerSH/poster/A671F8B0EE715408_roughness.r.rtex.dds@
             }
         }
 
@@ -422,8 +422,8 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/prop_textures/broker_safehouse/poster/F7C881A5B07C855B_albedo.a.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/prop_textures/broker_safehouse/poster/generic_poster_1x2_roughness.r.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/ptex/brokerSH/poster/F7C881A5B07C855B_albedo.a.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/ptex/brokerSH/poster/generic_poster_1x2_roughness.r.rtex.dds@
             }
         }
 
@@ -431,8 +431,8 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/prop_textures/broker_safehouse/poster/EF21F56900F27A2B_albedo.a.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/prop_textures/broker_safehouse/poster/generic_poster_1x2_roughness.r.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/ptex/brokerSH/poster/EF21F56900F27A2B_albedo.a.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/ptex/brokerSH/poster/generic_poster_1x2_roughness.r.rtex.dds@
             }
         }
 
@@ -440,8 +440,8 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/prop_textures/broker_safehouse/poster/D3285FB347C17160_albedo.a.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/prop_textures/broker_safehouse/poster/generic_poster_1x2_roughness.r.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/ptex/brokerSH/poster/D3285FB347C17160_albedo.a.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/ptex/brokerSH/poster/generic_poster_1x2_roughness.r.rtex.dds@
             }
         }
 
@@ -449,8 +449,8 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/prop_textures/broker_safehouse/poster/9CC621E17C61CA0D_albedo.a.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/prop_textures/broker_safehouse/poster/generic_poster_1x2_roughness.r.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/ptex/brokerSH/poster/9CC621E17C61CA0D_albedo.a.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/ptex/brokerSH/poster/generic_poster_1x2_roughness.r.rtex.dds@
             }
         }
 
@@ -458,9 +458,9 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/prop_textures/broker_safehouse/paper_box01/9A28EB0B9102129C_albedo.a.rtex.dds@
-                custom asset inputs:normalmap_texture = @./assets/prop_textures/broker_safehouse/paper_box01/9A28EB0B9102129C_normal_dx_OTH_Normal.n.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/prop_textures/broker_safehouse/paper_box01/9A28EB0B9102129C_roughness.r.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/ptex/brokerSH/paper_box01/9A28EB0B9102129C_albedo.a.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/ptex/brokerSH/paper_box01/9A28EB0B9102129C_normal_dx_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/ptex/brokerSH/paper_box01/9A28EB0B9102129C_roughness.r.rtex.dds@
             }
         }
 
@@ -468,9 +468,9 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/prop_textures/broker_safehouse/rustic_table_big/rustic_table_big_Default_albedo.a.rtex.dds@
-                custom asset inputs:normalmap_texture = @./assets/prop_textures/broker_safehouse/rustic_table_big/rustic_table_big_Default_normal_dx_OTH_Normal.n.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/prop_textures/broker_safehouse/rustic_table_big/rustic_table_big_Default_roughness.r.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/ptex/brokerSH/rustic_table_big/rustic_table_big_Default_albedo.a.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/ptex/brokerSH/rustic_table_big/rustic_table_big_Default_normal_dx_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/ptex/brokerSH/rustic_table_big/rustic_table_big_Default_roughness.r.rtex.dds@
             }
         }
 
@@ -478,12 +478,12 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/prop_textures/broker_safehouse/blanket/blanket_albedo.a.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/ptex/brokerSH/blanket/blanket_albedo.a.rtex.dds@
                 custom float inputs:displace_in = 0.02
                 custom float inputs:displace_out = 0.005
-                custom asset inputs:height_texture = @./assets/prop_textures/broker_safehouse/blanket/blanket_height.h.rtex.dds@
-                custom asset inputs:normalmap_texture = @./assets/prop_textures/broker_safehouse/blanket/blanket_normal_dx_OTH_Normal.n.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/prop_textures/broker_safehouse/blanket/blanket_roughness.r.rtex.dds@
+                custom asset inputs:height_texture = @./assets/ptex/brokerSH/blanket/blanket_height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/ptex/brokerSH/blanket/blanket_normal_dx_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/ptex/brokerSH/blanket/blanket_roughness.r.rtex.dds@
             }
         }
 
@@ -491,9 +491,9 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/prop_textures/broker_safehouse/chair_leather/chair_leather_Default_albedo.a.rtex.dds@
-                custom asset inputs:normalmap_texture = @./assets/prop_textures/broker_safehouse/chair_leather/chair_leather_Default_normal_dx_OTH_Normal.n.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/prop_textures/broker_safehouse/chair_leather/chair_leather_Default_roughness.r.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/ptex/brokerSH/chair_leather/chair_leather_Default_albedo.a.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/ptex/brokerSH/chair_leather/chair_leather_Default_normal_dx_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/ptex/brokerSH/chair_leather/chair_leather_Default_roughness.r.rtex.dds@
             }
         }
 
@@ -501,8 +501,8 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/prop_textures/broker_safehouse/paper_box03/038E88B876FC1917_albedo.a.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/prop_textures/broker_safehouse/paper_box03/038E88B876FC1917_roughness.r.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/ptex/brokerSH/paper_box03/038E88B876FC1917_albedo.a.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/ptex/brokerSH/paper_box03/038E88B876FC1917_roughness.r.rtex.dds@
             }
         }
 
@@ -510,10 +510,10 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/prop_textures/broker_safehouse/freezer/broker_freezer_mat_317FA5746245BB96_albedo.a.rtex.dds@
-                custom asset inputs:metallic_texture = @./assets/prop_textures/broker_safehouse/freezer/broker_freezer_mat_317FA5746245BB96_metalness.m.rtex.dds@
-                custom asset inputs:normalmap_texture = @./assets/prop_textures/broker_safehouse/freezer/broker_freezer_mat_317FA5746245BB96_normal_dx_OTH_Normal.n.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/prop_textures/broker_safehouse/freezer/broker_freezer_mat_317FA5746245BB96_roughness.r.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/ptex/brokerSH/freezer/broker_freezer_mat_317FA5746245BB96_albedo.a.rtex.dds@
+                custom asset inputs:metallic_texture = @./assets/ptex/brokerSH/freezer/broker_freezer_mat_317FA5746245BB96_metalness.m.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/ptex/brokerSH/freezer/broker_freezer_mat_317FA5746245BB96_normal_dx_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/ptex/brokerSH/freezer/broker_freezer_mat_317FA5746245BB96_roughness.r.rtex.dds@
             }
         }
 

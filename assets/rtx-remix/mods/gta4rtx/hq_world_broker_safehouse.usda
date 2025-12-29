@@ -11,13 +11,13 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/world_textures/interiors/broker_safehouse/D8A9067FFEF9B9C6_wood/D8A9067FFEF9B9C6_broker_wood_floor_seamless_albedo.a.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/wtex/interiors/brokerSH/D8A9067FFEF9B9C6_wood/D8A9067FFEF9B9C6_broker_wood_floor_seamless_albedo.a.rtex.dds@
                 custom float inputs:displace_in = 0.07
                 custom float inputs:displace_out = 0
-                custom asset inputs:height_texture = @./assets/world_textures/interiors/broker_safehouse/D8A9067FFEF9B9C6_wood/D8A9067FFEF9B9C6_broker_wood_floor_seamless_height.h.rtex.dds@
-                custom asset inputs:normalmap_texture = @./assets/world_textures/interiors/broker_safehouse/D8A9067FFEF9B9C6_wood/D8A9067FFEF9B9C6_broker_wood_floor_seamless_normal_dx_OTH_Normal.n.rtex.dds@
+                custom asset inputs:height_texture = @./assets/wtex/interiors/brokerSH/D8A9067FFEF9B9C6_wood/D8A9067FFEF9B9C6_broker_wood_floor_seamless_height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/interiors/brokerSH/D8A9067FFEF9B9C6_wood/D8A9067FFEF9B9C6_broker_wood_floor_seamless_normal_dx_OTH_Normal.n.rtex.dds@
                 custom float inputs:reflection_roughness_constant = 0.685
-                custom asset inputs:reflectionroughness_texture = @./assets/world_textures/interiors/broker_safehouse/D8A9067FFEF9B9C6_wood/D8A9067FFEF9B9C6_broker_wood_floor_seamless_roughness.r.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/interiors/brokerSH/D8A9067FFEF9B9C6_wood/D8A9067FFEF9B9C6_broker_wood_floor_seamless_roughness.r.rtex.dds@
             }
         }
 
@@ -25,12 +25,12 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/world_textures/interiors/broker_safehouse/B4B5968194EC1A30_tiles/B4B5968194EC1A30_tiles_floor_albedo.a.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/wtex/interiors/brokerSH/B4B5968194EC1A30_tiles/B4B5968194EC1A30_tiles_floor_albedo.a.rtex.dds@
                 custom float inputs:displace_in = 0.06
                 custom float inputs:displace_out = 0.02
-                custom asset inputs:height_texture = @./assets/world_textures/interiors/broker_safehouse/B4B5968194EC1A30_tiles/B4B5968194EC1A30_tiles_floor_height.h.rtex.dds@
-                custom asset inputs:normalmap_texture = @./assets/world_textures/interiors/broker_safehouse/B4B5968194EC1A30_tiles/B4B5968194EC1A30_tiles_floor_normal_dx_OTH_Normal.n.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/world_textures/interiors/broker_safehouse/B4B5968194EC1A30_tiles/B4B5968194EC1A30_tiles_floor_roughness.r.rtex.dds@
+                custom asset inputs:height_texture = @./assets/wtex/interiors/brokerSH/B4B5968194EC1A30_tiles/B4B5968194EC1A30_tiles_floor_height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/interiors/brokerSH/B4B5968194EC1A30_tiles/B4B5968194EC1A30_tiles_floor_normal_dx_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/interiors/brokerSH/B4B5968194EC1A30_tiles/B4B5968194EC1A30_tiles_floor_roughness.r.rtex.dds@
             }
         }
 
@@ -38,12 +38,12 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/world_textures/interiors/broker_safehouse/B4B5968194EC1A30_tiles/broken/B4B5968194EC1A30_tiles_floor_broken_albedo.a.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/wtex/interiors/brokerSH/B4B5968194EC1A30_tiles/broken/B4B5968194EC1A30_tiles_floor_broken_albedo.a.rtex.dds@
                 custom float inputs:displace_in = 0.06
                 custom float inputs:displace_out = 0.02
-                custom asset inputs:height_texture = @./assets/world_textures/interiors/broker_safehouse/B4B5968194EC1A30_tiles/broken/B4B5968194EC1A30_tiles_floor_broken_height.h.rtex.dds@
-                custom asset inputs:normalmap_texture = @./assets/world_textures/interiors/broker_safehouse/B4B5968194EC1A30_tiles/broken/B4B5968194EC1A30_tiles_floor_broken_normal_dx_OTH_Normal.n.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/world_textures/interiors/broker_safehouse/B4B5968194EC1A30_tiles/broken/B4B5968194EC1A30_tiles_floor_broken_roughness.r.rtex.dds@
+                custom asset inputs:height_texture = @./assets/wtex/interiors/brokerSH/B4B5968194EC1A30_tiles/broken/B4B5968194EC1A30_tiles_floor_broken_height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/interiors/brokerSH/B4B5968194EC1A30_tiles/broken/B4B5968194EC1A30_tiles_floor_broken_normal_dx_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/interiors/brokerSH/B4B5968194EC1A30_tiles/broken/B4B5968194EC1A30_tiles_floor_broken_roughness.r.rtex.dds@
             }
         }
 
@@ -51,12 +51,12 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/world_textures/interiors/broker_safehouse/B4B5968194EC1A30_tiles/B4B5968194EC1A30_tiles_floor_white_albedo.a.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/wtex/interiors/brokerSH/B4B5968194EC1A30_tiles/B4B5968194EC1A30_tiles_floor_white_albedo.a.rtex.dds@
                 custom float inputs:displace_in = 0.06
                 custom float inputs:displace_out = 0.02
-                custom asset inputs:height_texture = @./assets/world_textures/interiors/broker_safehouse/B4B5968194EC1A30_tiles/B4B5968194EC1A30_tiles_floor_height.h.rtex.dds@
-                custom asset inputs:normalmap_texture = @./assets/world_textures/interiors/broker_safehouse/B4B5968194EC1A30_tiles/B4B5968194EC1A30_tiles_floor_normal_dx_OTH_Normal.n.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/world_textures/interiors/broker_safehouse/B4B5968194EC1A30_tiles/B4B5968194EC1A30_tiles_floor_roughness.r.rtex.dds@
+                custom asset inputs:height_texture = @./assets/wtex/interiors/brokerSH/B4B5968194EC1A30_tiles/B4B5968194EC1A30_tiles_floor_height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/interiors/brokerSH/B4B5968194EC1A30_tiles/B4B5968194EC1A30_tiles_floor_normal_dx_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/interiors/brokerSH/B4B5968194EC1A30_tiles/B4B5968194EC1A30_tiles_floor_roughness.r.rtex.dds@
             }
         }
 
@@ -64,12 +64,12 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/world_textures/interiors/broker_safehouse/B4B5968194EC1A30_tiles/white_broken/B4B5968194EC1A30_tiles_floor_white_broken_albedo.a.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/wtex/interiors/brokerSH/B4B5968194EC1A30_tiles/white_broken/B4B5968194EC1A30_tiles_floor_white_broken_albedo.a.rtex.dds@
                 custom float inputs:displace_in = 0.06
                 custom float inputs:displace_out = 0.02
-                custom asset inputs:height_texture = @./assets/world_textures/interiors/broker_safehouse/B4B5968194EC1A30_tiles/white_broken/B4B5968194EC1A30_tiles_floor_white_broken_height.h.rtex.dds@
-                custom asset inputs:normalmap_texture = @./assets/world_textures/interiors/broker_safehouse/B4B5968194EC1A30_tiles/white_broken/B4B5968194EC1A30_tiles_floor_white_broken_normal_dx_OTH_Normal.n.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/world_textures/interiors/broker_safehouse/B4B5968194EC1A30_tiles/white_broken/B4B5968194EC1A30_tiles_floor_white_broken_roughness.r.rtex.dds@
+                custom asset inputs:height_texture = @./assets/wtex/interiors/brokerSH/B4B5968194EC1A30_tiles/white_broken/B4B5968194EC1A30_tiles_floor_white_broken_height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/interiors/brokerSH/B4B5968194EC1A30_tiles/white_broken/B4B5968194EC1A30_tiles_floor_white_broken_normal_dx_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/interiors/brokerSH/B4B5968194EC1A30_tiles/white_broken/B4B5968194EC1A30_tiles_floor_white_broken_roughness.r.rtex.dds@
             }
         }
 
@@ -77,7 +77,7 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/world_textures/interiors/broker_safehouse/513C1ACD8EF07E7B_dirt_decal/513C1ACD8EF07E7B_albedo.a.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/wtex/interiors/brokerSH/513C1ACD8EF07E7B_dirt_decal/513C1ACD8EF07E7B_albedo.a.rtex.dds@
                 custom float inputs:metallic_constant = 0
                 custom float inputs:reflection_roughness_constant = 0.645
             }
@@ -87,11 +87,11 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/world_textures/interiors/broker_safehouse/92D94FC9A9E52F8C_tiles/92D94FC9A9E52F8C_tiles_albedo.a.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/wtex/interiors/brokerSH/92D94FC9A9E52F8C_tiles/92D94FC9A9E52F8C_tiles_albedo.a.rtex.dds@
                 custom float inputs:displace_in = 0.08
-                custom asset inputs:height_texture = @./assets/world_textures/interiors/broker_safehouse/92D94FC9A9E52F8C_tiles/92D94FC9A9E52F8C_tiles_height.h.rtex.dds@
-                custom asset inputs:normalmap_texture = @./assets/world_textures/interiors/broker_safehouse/92D94FC9A9E52F8C_tiles/92D94FC9A9E52F8C_tiles_normal_dx_OTH_Normal.n.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/world_textures/interiors/broker_safehouse/92D94FC9A9E52F8C_tiles/92D94FC9A9E52F8C_tiles_roughness.r.rtex.dds@
+                custom asset inputs:height_texture = @./assets/wtex/interiors/brokerSH/92D94FC9A9E52F8C_tiles/92D94FC9A9E52F8C_tiles_height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/interiors/brokerSH/92D94FC9A9E52F8C_tiles/92D94FC9A9E52F8C_tiles_normal_dx_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/interiors/brokerSH/92D94FC9A9E52F8C_tiles/92D94FC9A9E52F8C_tiles_roughness.r.rtex.dds@
             }
         }
 
@@ -99,11 +99,11 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/world_textures/interiors/broker_safehouse/577B6105E5734761_plaster/plaster_40_basecolor_gray-2K.a.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/wtex/interiors/brokerSH/577B6105E5734761_plaster/plaster_40_basecolor_gray-2K.a.rtex.dds@
                 custom float inputs:displace_in = 0.025
-                custom asset inputs:height_texture = @./assets/world_textures/interiors/broker_safehouse/577B6105E5734761_plaster/plaster_40_height-2K.h.rtex.dds@
-                custom asset inputs:normalmap_texture = @./assets/world_textures/interiors/broker_safehouse/577B6105E5734761_plaster/plaster_40_normal-2K_OTH_Normal.n.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/world_textures/interiors/broker_safehouse/577B6105E5734761_plaster/plaster_40_roughness-2K.r.rtex.dds@
+                custom asset inputs:height_texture = @./assets/wtex/interiors/brokerSH/577B6105E5734761_plaster/plaster_40_height-2K.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/interiors/brokerSH/577B6105E5734761_plaster/plaster_40_normal-2K_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/interiors/brokerSH/577B6105E5734761_plaster/plaster_40_roughness-2K.r.rtex.dds@
             }
         }
 
@@ -111,12 +111,12 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/world_textures/interiors/broker_safehouse/745E477FDFC702B7_lower_wallpaper/745E477FDFC702B7_wallpaper_pink_orna_albedo.a.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/wtex/interiors/brokerSH/745E477FDFC702B7_lower_wallpaper/745E477FDFC702B7_wallpaper_pink_orna_albedo.a.rtex.dds@
                 custom float inputs:displace_in = 0.015
                 custom float inputs:displace_out = 0.002
-                custom asset inputs:height_texture = @./assets/world_textures/interiors/broker_safehouse/745E477FDFC702B7_lower_wallpaper/745E477FDFC702B7_wallpaper_pink_orna_height.h.rtex.dds@
-                custom asset inputs:normalmap_texture = @./assets/world_textures/interiors/broker_safehouse/745E477FDFC702B7_lower_wallpaper/745E477FDFC702B7_wallpaper_pink_orna_normal_dx_OTH_Normal.n.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/world_textures/interiors/broker_safehouse/745E477FDFC702B7_lower_wallpaper/745E477FDFC702B7_wallpaper_pink_orna_roughness.r.rtex.dds@
+                custom asset inputs:height_texture = @./assets/wtex/interiors/brokerSH/745E477FDFC702B7_lower_wallpaper/745E477FDFC702B7_wallpaper_pink_orna_height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/interiors/brokerSH/745E477FDFC702B7_lower_wallpaper/745E477FDFC702B7_wallpaper_pink_orna_normal_dx_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/interiors/brokerSH/745E477FDFC702B7_lower_wallpaper/745E477FDFC702B7_wallpaper_pink_orna_roughness.r.rtex.dds@
             }
         }
 
@@ -124,9 +124,9 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/world_textures/interiors/broker_safehouse/multi_green_wallpaper_variations/intact/green_plaster_wall_variation_intact_albedo.a.rtex.dds@
-                custom asset inputs:normalmap_texture = @./assets/world_textures/interiors/broker_safehouse/multi_green_wallpaper_variations/intact/green_plaster_wall_variation_intact_normal_dx_OTH_Normal.n.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/world_textures/interiors/broker_safehouse/multi_green_wallpaper_variations/intact/green_plaster_wall_variation_intact_roughness.r.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/wtex/interiors/brokerSH/multi_green_wallpaper_variations/intact/green_plaster_wall_variation_intact_albedo.a.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/interiors/brokerSH/multi_green_wallpaper_variations/intact/green_plaster_wall_variation_intact_normal_dx_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/interiors/brokerSH/multi_green_wallpaper_variations/intact/green_plaster_wall_variation_intact_roughness.r.rtex.dds@
             }
         }
 
@@ -134,12 +134,12 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/world_textures/interiors/broker_safehouse/multi_green_wallpaper_variations/slightly/green_plaster_wall_variation_slightly_albedo.a.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/wtex/interiors/brokerSH/multi_green_wallpaper_variations/slightly/green_plaster_wall_variation_slightly_albedo.a.rtex.dds@
                 custom float inputs:displace_in = 0.1
                 custom float inputs:displace_out = 0
-                custom asset inputs:height_texture = @./assets/world_textures/interiors/broker_safehouse/multi_green_wallpaper_variations/slightly/green_plaster_wall_variation_slightly_height.h.rtex.dds@
-                custom asset inputs:normalmap_texture = @./assets/world_textures/interiors/broker_safehouse/multi_green_wallpaper_variations/slightly/green_plaster_wall_variation_slightly_normal_dx_OTH_Normal.n.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/world_textures/interiors/broker_safehouse/multi_green_wallpaper_variations/slightly/green_plaster_wall_variation_slightly_roughness.r.rtex.dds@
+                custom asset inputs:height_texture = @./assets/wtex/interiors/brokerSH/multi_green_wallpaper_variations/slightly/green_plaster_wall_variation_slightly_height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/interiors/brokerSH/multi_green_wallpaper_variations/slightly/green_plaster_wall_variation_slightly_normal_dx_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/interiors/brokerSH/multi_green_wallpaper_variations/slightly/green_plaster_wall_variation_slightly_roughness.r.rtex.dds@
             }
         }
 
@@ -147,12 +147,12 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/world_textures/interiors/broker_safehouse/multi_green_wallpaper_variations/full/green_plaster_wall_variation_full_albedo.a.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/wtex/interiors/brokerSH/multi_green_wallpaper_variations/full/green_plaster_wall_variation_full_albedo.a.rtex.dds@
                 custom float inputs:displace_in = 0.2
                 custom float inputs:displace_out = 0
-                custom asset inputs:height_texture = @./assets/world_textures/interiors/broker_safehouse/multi_green_wallpaper_variations/full/green_plaster_wall_variation_full_height.h.rtex.dds@
-                custom asset inputs:normalmap_texture = @./assets/world_textures/interiors/broker_safehouse/multi_green_wallpaper_variations/full/green_plaster_wall_variation_full_normal_dx_OTH_Normal.n.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/world_textures/interiors/broker_safehouse/multi_green_wallpaper_variations/full/green_plaster_wall_variation_full_roughness.r.rtex.dds@
+                custom asset inputs:height_texture = @./assets/wtex/interiors/brokerSH/multi_green_wallpaper_variations/full/green_plaster_wall_variation_full_height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/interiors/brokerSH/multi_green_wallpaper_variations/full/green_plaster_wall_variation_full_normal_dx_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/interiors/brokerSH/multi_green_wallpaper_variations/full/green_plaster_wall_variation_full_roughness.r.rtex.dds@
             }
         }
 
@@ -161,13 +161,13 @@ over "RootNode"
             over "Shader"
             {
                 custom color3f inputs:diffuse_color_constant = (0.88030887, 0.88030005, 0.88030005)
-                asset inputs:diffuse_texture = @./assets/world_textures/interiors/broker_safehouse/1A44AD01CF4DCC60_dirt_decal/1A44AD01CF4DCC60_dirt_decal_02_albedo.a.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/wtex/interiors/brokerSH/1A44AD01CF4DCC60_dirt_decal/dirt_decal_02_albedo.a.rtex.dds@
                 custom float inputs:displace_in = 0.01
-                custom asset inputs:height_texture = @./assets/world_textures/interiors/broker_safehouse/1A44AD01CF4DCC60_dirt_decal/1A44AD01CF4DCC60_dirt_decal_fix_height.h.rtex.dds@
+                custom asset inputs:height_texture = @./assets/wtex/interiors/brokerSH/1A44AD01CF4DCC60_dirt_decal/dirt_decal_fix_height.h.rtex.dds@
                 custom float inputs:metallic_constant = 0
-                custom asset inputs:normalmap_texture = @./assets/world_textures/interiors/broker_safehouse/1A44AD01CF4DCC60_dirt_decal/1A44AD01CF4DCC60_dirt_decal_normal_dx_OTH_Normal.n.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/interiors/brokerSH/1A44AD01CF4DCC60_dirt_decal/dirt_decal_normal_dx_OTH_Normal.n.rtex.dds@
                 custom float inputs:reflection_roughness_constant = 0.55
-                custom asset inputs:reflectionroughness_texture = @./assets/world_textures/interiors/broker_safehouse/1A44AD01CF4DCC60_dirt_decal/1A44AD01CF4DCC60_dirt_decal_roughness.r.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/interiors/brokerSH/1A44AD01CF4DCC60_dirt_decal/dirt_decal_roughness.r.rtex.dds@
             }
         }
 
@@ -175,9 +175,9 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/world_textures/interiors/broker_safehouse/B401B62CBD4A5BBD_upper_wood_trim/B401B62CBD4A5BBD_wood_trim_albedo.a.rtex.dds@
-                custom asset inputs:normalmap_texture = @./assets/world_textures/interiors/broker_safehouse/B401B62CBD4A5BBD_upper_wood_trim/B401B62CBD4A5BBD_wood_trim_normal_dx_OTH_Normal.n.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/world_textures/interiors/broker_safehouse/B401B62CBD4A5BBD_upper_wood_trim/B401B62CBD4A5BBD_wood_trim_roughness.r.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/wtex/interiors/brokerSH/B401B62CBD4A5BBD_upper_wood_trim/B401B62CBD4A5BBD_wood_trim_albedo.a.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/interiors/brokerSH/B401B62CBD4A5BBD_upper_wood_trim/B401B62CBD4A5BBD_wood_trim_normal_dx_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/interiors/brokerSH/B401B62CBD4A5BBD_upper_wood_trim/B401B62CBD4A5BBD_wood_trim_roughness.r.rtex.dds@
             }
         }
 
@@ -185,11 +185,11 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/world_textures/interiors/broker_safehouse/28D5FCA0562EFE84_worn_concrete_ceiling/28D5FCA0562EFE84_concrete_very_worn_albedo.a.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/wtex/interiors/brokerSH/28D5FCA0562EFE84_worn_concrete_ceiling/concrete_very_worn_albedo.a.rtex.dds@
                 custom float inputs:displace_in = 0.015
-                custom asset inputs:height_texture = @./assets/world_textures/interiors/broker_safehouse/28D5FCA0562EFE84_worn_concrete_ceiling/28D5FCA0562EFE84_concrete_very_worn_height.h.rtex.dds@
-                custom asset inputs:normalmap_texture = @./assets/world_textures/interiors/broker_safehouse/28D5FCA0562EFE84_worn_concrete_ceiling/28D5FCA0562EFE84_concrete_very_worn_normal_dx_OTH_Normal.n.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/world_textures/interiors/broker_safehouse/28D5FCA0562EFE84_worn_concrete_ceiling/28D5FCA0562EFE84_concrete_very_worn_roughness.r.rtex.dds@
+                custom asset inputs:height_texture = @./assets/wtex/interiors/brokerSH/28D5FCA0562EFE84_worn_concrete_ceiling/concrete_very_worn_height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/interiors/brokerSH/28D5FCA0562EFE84_worn_concrete_ceiling/concrete_very_worn_normal_dx_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/interiors/brokerSH/28D5FCA0562EFE84_worn_concrete_ceiling/concrete_very_worn_roughness.r.rtex.dds@
             }
         }
 
@@ -197,11 +197,11 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/world_textures/interiors/broker_safehouse/multi_green_wallpaper_variations/worn_slightly/6A7B6C1D0147310D_wall_test_Default_albedo.a.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/wtex/interiors/brokerSH/multi_green_wallpaper_variations/worn_slightly/6A7B6C1D0147310D_wall_test_Default_albedo.a.rtex.dds@
                 custom float inputs:displace_in = 0.005
-                custom asset inputs:height_texture = @./assets/world_textures/interiors/broker_safehouse/multi_green_wallpaper_variations/worn_slightly/6A7B6C1D0147310D_wall_test_Default_height.h.rtex.dds@
-                custom asset inputs:normalmap_texture = @./assets/world_textures/interiors/broker_safehouse/multi_green_wallpaper_variations/worn_slightly/6A7B6C1D0147310D_wall_test_Default_normal_dx_OTH_Normal.n.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/world_textures/interiors/broker_safehouse/multi_green_wallpaper_variations/worn_slightly/6A7B6C1D0147310D_wall_test_Default_roughness.r.rtex.dds@
+                custom asset inputs:height_texture = @./assets/wtex/interiors/brokerSH/multi_green_wallpaper_variations/worn_slightly/6A7B6C1D0147310D_wall_test_Default_height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/interiors/brokerSH/multi_green_wallpaper_variations/worn_slightly/6A7B6C1D0147310D_wall_test_Default_normal_dx_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/interiors/brokerSH/multi_green_wallpaper_variations/worn_slightly/6A7B6C1D0147310D_wall_test_Default_roughness.r.rtex.dds@
             }
         }
 
@@ -209,10 +209,10 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/world_textures/interiors/broker_safehouse/EFEECE021FA9BD32_window/EFEECE021FA9BD32_albedo.a.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/wtex/interiors/brokerSH/EFEECE021FA9BD32_window/EFEECE021FA9BD32_albedo.a.rtex.dds@
                 custom float inputs:metallic_constant = 0.39999998
                 custom float inputs:reflection_roughness_constant = 0.14999999
-                custom asset inputs:reflectionroughness_texture = @./assets/world_textures/interiors/broker_safehouse/EFEECE021FA9BD32_window/EFEECE021FA9BD32_window_test_roughness.r.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/interiors/brokerSH/EFEECE021FA9BD32_window/EFEECE021FA9BD32_window_test_roughness.r.rtex.dds@
             }
         }
 
@@ -220,11 +220,11 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/world_textures/interiors/broker_safehouse/9C749874BEB70077_green_floor_tiles/9C749874BEB70077_green_floor_tiles_albedo.a.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/wtex/interiors/brokerSH/9C749874BEB70077_green_floor_tiles/9C749874BEB70077_green_floor_tiles_albedo.a.rtex.dds@
                 custom float inputs:displace_in = 0.06
-                custom asset inputs:height_texture = @./assets/world_textures/interiors/broker_safehouse/9C749874BEB70077_green_floor_tiles/9C749874BEB70077_green_floor_tiles_height.h.rtex.dds@
-                custom asset inputs:normalmap_texture = @./assets/world_textures/interiors/broker_safehouse/9C749874BEB70077_green_floor_tiles/9C749874BEB70077_green_floor_tiles_normal_dx_OTH_Normal.n.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/world_textures/interiors/broker_safehouse/9C749874BEB70077_green_floor_tiles/9C749874BEB70077_green_floor_tiles_roughness.r.rtex.dds@
+                custom asset inputs:height_texture = @./assets/wtex/interiors/brokerSH/9C749874BEB70077_green_floor_tiles/9C749874BEB70077_green_floor_tiles_height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/interiors/brokerSH/9C749874BEB70077_green_floor_tiles/9C749874BEB70077_green_floor_tiles_normal_dx_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/interiors/brokerSH/9C749874BEB70077_green_floor_tiles/9C749874BEB70077_green_floor_tiles_roughness.r.rtex.dds@
             }
         }
 
@@ -232,12 +232,12 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/world_textures/interiors/broker_safehouse/BD66D813F9811411_wood_railing/BD66D813F9811411_wood_railing_layering_albedo.a.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/wtex/interiors/brokerSH/BD66D813F9811411_wood_railing/BD66D813F9811411_wood_railing_layering_albedo.a.rtex.dds@
                 custom float inputs:displace_in = 0
                 custom float inputs:displace_out = 0
-                custom asset inputs:height_texture = @./assets/world_textures/interiors/broker_safehouse/BD66D813F9811411_wood_railing/BD66D813F9811411_wood_railing_layering_height.h.rtex.dds@
-                custom asset inputs:normalmap_texture = @./assets/world_textures/interiors/broker_safehouse/BD66D813F9811411_wood_railing/BD66D813F9811411_wood_railing_layering_normal_dx_OTH_Normal.n.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/world_textures/interiors/broker_safehouse/BD66D813F9811411_wood_railing/BD66D813F9811411_wood_railing_layering_roughness.r.rtex.dds@
+                custom asset inputs:height_texture = @./assets/wtex/interiors/brokerSH/BD66D813F9811411_wood_railing/BD66D813F9811411_wood_railing_layering_height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/interiors/brokerSH/BD66D813F9811411_wood_railing/BD66D813F9811411_wood_railing_layering_normal_dx_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/interiors/brokerSH/BD66D813F9811411_wood_railing/BD66D813F9811411_wood_railing_layering_roughness.r.rtex.dds@
             }
         }
 
@@ -245,9 +245,9 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/world_textures/interiors/broker_safehouse/BD66D813F9811411_wood_railing/BD66D813F9811411_wood_railing_layering_albedo.a.rtex.dds@
-                custom asset inputs:normalmap_texture = @./assets/world_textures/interiors/broker_safehouse/BD66D813F9811411_wood_railing/BD66D813F9811411_wood_railing_layering_normal_dx_OTH_Normal.n.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/world_textures/interiors/broker_safehouse/BD66D813F9811411_wood_railing/BD66D813F9811411_wood_railing_layering_roughness.r.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/wtex/interiors/brokerSH/BD66D813F9811411_wood_railing/BD66D813F9811411_wood_railing_layering_albedo.a.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/interiors/brokerSH/BD66D813F9811411_wood_railing/BD66D813F9811411_wood_railing_layering_normal_dx_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/interiors/brokerSH/BD66D813F9811411_wood_railing/BD66D813F9811411_wood_railing_layering_roughness.r.rtex.dds@
             }
         }
 
@@ -255,12 +255,12 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/world_textures/interiors/broker_safehouse/638203BA458C9774_wood_railing_pillar/638203BA458C9774_wood_railing_pillar_albedo.a.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/wtex/interiors/brokerSH/638203BA458C9774_wood_railing_pillar/638203BA458C9774_wood_railing_pillar_albedo.a.rtex.dds@
                 custom float inputs:displace_in = 0.03
                 custom float inputs:displace_out = 0
-                custom asset inputs:height_texture = @./assets/world_textures/interiors/broker_safehouse/638203BA458C9774_wood_railing_pillar/638203BA458C9774_wood_railing_pillar_height.h.rtex.dds@
-                custom asset inputs:normalmap_texture = @./assets/world_textures/interiors/broker_safehouse/638203BA458C9774_wood_railing_pillar/638203BA458C9774_wood_railing_pillar_normal_dx_OTH_Normal.n.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/world_textures/interiors/broker_safehouse/638203BA458C9774_wood_railing_pillar/638203BA458C9774_wood_railing_pillar_roughness.r.rtex.dds@
+                custom asset inputs:height_texture = @./assets/wtex/interiors/brokerSH/638203BA458C9774_wood_railing_pillar/638203BA458C9774_wood_railing_pillar_height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/interiors/brokerSH/638203BA458C9774_wood_railing_pillar/638203BA458C9774_wood_railing_pillar_normal_dx_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/interiors/brokerSH/638203BA458C9774_wood_railing_pillar/638203BA458C9774_wood_railing_pillar_roughness.r.rtex.dds@
             }
         }
 
@@ -268,9 +268,9 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/world_textures/interiors/broker_safehouse/47ECA7911CB138E9_window_fol/47ECA7911CB138E9_albedo.a.rtex.dds@
-                custom asset inputs:normalmap_texture = @./assets/world_textures/interiors/broker_safehouse/47ECA7911CB138E9_window_fol/47ECA7911CB138E9_window_fol_normal_dx_OTH_Normal.n.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/world_textures/interiors/broker_safehouse/47ECA7911CB138E9_window_fol/47ECA7911CB138E9_roughness.r.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/wtex/interiors/brokerSH/47ECA7911CB138E9_window_fol/47ECA7911CB138E9_albedo.a.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/interiors/brokerSH/47ECA7911CB138E9_window_fol/47ECA7911CB138E9_window_fol_normal_dx_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/interiors/brokerSH/47ECA7911CB138E9_window_fol/47ECA7911CB138E9_roughness.r.rtex.dds@
             }
         }
 
@@ -303,7 +303,7 @@ over "RootNode"
         )
         {
             def Xform "ref_fd1b310eda1848f9ac3ba6176e5a9674" (
-                prepend references = @./assets/world_textures/interiors/broker_safehouse/A69044022A5AC269_wood_trim/inst_5451AA1628892464_fix.usda@
+                prepend references = @./assets/wtex/interiors/brokerSH/A69044022A5AC269_wood_trim/inst_5451AA1628892464_fix.usda@
             )
             {
                 custom bool IsRemixRef = 1
@@ -335,9 +335,9 @@ over "RootNode"
                             {
                                 over "Shader"
                                 {
-                                    custom asset inputs:diffuse_texture = @./assets/world_textures/interiors/broker_safehouse/A69044022A5AC269_wood_trim/textures/A69044022A5AC269_albedo.a.rtex.dds@
-                                    custom asset inputs:normalmap_texture = @./assets/world_textures/interiors/broker_safehouse/A69044022A5AC269_wood_trim/textures/A69044022A5AC269_normal_dx_OTH_Normal.n.rtex.dds@
-                                    custom asset inputs:reflectionroughness_texture = @./assets/world_textures/interiors/broker_safehouse/A69044022A5AC269_wood_trim/textures/A69044022A5AC269_roughness.r.rtex.dds@
+                                    custom asset inputs:diffuse_texture = @./assets/wtex/interiors/brokerSH/A69044022A5AC269_wood_trim/textures/A69044022A5AC269_albedo.a.rtex.dds@
+                                    custom asset inputs:normalmap_texture = @./assets/wtex/interiors/brokerSH/A69044022A5AC269_wood_trim/textures/A69044022A5AC269_normal_dx_OTH_Normal.n.rtex.dds@
+                                    custom asset inputs:reflectionroughness_texture = @./assets/wtex/interiors/brokerSH/A69044022A5AC269_wood_trim/textures/A69044022A5AC269_roughness.r.rtex.dds@
                                 }
                             }
                         }
@@ -351,7 +351,7 @@ over "RootNode"
         )
         {
             def Xform "ref_d4e7578a30534e89a071ae7d43949d04" (
-                prepend references = @./assets/world_textures/interiors/broker_safehouse/26F9A02743D028E4_wood_handle/inst_AD6CA0FA69D26092_fix.usda@
+                prepend references = @./assets/wtex/interiors/brokerSH/26F9A02743D028E4_wood_handle/inst_AD6CA0FA69D26092_fix.usda@
             )
             {
                 custom bool IsRemixRef = 1
@@ -378,10 +378,10 @@ over "RootNode"
                             {
                                 over "Shader"
                                 {
-                                    custom asset inputs:diffuse_texture = @./assets/world_textures/interiors/broker_safehouse/26F9A02743D028E4_wood_handle/textures/inst_AD6CA0FA69D26092_fix_mat_26F9A02743D028E4_albedo.a.rtex.dds@
-                                    custom asset inputs:normalmap_texture = @./assets/world_textures/interiors/broker_safehouse/26F9A02743D028E4_wood_handle/textures/inst_AD6CA0FA69D26092_fix_mat_26F9A02743D028E4_normal_dx_OTH_Normal.n.rtex.dds@
+                                    custom asset inputs:diffuse_texture = @./assets/wtex/interiors/brokerSH/26F9A02743D028E4_wood_handle/textures/fix_albedo.a.rtex.dds@
+                                    custom asset inputs:normalmap_texture = @./assets/wtex/interiors/brokerSH/26F9A02743D028E4_wood_handle/textures/fix_normal_dx_OTH_Normal.n.rtex.dds@
                                     custom float inputs:reflection_roughness_constant = 0.5
-                                    custom asset inputs:reflectionroughness_texture = @./assets/world_textures/interiors/broker_safehouse/26F9A02743D028E4_wood_handle/textures/inst_AD6CA0FA69D26092_fix_mat_26F9A02743D028E4_roughness.r.rtex.dds@
+                                    custom asset inputs:reflectionroughness_texture = @./assets/wtex/interiors/brokerSH/26F9A02743D028E4_wood_handle/textures/fix_roughness.r.rtex.dds@
                                 }
                             }
                         }
@@ -401,7 +401,7 @@ over "RootNode"
         over "mesh_8787965BDBBA0581"
         {
             def Xform "ref_e00b82476d0d40b39c1651b2d16de9dc" (
-                prepend references = @./assets/world_textures/interiors/broker_safehouse/green_tile_decal/green_tile_decal.usda@
+                prepend references = @./assets/wtex/interiors/brokerSH/green_tile_decal/green_tile_decal.usda@
             )
             {
                 custom bool IsRemixRef = 1

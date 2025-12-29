@@ -40,7 +40,7 @@ over "RootNode"
         )
         {
             def Xform "ref_2c1017bb27334ce4be421ee22eb634e1" (
-                prepend references = @./assets/world_mesh_fixes/terrain/mesh_BD641207EB31BB95/mesh_8FC7E15A049962C4_ext.usda@
+                prepend references = @./assets/wmeshfix/terrain/mesh_BD641207EB31BB95/mesh_8FC7E15A049962C4_ext.usda@
             )
             {
                 custom bool IsRemixRef = 1
@@ -89,7 +89,7 @@ over "RootNode"
         )
         {
             def Xform "ref_d2d86ef1c7f74473b0460df2bd024840" (
-                prepend references = @./assets/world_mesh_fixes/terrain/mesh_409DE4CDB6E5ABE3/fix_mesh_409DE4CDB6E5ABE3.usda@
+                prepend references = @./assets/wmeshfix/terrain/mesh_409DE4CDB6E5ABE3/fix_mesh_409DE4CDB6E5ABE3.usda@
             )
             {
                 custom bool IsRemixRef = 1
@@ -111,7 +111,7 @@ over "RootNode"
                             {
                                 over "Shader"
                                 {
-                                    asset inputs:diffuse_texture = @./assets/world_mesh_fixes/terrain/mesh_409DE4CDB6E5ABE3/textures/BBEB011C8F7FE893_albedo.a.rtex.dds@
+                                    asset inputs:diffuse_texture = @./assets/wmeshfix/terrain/mesh_409DE4CDB6E5ABE3/textures/BBEB011C8F7FE893_albedo.a.rtex.dds@
                                 }
                             }
                         }

@@ -21,7 +21,7 @@ over "RootNode"
                 custom int inputs:blend_type = 0
                 custom color3f inputs:diffuse_color_constant = (0.10424709, 0.099553876, 0.09619712)
                 custom bool inputs:inverted_blend = 0
-                custom asset inputs:normalmap_texture = @./assets/world_textures/dirt_decal/decal_roof_dirt_normal_dx_OTH_Normal.n.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/dirt_decal/decal_roof_dirt_normal_dx_OTH_Normal.n.rtex.dds@
                 custom float inputs:reflection_roughness_constant = 1
                 custom bool inputs:use_legacy_alpha_state = 1
             }
@@ -94,12 +94,12 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/world_textures/interiors/roman_depot/iv_wood_roman_depot_albedo.a.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/wtex/interiors/roman_depot/iv_wood_roman_depot_albedo.a.rtex.dds@
                 custom float inputs:displace_in = 0.02
                 custom float inputs:displace_out = 0.001
-                custom asset inputs:height_texture = @./assets/world_textures/interiors/roman_depot/iv_wood_roman_depot_height.h.rtex.dds@
-                custom asset inputs:normalmap_texture = @./assets/world_textures/interiors/roman_depot/iv_wood_roman_depot_normal_dx_OTH_Normal.n.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/world_textures/interiors/roman_depot/iv_wood_roman_depot_roughness.r.rtex.dds@
+                custom asset inputs:height_texture = @./assets/wtex/interiors/roman_depot/iv_wood_roman_depot_height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/interiors/roman_depot/iv_wood_roman_depot_normal_dx_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/interiors/roman_depot/iv_wood_roman_depot_roughness.r.rtex.dds@
             }
         }
 
@@ -107,10 +107,10 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/prop_textures/vending/sprunk/A2307F504F52BF11_col.a.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/ptex/vending/sprunk/A2307F504F52BF11_col.a.rtex.dds@
                 custom color3f inputs:emissive_color_constant = (1, 0.99999, 0.99999)
                 custom float inputs:emissive_intensity = 5
-                custom asset inputs:emissive_mask_texture = @./assets/prop_textures/vending/sprunk/A2307F504F52BF11_emissive.e.rtex.dds@
+                custom asset inputs:emissive_mask_texture = @./assets/ptex/vending/sprunk/A2307F504F52BF11_emissive.e.rtex.dds@
                 custom bool inputs:enable_emission = 1
                 custom float inputs:metallic_constant = 0.255
                 custom float inputs:reflection_roughness_constant = 0.265
@@ -243,7 +243,7 @@ over "RootNode"
             over "Shader"
             {
                 custom float inputs:emissive_intensity = 1
-                custom asset inputs:emissive_mask_texture = @./assets/world_textures/emissives/A98949D18F699A04_emissive.e.rtex.dds@
+                custom asset inputs:emissive_mask_texture = @./assets/wtex/emissives/A98949D18F699A04_emissive.e.rtex.dds@
                 custom bool inputs:enable_emission = 1
             }
         }
@@ -479,9 +479,9 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/props/prop_textures/emissives/AB61DA7720B5AD81_emissive.e.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/props/ptex/emissives/AB61DA7720B5AD81_emissive.e.rtex.dds@
                 custom float inputs:emissive_intensity = 100
-                custom asset inputs:emissive_mask_texture = @./assets/props/prop_textures/emissives/AB61DA7720B5AD81_warm_outer_dimm_emissive.e.rtex.dds@
+                custom asset inputs:emissive_mask_texture = @./assets/props/ptex/emissives/AB61DA7720B5AD81_warm_outer_dimm_emissive.e.rtex.dds@
                 custom bool inputs:enable_emission = 1
                 custom float inputs:reflection_roughness_constant = 0.69
                 custom bool inputs:thin_walled = 0
@@ -498,7 +498,7 @@ over "RootNode"
                 custom bool inputs:blend_enabled = 0
                 custom int inputs:blend_type = 3
                 custom float inputs:emissive_intensity = 50
-                custom asset inputs:emissive_mask_texture = @./assets/props/prop_textures/emissives/AB61DA7720B5AD81_warm_outer_dimm_emissive.e.rtex.dds@
+                custom asset inputs:emissive_mask_texture = @./assets/props/ptex/emissives/AB61DA7720B5AD81_warm_outer_dimm_emissive.e.rtex.dds@
                 custom bool inputs:enable_emission = 1
                 custom float inputs:thin_wall_thickness = 1
                 custom bool inputs:thin_walled = 1
@@ -512,7 +512,7 @@ over "RootNode"
             {
                 custom bool inputs:blend_enabled = 0
                 custom float inputs:emissive_intensity = 8
-                custom asset inputs:emissive_mask_texture = @./assets/props/prop_textures/emissives/AB61DA7720B5AD81_emissive.e.rtex.dds@
+                custom asset inputs:emissive_mask_texture = @./assets/props/ptex/emissives/AB61DA7720B5AD81_emissive.e.rtex.dds@
                 custom bool inputs:enable_emission = 1
                 custom bool inputs:use_legacy_alpha_state = 0
             }
@@ -525,12 +525,12 @@ over "RootNode"
             over "Shader"
             {
                 custom float inputs:ior_constant = 1.2
-                custom asset inputs:normalmap_texture = @./assets/world_textures/glass/505F852A4E16C024/505F852A4E16C024_normal_dx_OTH_Normal.n.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/glass/505F852A4E16C024/505F852A4E16C024_normal_dx_OTH_Normal.n.rtex.dds@
                 custom float inputs:thin_wall_thickness = 10
                 custom bool inputs:thin_walled = 1
                 custom color3f inputs:transmittance_color = (0.96138996, 0.9613803, 0.9613803)
                 custom float inputs:transmittance_measurement_distance = 1
-                custom asset inputs:transmittance_texture = @./assets/world_textures/glass/505F852A4E16C024/505F852A4E16C024_transmission.a.rtex.dds@
+                custom asset inputs:transmittance_texture = @./assets/wtex/glass/505F852A4E16C024/505F852A4E16C024_transmission.a.rtex.dds@
                 custom bool inputs:use_diffuse_layer = 0
             }
         }
@@ -539,7 +539,7 @@ over "RootNode"
         {
             over "Shader"
             {
-                custom asset inputs:reflectionroughness_texture = @./assets/world_textures/glass/4176FC5F7E15C720/4176FC5F7E15C720_roughness.r.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/glass/4176FC5F7E15C720/4176FC5F7E15C720_roughness.r.rtex.dds@
             }
         }
 
@@ -547,7 +547,7 @@ over "RootNode"
         {
             over "Shader"
             {
-                custom asset inputs:reflectionroughness_texture = @./assets/world_textures/glass/C6E4114DED118177/C6E4114DED118177_roughness.r.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/glass/C6E4114DED118177/C6E4114DED118177_roughness.r.rtex.dds@
             }
         }
 
@@ -559,7 +559,7 @@ over "RootNode"
             {
                 custom float inputs:thin_wall_thickness = 2
                 custom bool inputs:thin_walled = 1
-                custom asset inputs:transmittance_texture = @./assets/world_textures/glass/43ABA64B81CDFDD9/43ABA64B81CDFDD9_transmission.a.rtex.dds@
+                custom asset inputs:transmittance_texture = @./assets/wtex/glass/43ABA64B81CDFDD9/43ABA64B81CDFDD9_transmission.a.rtex.dds@
                 custom bool inputs:use_diffuse_layer = 0
             }
         }
@@ -608,8 +608,8 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/world_textures/glass/FBAB45A584C4DBDE_E14B2A36D9C90107/am_pkslpe_windowc_tilable_albedo.a.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/world_textures/glass/FBAB45A584C4DBDE_E14B2A36D9C90107/am_pkslpe_windowc_tilable.a.rtex_r.dds@
+                asset inputs:diffuse_texture = @./assets/wtex/glass/FBAB45A584C4DBDE_E14B2A36D9C90107/am_pkslpe_windowc_tilable_albedo.a.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/glass/FBAB45A584C4DBDE_E14B2A36D9C90107/am_pkslpe_windowc_tilable.a.rtex_r.dds@
             }
         }
 
@@ -617,8 +617,8 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/world_textures/glass/FBAB45A584C4DBDE_E14B2A36D9C90107/FBAB45A584C4DBDE_albedo.a.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/world_textures/glass/FBAB45A584C4DBDE_E14B2A36D9C90107/FBAB45A584C4DBDE_r.dds@
+                asset inputs:diffuse_texture = @./assets/wtex/glass/FBAB45A584C4DBDE_E14B2A36D9C90107/FBAB45A584C4DBDE_albedo.a.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/glass/FBAB45A584C4DBDE_E14B2A36D9C90107/FBAB45A584C4DBDE_r.dds@
             }
         }
 
@@ -626,8 +626,8 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/world_textures/glass/FBAB45A584C4DBDE_E14B2A36D9C90107/E14B2A36D9C90107_albedo.a.rtex.dds@
-                custom asset inputs:reflectionroughness_texture = @./assets/world_textures/glass/FBAB45A584C4DBDE_E14B2A36D9C90107/E14B2A36D9C90107_r.dds@
+                asset inputs:diffuse_texture = @./assets/wtex/glass/FBAB45A584C4DBDE_E14B2A36D9C90107/E14B2A36D9C90107_albedo.a.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/glass/FBAB45A584C4DBDE_E14B2A36D9C90107/E14B2A36D9C90107_r.dds@
             }
         }
 
@@ -635,7 +635,7 @@ over "RootNode"
         {
             over "Shader"
             {
-                custom asset inputs:reflectionroughness_texture = @./assets/world_textures/glass/FBAB45A584C4DBDE_E14B2A36D9C90107/am_pkslpe_lime_1_r.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/glass/FBAB45A584C4DBDE_E14B2A36D9C90107/am_pkslpe_lime_1_r.dds@
             }
         }
 
@@ -643,7 +643,7 @@ over "RootNode"
         {
             over "Shader"
             {
-                custom asset inputs:reflectionroughness_texture = @./assets/world_textures/glass/FBAB45A584C4DBDE_E14B2A36D9C90107/am_pkslpe_bstonetop_r.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/glass/FBAB45A584C4DBDE_E14B2A36D9C90107/am_pkslpe_bstonetop_r.dds@
             }
         }
 

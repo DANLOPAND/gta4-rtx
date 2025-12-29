@@ -80,13 +80,13 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/prop_textures/small_props/0C08453B49AD01A5_pisswasser/0C08453B49AD01A5_albedo.a.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/ptex/small_props/0C08453B49AD01A5_pisswasser/0C08453B49AD01A5_albedo.a.rtex.dds@
                 custom float inputs:metallic_constant = 0.099999994
-                custom asset inputs:reflectionroughness_texture = @./assets/prop_textures/small_props/0C08453B49AD01A5_pisswasser/0C08453B49AD01A5_roughness.r.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/ptex/small_props/0C08453B49AD01A5_pisswasser/0C08453B49AD01A5_roughness.r.rtex.dds@
                 custom float inputs:subsurface_measurement_distance = 3.6
                 custom color3f inputs:subsurface_single_scattering_albedo = (1, 0.99999, 0.99999)
                 custom asset inputs:subsurface_single_scattering_texture = @@
-                custom asset inputs:subsurface_thickness_texture = @./assets/prop_textures/small_props/0C08453B49AD01A5_pisswasser/0C08453B49AD01A5_trans.a.rtex.dds@
+                custom asset inputs:subsurface_thickness_texture = @./assets/ptex/small_props/0C08453B49AD01A5_pisswasser/0C08453B49AD01A5_trans.a.rtex.dds@
                 custom color3f inputs:subsurface_transmittance_color = (0.1342556, 0.52616423, 0.9150579)
                 custom asset inputs:subsurface_transmittance_texture = @@
                 custom float inputs:subsurface_volumetric_anisotropy = 0.99
@@ -107,14 +107,14 @@ over "RootNode"
             {
                 custom bool inputs:blend_enabled = 0
                 custom int inputs:blend_type = 0
-                asset inputs:diffuse_texture = @./assets/prop_textures/small_props/E55A6418E43672EC_wine_bleuterd/E55A6418E43672EC.a.rtex.dds@
-                custom asset inputs:metallic_texture = @./assets/prop_textures/small_props/E55A6418E43672EC_wine_bleuterd/E55A6418E43672EC_metalness.m.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/ptex/small_props/E55A6418E43672EC_wine_bleuterd/E55A6418E43672EC.a.rtex.dds@
+                custom asset inputs:metallic_texture = @./assets/ptex/small_props/E55A6418E43672EC_wine_bleuterd/E55A6418E43672EC_metalness.m.rtex.dds@
                 custom float inputs:opacity_constant = 1
-                custom asset inputs:reflectionroughness_texture = @./assets/prop_textures/small_props/E55A6418E43672EC_wine_bleuterd/E55A6418E43672EC_roughness.r.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/ptex/small_props/E55A6418E43672EC_wine_bleuterd/E55A6418E43672EC_roughness.r.rtex.dds@
                 custom bool inputs:subsurface_diffusion_profile = 0
                 custom float inputs:subsurface_measurement_distance = 4.96
                 custom color3f inputs:subsurface_single_scattering_albedo = (1, 0.99999, 0.99999)
-                custom asset inputs:subsurface_thickness_texture = @./assets/prop_textures/small_props/E55A6418E43672EC_wine_bleuterd/E55A6418E43672EC_trans_mask.a.rtex.dds@
+                custom asset inputs:subsurface_thickness_texture = @./assets/ptex/small_props/E55A6418E43672EC_wine_bleuterd/E55A6418E43672EC_trans_mask.a.rtex.dds@
                 custom color3f inputs:subsurface_transmittance_color = (0.04925391, 0.48026893, 0.9111969)
                 custom float inputs:subsurface_volumetric_anisotropy = 0.99
                 custom bool inputs:use_legacy_alpha_state = 0
@@ -179,7 +179,7 @@ over "RootNode"
             {
                 custom bool inputs:blend_enabled = 0
                 custom int inputs:blend_type = 3
-                custom asset inputs:normalmap_texture = @./assets/prop_textures/lamps/tlad_safehouse_hanging_fabric/Fabric_Jute_001_normal_OTH_Normal.n.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/ptex/lamps/tlad_safehouse_hanging_fabric/Fabric_Jute_001_normal_OTH_Normal.n.rtex.dds@
                 custom float inputs:reflection_roughness_constant = 0.815
                 custom float inputs:subsurface_measurement_distance = 2.56
                 custom color3f inputs:subsurface_single_scattering_albedo = (0.9266409, 0.5562994, 0.26475453)
@@ -230,7 +230,7 @@ over "RootNode"
             {
                 custom bool inputs:blend_enabled = 0
                 custom int inputs:blend_type = 0
-                custom asset inputs:normalmap_texture = @./assets/prop_textures/lamps/tlad_safehouse_hanging_fabric/Fabric_Jute_001_normal_OTH_Normal.n.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/ptex/lamps/tlad_safehouse_hanging_fabric/Fabric_Jute_001_normal_OTH_Normal.n.rtex.dds@
                 custom float inputs:reflection_roughness_constant = 0.83
                 custom float inputs:subsurface_measurement_distance = 9.92
                 custom color3f inputs:subsurface_single_scattering_albedo = (0.9227799, 0.88967735, 0.84795994)

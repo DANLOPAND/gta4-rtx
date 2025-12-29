@@ -10,7 +10,7 @@ over "RootNode"
         over "mesh_991239CF46FE9DB2"
         {
             def Xform "ref_9a8f8254dccd44d3a8e67edb68b15cc6" (
-                prepend references = @./assets/world_mesh_fixes/roman_depot/mesh_991239CF46FE9DB2_window_wood_fix.usd@
+                prepend references = @./assets/wmeshfix/roman_depot/mesh_991239CF46FE9DB2_window_wood_fix.usd@
             )
             {
                 custom bool IsRemixRef = 1
@@ -29,7 +29,7 @@ over "RootNode"
                             {
                                 over "Shader"
                                 {
-                                    custom asset inputs:diffuse_texture = @./assets/world_mesh_fixes/roman_depot/textures/C56BD938660E00FE_albedo.a.rtex.dds@
+                                    custom asset inputs:diffuse_texture = @./assets/wmeshfix/roman_depot/textures/C56BD938660E00FE_albedo.a.rtex.dds@
                                     custom float inputs:reflection_roughness_constant = 1
                                     custom bool inputs:use_legacy_alpha_state = 0
                                 }
@@ -48,7 +48,7 @@ over "RootNode"
             }
 
             def Xform "ref_9e166abb18594cc9b70bc333db80a1d4" (
-                prepend references = @./assets/world_mesh_fixes/roman_depot/mesh_AB8A8E7D187A9063_window_glass_fix_single.usd@
+                prepend references = @./assets/wmeshfix/roman_depot/mesh_AB8A8E7D187A9063_window_glass_fix_single.usd@
             )
             {
                 custom bool IsRemixRef = 1
@@ -87,7 +87,7 @@ over "RootNode"
                                         uniform token info:implementationSource = "sourceAsset"
                                         uniform asset info:mdl:sourceAsset = @AperturePBR_Opacity.mdl@
                                         uniform token info:mdl:sourceAsset:subIdentifier = "AperturePBR_Opacity"
-                                        custom asset inputs:diffuse_texture = @./assets/world_mesh_fixes/roman_depot/textures/C56BD938660E00FE_albedo.a.rtex.dds@
+                                        custom asset inputs:diffuse_texture = @./assets/wmeshfix/roman_depot/textures/C56BD938660E00FE_albedo.a.rtex.dds@
                                         custom bool inputs:use_legacy_alpha_state = 0
                                         token outputs:out (
                                             renderType = "material"
@@ -151,7 +151,7 @@ over "RootNode"
                             {
                                 over "Shader"
                                 {
-                                    custom asset inputs:diffuse_texture = @./assets/world_mesh_fixes/roman_depot/textures/C56BD938660E00FE_albedo.a.rtex.dds@
+                                    custom asset inputs:diffuse_texture = @./assets/wmeshfix/roman_depot/textures/C56BD938660E00FE_albedo.a.rtex.dds@
                                     custom bool inputs:use_legacy_alpha_state = 0
                                 }
                             }
@@ -161,7 +161,7 @@ over "RootNode"
             }
 
             def Xform "ref_6636812d50514706887819d9c3348368" (
-                prepend references = @./assets/world_mesh_fixes/roman_depot/mesh_991239CF46FE9DB2_window_wood_outer_single.usd@
+                prepend references = @./assets/wmeshfix/roman_depot/mesh_991239CF46FE9DB2_window_wood_outer_single.usd@
             )
             {
                 custom bool IsRemixRef = 1
@@ -185,7 +185,7 @@ over "RootNode"
                             {
                                 over "Shader"
                                 {
-                                    custom asset inputs:diffuse_texture = @./assets/world_mesh_fixes/roman_depot/textures/C56BD938660E00FE_albedo.a.rtex.dds@
+                                    custom asset inputs:diffuse_texture = @./assets/wmeshfix/roman_depot/textures/C56BD938660E00FE_albedo.a.rtex.dds@
                                     custom bool inputs:use_legacy_alpha_state = 0
                                 }
                             }
@@ -206,7 +206,7 @@ over "RootNode"
             }
 
             def Xform "ref_9915e3580e2544e886912639af6988aa" (
-                prepend references = @./assets/world_mesh_fixes/roman_depot/mesh_991239CF46FE9DB2_window_wood_outer_single.usd@
+                prepend references = @./assets/wmeshfix/roman_depot/mesh_991239CF46FE9DB2_window_wood_outer_single.usd@
             )
             {
                 custom bool IsRemixRef = 1
@@ -231,7 +231,7 @@ over "RootNode"
                                 over "Shader"
                                 {
                                     custom bool inputs:blend_enabled = 0
-                                    custom asset inputs:diffuse_texture = @./assets/world_mesh_fixes/roman_depot/textures/C56BD938660E00FE_albedo.a.rtex.dds@
+                                    custom asset inputs:diffuse_texture = @./assets/wmeshfix/roman_depot/textures/C56BD938660E00FE_albedo.a.rtex.dds@
                                     custom float inputs:reflection_roughness_constant = 0.84499997
                                     custom bool inputs:use_legacy_alpha_state = 0
                                 }
@@ -253,7 +253,7 @@ over "RootNode"
             }
 
             def Xform "ref_e7d11ebdff994d51b1d10cb359405bda" (
-                prepend references = @./assets/world_mesh_fixes/roman_depot/mesh_991239CF46FE9DB2_window_wood_outer_single.usd@
+                prepend references = @./assets/wmeshfix/roman_depot/mesh_991239CF46FE9DB2_window_wood_outer_single.usd@
             )
             {
                 custom bool IsRemixRef = 1
@@ -277,7 +277,7 @@ over "RootNode"
                             {
                                 over "Shader"
                                 {
-                                    custom asset inputs:diffuse_texture = @./assets/world_mesh_fixes/roman_depot/textures/C56BD938660E00FE_albedo.a.rtex.dds@
+                                    custom asset inputs:diffuse_texture = @./assets/wmeshfix/roman_depot/textures/C56BD938660E00FE_albedo.a.rtex.dds@
                                     custom bool inputs:use_legacy_alpha_state = 0
                                 }
                             }
@@ -303,7 +303,7 @@ over "RootNode"
         )
         {
             def Xform "ref_b569e878199e4fe3a6054e7b0a4c0a5e" (
-                prepend references = @./assets/world_mesh_fixes/roman_depot/mesh_AB8A8E7D187A9063_window_glass_fix.usd@
+                prepend references = @./assets/wmeshfix/roman_depot/mesh_AB8A8E7D187A9063_window_glass_fix.usd@
             )
             {
                 custom bool IsRemixRef = 1
@@ -337,7 +337,7 @@ over "RootNode"
                                         uniform token info:implementationSource = "sourceAsset"
                                         uniform asset info:mdl:sourceAsset = @AperturePBR_Opacity.mdl@
                                         uniform token info:mdl:sourceAsset:subIdentifier = "AperturePBR_Opacity"
-                                        custom asset inputs:diffuse_texture = @./assets/world_mesh_fixes/roman_depot/textures/C56BD938660E00FE_albedo.a.rtex.dds@
+                                        custom asset inputs:diffuse_texture = @./assets/wmeshfix/roman_depot/textures/C56BD938660E00FE_albedo.a.rtex.dds@
                                         token outputs:out (
                                             renderType = "material"
                                         )
@@ -365,7 +365,7 @@ over "RootNode"
                                         uniform token info:implementationSource = "sourceAsset"
                                         uniform asset info:mdl:sourceAsset = @AperturePBR_Opacity.mdl@
                                         uniform token info:mdl:sourceAsset:subIdentifier = "AperturePBR_Opacity"
-                                        custom asset inputs:diffuse_texture = @./assets/world_mesh_fixes/roman_depot/textures/C56BD938660E00FE_albedo.a.rtex.dds@
+                                        custom asset inputs:diffuse_texture = @./assets/wmeshfix/roman_depot/textures/C56BD938660E00FE_albedo.a.rtex.dds@
                                         custom bool inputs:use_legacy_alpha_state = 0
                                         token outputs:out (
                                             renderType = "material"
@@ -437,7 +437,7 @@ over "RootNode"
         )
         {
             def Xform "ref_36da67f6c52c474ca42f2282e899299f" (
-                prepend references = @./assets/world_mesh_fixes/roman_depot/mesh_11728CD743410F3A_outer_glass_fix.usd@
+                prepend references = @./assets/wmeshfix/roman_depot/mesh_11728CD743410F3A_outer_glass_fix.usd@
             )
             {
                 custom bool IsRemixRef = 1
@@ -456,7 +456,7 @@ over "RootNode"
                             {
                                 over "Shader"
                                 {
-                                    custom asset inputs:diffuse_texture = @./assets/world_mesh_fixes/roman_depot/textures/342E3CBAAA30D43D_outer_windows_albedo.a.rtex.dds@
+                                    custom asset inputs:diffuse_texture = @./assets/wmeshfix/roman_depot/textures/342E3CBAAA30D43D_outer_windows_albedo.a.rtex.dds@
                                 }
                             }
                         }
@@ -470,7 +470,7 @@ over "RootNode"
         )
         {
             def Xform "ref_85ac9a33522e4d7a80cbf17335f238e4" (
-                prepend references = @./assets/world_mesh_fixes/roman_depot/mesh_D705BA4687D226C4_fix.usd@
+                prepend references = @./assets/wmeshfix/roman_depot/mesh_D705BA4687D226C4_fix.usd@
             )
             {
                 custom bool IsRemixRef = 1
@@ -497,7 +497,7 @@ over "RootNode"
                             {
                                 over "Shader"
                                 {
-                                    custom asset inputs:diffuse_texture = @./assets/world_mesh_fixes/roman_depot/textures/A2F91027E77F0184_albedo.a.rtex.dds@
+                                    custom asset inputs:diffuse_texture = @./assets/wmeshfix/roman_depot/textures/A2F91027E77F0184_albedo.a.rtex.dds@
                                 }
                             }
                         }
@@ -511,7 +511,7 @@ over "RootNode"
         )
         {
             def Xform "ref_6f755173b980415ca01b28dffb504280" (
-                prepend references = @./assets/world_mesh_fixes/roman_depot/mesh_365DC60C2BD7B2FF_fix.usd@
+                prepend references = @./assets/wmeshfix/roman_depot/mesh_365DC60C2BD7B2FF_fix.usd@
             )
             {
                 custom bool IsRemixRef = 1
@@ -538,7 +538,7 @@ over "RootNode"
                             {
                                 over "Shader"
                                 {
-                                    custom asset inputs:diffuse_texture = @./assets/world_mesh_fixes/roman_depot/textures/4EBA6E10AA174C3D_albedo.a.rtex.dds@
+                                    custom asset inputs:diffuse_texture = @./assets/wmeshfix/roman_depot/textures/4EBA6E10AA174C3D_albedo.a.rtex.dds@
                                 }
                             }
                         }
@@ -554,7 +554,7 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/world_mesh_fixes/roman_depot/textures/C56BD938660E00FE_albedo.a.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/wmeshfix/roman_depot/textures/C56BD938660E00FE_albedo.a.rtex.dds@
                 custom bool inputs:use_legacy_alpha_state = 0
             }
         }

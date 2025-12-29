@@ -11,7 +11,7 @@ over "RootNode"
         {
             over "Shader"
             {
-                asset inputs:diffuse_texture = @./assets/prop_textures/tables/04EA53916EB64F77_tbogt_club_table/04EA53916EB64F77_albedo.a.rtex.dds@
+                asset inputs:diffuse_texture = @./assets/ptex/tables/04EA53916EB64F77_tbogt_club_table/04EA53916EB64F77_albedo.a.rtex.dds@
                 custom asset inputs:metallic_texture = @@
                 custom asset inputs:normalmap_texture = @@
                 custom asset inputs:reflectionroughness_texture = @./assets/helper/imperfections/smudges_med_roughness.r.rtex.dds@
