@@ -331,7 +331,7 @@ over "RootNode"
 
                         over "Looks"
                         {
-                            over "mat_A69044022A5AC269"
+                            over "fix_A69044022A5AC269"
                             {
                                 over "Shader"
                                 {

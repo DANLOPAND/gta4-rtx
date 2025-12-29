@@ -546,6 +546,159 @@ over "RootNode"
                 }
             }
         }
+
+        over "mesh_1C433302311B31DB" (
+            references = None
+        )
+        {
+            def Xform "ref_76c58171b14740f7944201c9a42c4dca" (
+                prepend references = @./assets/wtex/glass/89D25A06CADAC98D/fix_1C43330.usda@
+            )
+            {
+                custom bool IsRemixRef = 1
+                double3 xformOp:rotateXYZ = (0, 0, 0)
+                double3 xformOp:scale = (1, 1, 1)
+                double3 xformOp:translate = (0, 0, 0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+
+                over "XForms"
+                {
+                    float3 xformOp:rotateXYZ = (0, 0, 0)
+                    float3 xformOp:scale = (1, 1, 1)
+                    double3 xformOp:translate = (0, 0, 0)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+
+                    over "World"
+                    {
+                        over "Looks"
+                        {
+                            over "fix_89D25"
+                            {
+                                over "Shader"
+                                {
+                                    color3f inputs:diffuse_color_constant = (0.25096524, 0.25096273, 0.25096273)
+                                    custom asset inputs:diffuse_texture = @./assets/wtex/glass/89D25A06CADAC98D/89D25_transm_f.a.rtex.dds@
+                                    custom float inputs:metallic_constant = 1
+                                    custom float inputs:reflection_roughness_constant = 0.114999995
+                                    custom asset inputs:reflectionroughness_texture = @@
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        over "mesh_E006476DAD0EA0B0" (
+            references = None
+        )
+        {
+            def Xform "ref_a5c1c5af7f60407da53b97bafb981791" (
+                prepend references = @./assets/wtex/glass/A1A69826995A7E1E/fix_meE00647.usda@
+            )
+            {
+                custom bool IsRemixRef = 1
+                double3 xformOp:rotateXYZ = (0, 0, 0)
+                double3 xformOp:scale = (1, 1, 1)
+                double3 xformOp:translate = (0, 0, 0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+
+                over "XForms"
+                {
+                    float3 xformOp:rotateXYZ = (0, 0, 0)
+                    float3 xformOp:scale = (1, 1, 1)
+                    double3 xformOp:translate = (0, 0, 0)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+
+                    over "World"
+                    {
+                        over "Looks"
+                        {
+                            over "fix_metal_A1A69826"
+                            {
+                                over "Shader"
+                                {
+                                    color3f inputs:diffuse_color_constant = (0.22393823, 0.22393599, 0.22393599)
+                                    custom asset inputs:diffuse_texture = @./assets/wtex/glass/A1A69826995A7E1E/A1A69_trans.a.rtex.dds@
+                                    custom float inputs:metallic_constant = 0.555
+                                    custom float inputs:reflection_roughness_constant = 0.22999999
+                                    custom bool inputs:use_legacy_alpha_state = 0
+                                }
+                            }
+
+                            over "fix_glass_A1A69826"
+                            {
+                                over "Shader"
+                                {
+                                    custom float inputs:ior_constant = 2
+                                    custom asset inputs:normalmap_texture = @./assets/wtex/glass/A1A69826995A7E1E/A1A69_txt_nml_dx_OTH_Normal.n.rtex.dds@
+                                    custom float inputs:thin_wall_thickness = 0.8
+                                    custom bool inputs:thin_walled = 1
+                                    custom color3f inputs:transmittance_color = (1, 0.99999, 0.99999)
+                                    custom float inputs:transmittance_measurement_distance = 1
+                                    custom asset inputs:transmittance_texture = @./assets/wtex/glass/A1A69826995A7E1E/A1A69_trans.a.rtex.dds@
+                                    custom bool inputs:use_diffuse_layer = 0
+                                }
+                            }
+                        }
+
+                        over "glass"
+                        {
+                            over "glass_001"
+                            {
+                                uniform bool doubleSided = 1
+                            }
+                        }
+
+                        over "metalframe"
+                        {
+                            over "metalframe_001"
+                            {
+                                uniform bool doubleSided = 1
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        over "mesh_28905542F5D07EDF" (
+            references = None
+        )
+        {
+            def Xform "ref_d74f763c8fbc4efe90c28e2aef422924" (
+                prepend references = @./assets/wmeshfix/broker/fence_289055/br_fence_fix01.usda@
+            )
+            {
+                custom bool IsRemixRef = 1
+                double3 xformOp:rotateXYZ = (0, 0, 0)
+                double3 xformOp:scale = (1, 1, 1)
+                double3 xformOp:translate = (0, 0, 0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+
+                over "XForms"
+                {
+                    float3 xformOp:rotateXYZ = (0, 0, 0)
+                    float3 xformOp:scale = (1, 1, 1)
+                    double3 xformOp:translate = (0, 0, 0)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+
+                    over "World"
+                    {
+                        over "Looks"
+                        {
+                            over "fix_F42CF6B05"
+                            {
+                                over "Shader"
+                                {
+                                    custom asset inputs:diffuse_texture = @./assets/wmeshfix/broker/fence_289055/tex/F42CF6B051FEB51A_albedo.a.rtex.dds@
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     over "Looks"

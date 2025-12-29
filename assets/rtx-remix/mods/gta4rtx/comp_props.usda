@@ -356,15 +356,6 @@ over "RootNode"
             }
         }
 
-        over "mat_A69044022A5AC269"
-        {
-            over "Shader"
-            {
-                custom float inputs:metallic_constant = 0.84999996
-                custom float inputs:reflection_roughness_constant = 0.45999998
-            }
-        }
-
         over "mat_85D10BFB247689C0"
         {
             over "Shader"
@@ -486,6 +477,74 @@ over "RootNode"
             over "Shader"
             {
                 custom float inputs:reflection_roughness_constant = 0.96999997
+            }
+        }
+
+        over "mat_79E73962DD68FB94" (
+            references = @./materials/AperturePBR_Translucent.usda@</Looks/mat_AperturePBR_Translucent>
+        )
+        {
+            over "Shader"
+            {
+                custom float inputs:thin_wall_thickness = 1
+                custom bool inputs:thin_walled = 1
+                custom color3f inputs:transmittance_color = (0.8054889, 0.8378378, 0.834464)
+                custom float inputs:transmittance_measurement_distance = 1
+            }
+        }
+
+        over "mat_3F6C008F32FE3D33"
+        {
+            over "Shader"
+            {
+                custom float inputs:metallic_constant = 0.78
+                custom float inputs:reflection_roughness_constant = 0.105
+            }
+        }
+
+        over "mat_E52B613AB4B04486"
+        {
+            over "Shader"
+            {
+                custom float inputs:reflection_roughness_constant = 1
+            }
+        }
+
+        over "mat_6284FFE516A6C9D2"
+        {
+            over "Shader"
+            {
+                custom float inputs:reflection_roughness_constant = 0.77
+            }
+        }
+
+        over "mat_E57D835AF5D013FE" (
+            references = @./materials/AperturePBR_Translucent.usda@</Looks/mat_AperturePBR_Translucent>
+        )
+        {
+            over "Shader"
+            {
+                custom float inputs:ior_constant = 1.5
+                custom asset inputs:normalmap_texture = @./assets/props/brokerSH/rug01/textures/broker_rug01_persian_rug01_normal_dx_OTH_Normal.n.rtex.dds@
+                custom float inputs:thin_wall_thickness = 0.1
+                custom bool inputs:thin_walled = 1
+                custom color3f inputs:transmittance_color = (0.37709635, 0.7876448, 0.7543568)
+                custom float inputs:transmittance_measurement_distance = 1
+                custom asset inputs:transmittance_texture = @./assets/ptex/tables/E57D835AF5D013FE/e57_transmission_less.a.rtex.dds@
+                custom bool inputs:use_diffuse_layer = 1
+            }
+        }
+
+        over "mat_9CA0ACEC206FCF52"
+        {
+            over "Shader"
+            {
+                custom float inputs:subsurface_measurement_distance = 2.8
+                custom color3f inputs:subsurface_single_scattering_albedo = (0.63706553, 0.63706565, 0.6370593)
+                custom asset inputs:subsurface_single_scattering_texture = @./assets/props/ptex/umbrella/9CA0ACEC206FCF52/umb_trans.a.rtex.dds@
+                custom color3f inputs:subsurface_transmittance_color = (0.9034749, 0.8685917, 0.8685917)
+                custom asset inputs:subsurface_transmittance_texture = @./assets/props/ptex/umbrella/9CA0ACEC206FCF52/umb_trans.a.rtex.dds@
+                custom float inputs:subsurface_volumetric_anisotropy = -0.3564
             }
         }
     }
