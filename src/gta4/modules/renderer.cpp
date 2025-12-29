@@ -1,4 +1,4 @@
-﻿#include "std_include.hpp"
+#include "std_include.hpp"
 #include "renderer.hpp"
 
 #include "d3d9ex.hpp"
@@ -3247,6 +3247,9 @@ namespace gta4
 		// skip og light rendering
 		shared::utils::hook::conditional_jump_to_jmp(game::cond_jmp_addr__skip_deferred_light_rendering01); // 0x928AE5
 		shared::utils::hook::set(game::cond_jmp_addr__skip_deferred_light_rendering02, 0xC3); // 0x8DCBC0 - do not exec code inside CDrawDefLight::Draw
+
+		// do not add projected light coronas
+		shared::utils::hook::set(game::nop_addr__disable_add_projected_light, 0xC3);
 
 		shared::utils::hook(game::retn_addr__pre_draw_fx_instance - 5u, pre_draw_fx_instance_stub, HOOK_JUMP).install()->quick(); // 0x8DD5A4 --- retn to (0x8DD5A9 .. sig addr)
 		shared::utils::hook(game::hk_addr__post_draw_fx_instance, post_draw_fx_instance_stub, HOOK_JUMP).install()->quick(); // 0x8DD659

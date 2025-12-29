@@ -183,7 +183,6 @@ namespace gta4::game
 	extern uint32_t retn_addr__frustum_check_interior_objs;
 
 	extern uint32_t hk_addr__prevent_game_input_func;
-
 	extern uint32_t nop_addr__always_draw_game_in_menus;
 
 	extern uint32_t nop_addr__disable_unused_rendering_01;
@@ -211,6 +210,7 @@ namespace gta4::game
 
 	extern uint32_t cond_jmp_addr__skip_deferred_light_rendering01;
 	extern uint32_t cond_jmp_addr__skip_deferred_light_rendering02;
+	extern uint32_t nop_addr__disable_add_projected_light;
 
 	extern uint32_t hk_addr__on_draw_entities_mod_fn_args;
 	extern uint32_t hk_addr__rmcdrawable_grab_model_hash;

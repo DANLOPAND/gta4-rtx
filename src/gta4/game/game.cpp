@@ -192,6 +192,7 @@ namespace gta4::game
 
 	uint32_t cond_jmp_addr__skip_deferred_light_rendering01 = 0u;
 	uint32_t cond_jmp_addr__skip_deferred_light_rendering02 = 0u;
+	uint32_t nop_addr__disable_add_projected_light = 0u;
 
 	uint32_t hk_addr__on_draw_entities_mod_fn_args = 0u;
 	uint32_t hk_addr__rmcdrawable_grab_model_hash = 0u;
@@ -675,7 +676,7 @@ namespace gta4::game
 
 		PATTERN_OFFSET_SIMPLE(cond_jmp_addr__skip_deferred_light_rendering01, "0F 8E ? ? ? ? 83 C7 ? 89 7C 24 ? 8B 47", 0, 0x928AE5);
 		PATTERN_OFFSET_SIMPLE(cond_jmp_addr__skip_deferred_light_rendering02, "56 8B F1 FF 76 ? FF 76 ? E8", 0, 0x8DCBC0);
-
+		PATTERN_OFFSET_SIMPLE(nop_addr__disable_add_projected_light, "8B 15 ? ? ? ? 56 8D 72", 0, 0xC1F020);
 
 		PATTERN_OFFSET_SIMPLE(hk_addr__on_draw_entities_mod_fn_args, "50 50 0F B6 46 ? 50 8D 44 24 ? 50 8B CF", 0, 0x8DCD49);
 		if (const auto offset = shared::utils::mem::find_pattern("? ? ? ? ? ? 33 C0 C7 86 ? ? ? ? ? ? ? ? 89 86 ? ? ? ? C7 86", 2, "hk_addr__rmcdrawable_grab_model_hash", use_pattern, 0x633994); offset) 
