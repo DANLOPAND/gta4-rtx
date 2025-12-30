@@ -493,15 +493,6 @@ over "RootNode"
             }
         }
 
-        over "mat_3F6C008F32FE3D33"
-        {
-            over "Shader"
-            {
-                custom float inputs:metallic_constant = 0.78
-                custom float inputs:reflection_roughness_constant = 0.105
-            }
-        }
-
         over "mat_E52B613AB4B04486"
         {
             over "Shader"
