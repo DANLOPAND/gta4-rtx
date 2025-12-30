@@ -58,6 +58,8 @@ namespace gta4
 				return;
 			}
 
+			const auto im = imgui::get();
+
 			// save & restore after drawing
 			IDirect3DVertexShader9* og_vs = nullptr;
 			dev->GetVertexShader(&og_vs);
@@ -82,7 +84,7 @@ namespace gta4
 				if (vp->sceneviewport)
 				{
 					Vector cam_org = &vp->sceneviewport->cameraInv.m[3][0];
-					cam_org.z += 20.0f; //+ (float)imgui::get()->m_dbg_int_01;
+					cam_org.z += 20.0f + im->m_dbg_global_wetness_rain_marker_height_offset;
 
 					// #9001 at day and 9003 at night (we need to adjust emissiveness and metalness to make it more or less visible)
 					const int marker_num = !is_night ? 9001 : 9003;
@@ -96,7 +98,7 @@ namespace gta4
 				if (vp->sceneviewport)
 				{
 					Vector cam_org = &vp->sceneviewport->cameraInv.m[3][0];
-					cam_org.z += 20.0f; 
+					cam_org.z += 20.0f + im->m_dbg_global_wetness_rain_marker_height_offset;
 
 					// #9002 at day and 9004 at night (we need to adjust emissiveness and metalness to make it more or less visible)
 					const int marker_num = !is_night ? 9002 : 9004;

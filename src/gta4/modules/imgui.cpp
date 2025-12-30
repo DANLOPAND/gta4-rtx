@@ -847,6 +847,7 @@ namespace gta4
 			}
 
 			ImGui::Checkbox("Wetness OcclTest Allow on Ignored", &im->m_dbg_global_wetness_occl_allow_on_ignored); TT("Allows occlusion tests on ignored surfaces.");
+			ImGui::DragFloat("Wetness Rain Marker Height Offset", &im->m_dbg_global_wetness_rain_marker_height_offset, 0.05f, -100.0f, 100.0f, "%.0f");
 
 			ImGui::TreePop();
 		}

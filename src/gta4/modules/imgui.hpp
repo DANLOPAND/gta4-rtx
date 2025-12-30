@@ -103,6 +103,7 @@ namespace gta4
 		bool m_dbg_global_wetness_override = false;
 		float m_dbg_global_wetness = 0.0f;
 		bool m_dbg_global_wetness_occl_allow_on_ignored = false;
+		float m_dbg_global_wetness_rain_marker_height_offset = 0.0f;
 
 		bool m_dbg_custom_veh_headlight_enabled = false;
 		Vector m_dbg_custom_veh_headlight_color = { 1.0f, 0.0f, 0.0f };
