@@ -318,6 +318,9 @@ namespace gta4
 				rain_flags |= renderer::WETNESS_FLAG_ENABLE_EXP_RAINDROPS | renderer::WETNESS_FLAG_USE_LOCAL_COORDINATES | renderer::WETNESS_FLAG_RAINDROPS_HALF_DENSITY;
 			}
 		}
+		else if (ctx.info.preset_index == GTA_VEHICLE_VEHGLASS) {
+			return; // do not set roughness mod on vehglass if raindrops are disabled
+		}
 
 		renderer::set_remix_roughness_scalar(dev,
 			gs->timecycle_wetness_vehicle_scalar.get_as<float>(),
