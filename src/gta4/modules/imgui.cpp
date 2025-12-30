@@ -1155,7 +1155,13 @@ namespace gta4
 		ImGui::Spacing(0, 4);
 
 		compsettings_bool_widget("Enable Rain - Remix Particle System", gs->rain_particle_system_enabled);
-		compsettings_bool_widget("Rain - Expensive Collision Testing", gs->remix_override_enable_particle_tlas_collision);
+		if (compsettings_bool_widget("Rain - Expensive Collision Testing", gs->remix_override_enable_particle_tlas_collision))
+		{
+			auto vars = remix_vars::get();
+			static auto particles_forceScreenSpaceCollision = vars->get_option("rtx.particles.forceScreenSpaceCollision");
+			remix_vars::option_value val{ .enabled = !gs->remix_override_enable_particle_tlas_collision._bool() };
+			vars->set_option(particles_forceScreenSpaceCollision, val, false, true);
+		}
 
 		ImGui::Spacing(0, 4);
 	}
@@ -1695,7 +1701,13 @@ namespace gta4
 
 		compsettings_bool_widget("Enable Rain - Remix Particle System", gs->rain_particle_system_enabled);
 		ImGui::Style_BoldOrangeTextPush();
-		compsettings_bool_widget("Rain - Expensive Collision Testing", gs->remix_override_enable_particle_tlas_collision);
+		if (compsettings_bool_widget("Rain - Expensive Collision Testing", gs->remix_override_enable_particle_tlas_collision))
+		{
+			auto vars = remix_vars::get();
+			static auto particles_forceScreenSpaceCollision = vars->get_option("rtx.particles.forceScreenSpaceCollision");
+			remix_vars::option_value val { .enabled = !gs->remix_override_enable_particle_tlas_collision._bool() };
+			vars->set_option(particles_forceScreenSpaceCollision, val, false, true);
+		}
 		ImGui::Style_BoldOrangeTextPop();
 
 		ImGui::Spacing(0, inbetween_spacing);

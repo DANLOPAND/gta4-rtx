@@ -559,13 +559,6 @@ namespace gta4
 				{
 					framecounter = 0u;
 
-					{
-						const auto particle_tlas_enabled = gs->remix_override_enable_particle_tlas_collision._bool();
-						static auto particles_forceScreenSpaceCollision = get_option("rtx.particles.forceScreenSpaceCollision");
-						remix_vars::option_value val { .enabled = !particle_tlas_enabled };
-						set_option(particles_forceScreenSpaceCollision, val, false, true);
-					}
-
 					// Remix sets 'rtx.di.initialSampleCount' to hardcoded values on start
 					// and we def. need more then 3 samples to get somewhat good looking vehicle lights
 					const auto rtxdi_override_val = gs->remix_override_rtxdi_samplecount.get_as<int>();

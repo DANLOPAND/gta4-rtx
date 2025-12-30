@@ -138,7 +138,7 @@ over "RootNode"
                                 bool primvars:particle:alignParticlesToVelocity = 1
                                 uniform token primvars:particle:billboardType = "FaceCamera_UpAxisLocked"
                                 float primvars:particle:collisionRestitution = 0
-                                float primvars:particle:collisionThickness = 0.01
+                                float primvars:particle:collisionThickness = 0.001
                                 bool primvars:particle:enableCollisionDetection = 1
                                 bool primvars:particle:enableCollisionDetectionTLAS = 1
                                 bool primvars:particle:enableMotionTrail = 1
@@ -149,12 +149,12 @@ over "RootNode"
                                 float primvars:particle:initialVelocityFromNormal = 200
                                 int primvars:particle:maxNumParticles = 15000
                                 float primvars:particle:maxSpawnSize = 7
-                                float primvars:particle:maxSpeed = 2000
                                 float primvars:particle:maxTimeToLive = 4
                                 float primvars:particle:minSpawnSize = 6
                                 float primvars:particle:minTimeToLive = 3
                                 float primvars:particle:motionTrailMultiplier = 1.6
                                 float primvars:particle:spawnRatePerSecond = 1400
+                                float primvars:particle:maxSpeed = 2000
                             }
                         }
                     }
@@ -220,7 +220,7 @@ over "RootNode"
                                 bool primvars:particle:alignParticlesToVelocity = 1
                                 uniform token primvars:particle:billboardType = "FaceCamera_UpAxisLocked"
                                 float primvars:particle:collisionRestitution = 0
-                                float primvars:particle:collisionThickness = 0.01
+                                float primvars:particle:collisionThickness = 0.001
                                 bool primvars:particle:enableCollisionDetection = 1
                                 bool primvars:particle:enableCollisionDetectionTLAS = 1
                                 bool primvars:particle:enableMotionTrail = 1
@@ -231,12 +231,12 @@ over "RootNode"
                                 float primvars:particle:initialVelocityFromNormal = 200
                                 int primvars:particle:maxNumParticles = 7000
                                 float primvars:particle:maxSpawnSize = 7
-                                float primvars:particle:maxSpeed = 2000
                                 float primvars:particle:maxTimeToLive = 4
                                 float primvars:particle:minSpawnSize = 5
                                 float primvars:particle:minTimeToLive = 3
                                 float primvars:particle:motionTrailMultiplier = 1.4
                                 float primvars:particle:spawnRatePerSecond = 300
+                                float primvars:particle:maxSpeed = 2000
                             }
                         }
                     }
@@ -302,7 +302,7 @@ over "RootNode"
                                 bool primvars:particle:alignParticlesToVelocity = 1
                                 uniform token primvars:particle:billboardType = "FaceCamera_UpAxisLocked"
                                 float primvars:particle:collisionRestitution = 0
-                                float primvars:particle:collisionThickness = 0.01
+                                float primvars:particle:collisionThickness = 0.001
                                 bool primvars:particle:enableCollisionDetection = 1
                                 bool primvars:particle:enableCollisionDetectionTLAS = 1
                                 bool primvars:particle:enableMotionTrail = 1
@@ -313,12 +313,12 @@ over "RootNode"
                                 float primvars:particle:initialVelocityFromNormal = 200
                                 int primvars:particle:maxNumParticles = 15000
                                 float primvars:particle:maxSpawnSize = 7
-                                float primvars:particle:maxSpeed = 2000
                                 float primvars:particle:maxTimeToLive = 4
                                 float primvars:particle:minSpawnSize = 5
                                 float primvars:particle:minTimeToLive = 4
                                 float primvars:particle:motionTrailMultiplier = 1.5
                                 float primvars:particle:spawnRatePerSecond = 1300
+                                float primvars:particle:maxSpeed = 2000
                             }
                         }
                     }
@@ -384,7 +384,7 @@ over "RootNode"
                                 bool primvars:particle:alignParticlesToVelocity = 1
                                 uniform token primvars:particle:billboardType = "FaceCamera_UpAxisLocked"
                                 float primvars:particle:collisionRestitution = 0
-                                float primvars:particle:collisionThickness = 0.01
+                                float primvars:particle:collisionThickness = 0.001
                                 bool primvars:particle:enableCollisionDetection = 1
                                 bool primvars:particle:enableCollisionDetectionTLAS = 1
                                 bool primvars:particle:enableMotionTrail = 1
@@ -395,12 +395,12 @@ over "RootNode"
                                 float primvars:particle:initialVelocityFromNormal = 200
                                 int primvars:particle:maxNumParticles = 7000
                                 float primvars:particle:maxSpawnSize = 7
-                                float primvars:particle:maxSpeed = 2000
                                 float primvars:particle:maxTimeToLive = 4
                                 float primvars:particle:minSpawnSize = 5
                                 float primvars:particle:minTimeToLive = 3
                                 float primvars:particle:motionTrailMultiplier = 1.4
                                 float primvars:particle:spawnRatePerSecond = 300
+                                float primvars:particle:maxSpeed = 2000
                             }
                         }
                     }
