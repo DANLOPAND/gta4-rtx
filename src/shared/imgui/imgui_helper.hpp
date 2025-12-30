@@ -83,6 +83,8 @@ namespace ImGui
 	void Style_ColorButtonPop();
 	void Style_InvisibleSelectorPush();
 	void Style_InvisibleSelectorPop();
+	void Style_BoldOrangeTextPush();
+	void Style_BoldOrangeTextPop();
 
 	// #
 
@@ -112,4 +114,6 @@ namespace ImGui
 
 	float Widget_ContainerWithDropdownShadow(const float container_height, const std::function<void()>& callback, const ImVec4* bg_col = nullptr, const ImVec4* border_col = nullptr);
 	float Widget_ContainerWithDropdownShadowSquare(const float container_height, const std::function<void()>& callback, const ImVec4* bg_col = nullptr, const ImVec4* border_col = nullptr);
+	
+	float Widget_CategoryWithVerticalLabel(const char* category_text, const std::function<void()>& callback, const ImVec4* text_color = nullptr, const ImVec4* line_color = nullptr);
 }

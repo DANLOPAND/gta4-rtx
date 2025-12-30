@@ -34,6 +34,7 @@ extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND, UINT, WPARAM, LPARAM);
 
 constexpr float TREENODE_SPACING = 6.0f;
 constexpr float TREENODE_SPACING_INSIDE = 6.0f;
+constexpr float SEPARATOR_SPACING = 12.0f;
 
 namespace gta4
 {
@@ -465,6 +466,8 @@ namespace gta4
 				ImGui::TreePop();
 			}
 			ImGui::EndDisabled();
+
+			ImGui::Spacing(0.0f, 4.0f);
 		}
 	}
 
@@ -916,8 +919,13 @@ namespace gta4
 			SET_CHILD_WIDGET_WIDTH_MAN(140.0f); ImGui::ColorEdit4("ButtonGreen", &im->ImGuiCol_ButtonGreen.x, coloredit_flags);
 			SET_CHILD_WIDGET_WIDTH_MAN(140.0f); ImGui::ColorEdit4("ButtonYellow", &im->ImGuiCol_ButtonYellow.x, coloredit_flags);
 			SET_CHILD_WIDGET_WIDTH_MAN(140.0f); ImGui::ColorEdit4("ButtonRed", &im->ImGuiCol_ButtonRed.x, coloredit_flags);
+
+			SET_CHILD_WIDGET_WIDTH_MAN(140.0f); ImGui::ColorEdit4("FadeContainerBg Start", &im->ImGuiCol_VerticalFadeContainerBackgroundStart.x, coloredit_flags);
+			SET_CHILD_WIDGET_WIDTH_MAN(140.0f); ImGui::ColorEdit4("FadeContainerBg End", &im->ImGuiCol_VerticalFadeContainerBackgroundEnd.x, coloredit_flags);
 			ImGui::TreePop();
 		}
+
+		ImGui::Spacing(0, TREENODE_SPACING);
 	}
 
 	void dev_other_container()
@@ -934,6 +942,8 @@ namespace gta4
 			im->m_dbg_debug_single_frame_timecycle_remix_vars = true;
 		}
 #endif
+
+		ImGui::Spacing(0.0f, 4.0f);
 	}
 
 	void imgui::tab_dev()
@@ -1042,7 +1052,7 @@ namespace gta4
 		//static const auto& im = imgui::get();
 		static const auto& gs = comp_settings::get();
 
-		const float inbetween_spacing = 8.0f;
+		const float inbetween_spacing = SEPARATOR_SPACING;
 
 		ImGui::Spacing(0, 4);
 		ImGui::SeparatorText(" General ");
@@ -1145,6 +1155,7 @@ namespace gta4
 		ImGui::Spacing(0, 4);
 
 		compsettings_bool_widget("Enable Rain - Remix Particle System", gs->rain_particle_system_enabled);
+		compsettings_bool_widget("Rain - Expensive Collision Testing", gs->remix_override_enable_particle_tlas_collision);
 
 		ImGui::Spacing(0, 4);
 	}
@@ -1152,7 +1163,7 @@ namespace gta4
 	void compsettings_culling_container()
 	{
 		static const auto& gs = comp_settings::get();
-		const float inbetween_spacing = 8.0f;
+		const float inbetween_spacing = SEPARATOR_SPACING;
 
 		ImGui::Spacing(0, 4);
 		ImGui::SeparatorText(" Anti Culling of Static Objects ");
@@ -1195,7 +1206,7 @@ namespace gta4
 		//static const auto& im = imgui::get();
 		static const auto& gs = comp_settings::get();
 
-		const float inbetween_spacing = 8.0f;
+		const float inbetween_spacing = SEPARATOR_SPACING;
 
 		bool clear = false;
 
@@ -1248,6 +1259,7 @@ namespace gta4
 		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Fake Siren Light Intensity Offset", gs->translate_vehicle_fake_siren_intensity_offset, 0.0f, 0.0f, 0.01f));
 		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Fake Siren Light Radius Offset", gs->translate_vehicle_fake_siren_radius_offset, 0.0f, 0.0f, 0.01f));
 
+		ImGui::Spacing(0.0f, 4.0f);
 		CLEAR_CACHE_CHECK(clear, compsettings_bool_widget("V-Siren Make Spotlight", gs->translate_vehicle_vsirens_make_spotlight));
 		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("V-Siren Light Intensity Offset", gs->translate_vehicle_vsirens_intensity_offset, 0.0f, 0.0f, 0.01f));
 		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("V-Siren Light Radius Offset", gs->translate_vehicle_vsirens_radius_offset, 0.0f, 0.0f, 0.01f));
@@ -1264,7 +1276,7 @@ namespace gta4
 		//static const auto& im = imgui::get();
 		static const auto& gs = comp_settings::get();
 
-		const float inbetween_spacing = 8.0f;
+		const float inbetween_spacing = SEPARATOR_SPACING;
 
 		ImGui::Spacing(0, 4);
 		ImGui::SeparatorText(" Vehicle ");
@@ -1308,7 +1320,7 @@ namespace gta4
 		static const auto& im = imgui::get();
 		static const auto& gs = comp_settings::get();
 
-		const float inbetween_spacing = 8.0f;
+		const float inbetween_spacing = SEPARATOR_SPACING;
 
 		ImGui::Spacing(0, 4);
 		ImGui::Indent(4);
@@ -1545,66 +1557,54 @@ namespace gta4
 
 			ImGui::BeginDisabled(!gs->timecycle_wetness_enabled.get_as<bool>());
 			{
-				ImGui::PushFont(shared::imgui::font::BOLD);
-				ImGui::TextUnformatted("::  World");
-				ImGui::PopFont();
-				ImGui::PushID("world");
-				compsettings_float_widget("Wetness Scalar", gs->timecycle_wetness_world_scalar, 0.0f, 0.0f, 0.005f);
-				compsettings_float_widget("Additional Wetness Offset", gs->timecycle_wetness_world_offset, 0.0f, 0.0f, 0.005f);
-				compsettings_float_widget("Min Surface Z-Normal", gs->timecycle_wetness_world_z_normal, 0.0f, 1.0f, 0.005f);
-				compsettings_float_widget("Blending Strength", gs->timecycle_wetness_world_blending, 0.0f, 1.0f, 0.005f);
+				ImGui::Widget_CategoryWithVerticalLabel("World", [&]() {
+					ImGui::PushID("world");
+					compsettings_float_widget("Wetness Scalar", gs->timecycle_wetness_world_scalar, 0.0f, 0.0f, 0.005f);
+					compsettings_float_widget("Additional Wetness Offset", gs->timecycle_wetness_world_offset, 0.0f, 0.0f, 0.005f);
+					compsettings_float_widget("Min Surface Z-Normal", gs->timecycle_wetness_world_z_normal, 0.0f, 1.0f, 0.005f);
+					compsettings_float_widget("Blending Strength", gs->timecycle_wetness_world_blending, 0.0f, 1.0f, 0.005f);
 
-				compsettings_bool_widget("Enable Wetness Variation", gs->timecycle_wetness_world_variation_enable);
-				compsettings_bool_widget("Enable Puddle Layer", gs->timecycle_wetness_world_puddle_layer_enable);
-				compsettings_bool_widget("Enable World Raindrops", gs->timecycle_wetness_world_raindrop_enable);
-				compsettings_float_widget("World Raindrop Scale", gs->timecycle_wetness_world_raindrop_scalar, 0.0f, 10.0f, 0.005f);
+					compsettings_bool_widget("Enable Wetness Variation", gs->timecycle_wetness_world_variation_enable);
+					compsettings_bool_widget("Enable Puddle Layer", gs->timecycle_wetness_world_puddle_layer_enable);
+					compsettings_bool_widget("Enable World Raindrops", gs->timecycle_wetness_world_raindrop_enable);
+					compsettings_float_widget("World Raindrop Scale", gs->timecycle_wetness_world_raindrop_scalar, 0.0f, 10.0f, 0.005f);
 
-				ImGui::Spacing(0, 4.0f);
-				compsettings_bool_widget("Enable World Occlusion Check", gs->timecycle_wetness_world_occlusion_check_enable);
-				compsettings_bool_widget("Enable Occlusion Smoothing", gs->timecycle_wetness_world_occlusion_smoothing_enable);
-				ImGui::PopID();
-
-
-				ImGui::Spacing(0, inbetween_spacing);
-				ImGui::PushFont(shared::imgui::font::BOLD);
-				ImGui::TextUnformatted("::  Ped Wetness");
-				ImGui::PopFont();
-				ImGui::Spacing(0, 4);
-
-				ImGui::PushID("ped");
-				compsettings_bool_widget("Enable Ped Raindrops", gs->timecycle_wetness_ped_raindrop_enable);
-				compsettings_float_widget("Ped Raindrop Scale", gs->timecycle_wetness_ped_raindrop_scalar, 0.0f, 10.0f, 0.005f);
-				ImGui::PopID();
+					ImGui::Spacing(0, 4.0f);
+					compsettings_bool_widget("Enable World Occlusion Check", gs->timecycle_wetness_world_occlusion_check_enable);
+					compsettings_bool_widget("Enable Occlusion Smoothing", gs->timecycle_wetness_world_occlusion_smoothing_enable);
+					ImGui::PopID();
+				});
 
 
 				ImGui::Spacing(0, inbetween_spacing);
-				ImGui::PushFont(shared::imgui::font::BOLD);
-				ImGui::TextUnformatted("::  Vehicle Wetness");
-				ImGui::PopFont();
-				ImGui::Spacing(0, 4);
-
-				ImGui::PushID("vehicle");
-				compsettings_float_widget("Vehicle Wetness Scalar", gs->timecycle_wetness_vehicle_scalar, 0.0f, 1.0f, 0.005f);
-				compsettings_float_widget("Min Surface Z-Normal", gs->timecycle_wetness_vehicle_z_normal, 0.0f, 1.0f, 0.005f);
-				compsettings_float_widget("Blending Strength", gs->timecycle_wetness_vehicle_blending, 0.0f, 1.0f, 0.005f);
-
-				compsettings_bool_widget("Enable Vehicle Raindrops", gs->timecycle_wetness_vehicle_raindrop_enable);
-				compsettings_float_widget("Vehicle Raindrop Scale", gs->timecycle_wetness_vehicle_raindrop_scalar, 0.0f, 10.0f, 0.005f);
-				ImGui::PopID();
+				ImGui::Widget_CategoryWithVerticalLabel("Ped", [&]() {
+					ImGui::PushID("ped");
+					compsettings_bool_widget("Enable Ped Raindrops", gs->timecycle_wetness_ped_raindrop_enable);
+					compsettings_float_widget("Ped Raindrop Scale", gs->timecycle_wetness_ped_raindrop_scalar, 0.0f, 10.0f, 0.005f);
+					ImGui::PopID();
+				});
 
 
 				ImGui::Spacing(0, inbetween_spacing);
-				ImGui::PushFont(shared::imgui::font::BOLD);
-				ImGui::TextUnformatted("::  Vehicle Dirt Wetness");
-				ImGui::PopFont();
-				ImGui::Spacing(0, 4);
+				ImGui::Widget_CategoryWithVerticalLabel("Vehicle", [&]() {
+					ImGui::PushID("vehicle");
+					compsettings_float_widget("Vehicle Wetness Scalar", gs->timecycle_wetness_vehicle_scalar, 0.0f, 1.0f, 0.005f);
+					compsettings_float_widget("Min Surface Z-Normal", gs->timecycle_wetness_vehicle_z_normal, 0.0f, 1.0f, 0.005f);
+					compsettings_float_widget("Blending Strength", gs->timecycle_wetness_vehicle_blending, 0.0f, 1.0f, 0.005f);
 
-				ImGui::PushID("vehicledirt");
-				compsettings_float_widget("Intensity Scalar", gs->timecycle_wetness_vehicle_dirt_intensity_scalar, 0.0f, 1.0f, 0.005f);
-				compsettings_float_widget("Wetness Scalar", gs->timecycle_wetness_vehicle_dirt_roughness_scalar, 0.0f, 1.0f, 0.005f);
-				compsettings_float_widget("Min Surface Z-Normal", gs->timecycle_wetness_vehicle_dirt_z_normal, 0.0f, 1.0f, 0.005f);
-				compsettings_float_widget("Blending Strength", gs->timecycle_wetness_vehicle_dirt_blending, 0.0f, 1.0f, 0.005f);
-				ImGui::PopID();
+					compsettings_bool_widget("Enable Vehicle Raindrops", gs->timecycle_wetness_vehicle_raindrop_enable);
+					compsettings_float_widget("Vehicle Raindrop Scale", gs->timecycle_wetness_vehicle_raindrop_scalar, 0.0f, 10.0f, 0.005f);
+
+                    ImGui::SeparatorText("Vehicle Dirt");
+					ImGui::PushID("vehicledirt");
+					compsettings_float_widget("Intensity Scalar", gs->timecycle_wetness_vehicle_dirt_intensity_scalar, 0.0f, 1.0f, 0.005f);
+					compsettings_float_widget("Wetness Scalar", gs->timecycle_wetness_vehicle_dirt_roughness_scalar, 0.0f, 1.0f, 0.005f);
+					compsettings_float_widget("Min Surface Z-Normal", gs->timecycle_wetness_vehicle_dirt_z_normal, 0.0f, 1.0f, 0.005f);
+					compsettings_float_widget("Blending Strength", gs->timecycle_wetness_vehicle_dirt_blending, 0.0f, 1.0f, 0.005f);
+					ImGui::PopID();
+
+					ImGui::PopID();
+				});
 
 				ImGui::EndDisabled();
 			}
@@ -1617,7 +1617,7 @@ namespace gta4
 	{
 		//static const auto& im = imgui::get();
 		static const auto& gs = comp_settings::get();
-		//const float inbetween_spacing = 8.0f;
+		//const float inbetween_spacing = SEPARATOR_SPACING;
 
 		ImGui::Spacing(0, 4);
 		ImGui::SeparatorText(" Remix ");
@@ -1633,7 +1633,7 @@ namespace gta4
 	{
 		//const auto& im = imgui::get();
 		const auto& gs = comp_settings::get();
-		const float inbetween_spacing = 8.0f;
+		const float inbetween_spacing = SEPARATOR_SPACING;
 
 		ImGui::Spacing(0, inbetween_spacing);
 		ImGui::SeparatorText(" Emissives ");
@@ -1652,43 +1652,38 @@ namespace gta4
 
 		ImGui::BeginDisabled(!gs->timecycle_wetness_enabled.get_as<bool>());
 		{
-			ImGui::PushFont(shared::imgui::font::BOLD);
-			ImGui::TextUnformatted("::  World");
-			ImGui::PopFont();
-			ImGui::PushID("world");
-			compsettings_bool_widget("Enable Wetness Variation", gs->timecycle_wetness_world_variation_enable);
-			compsettings_bool_widget("Enable Puddle Layer", gs->timecycle_wetness_world_puddle_layer_enable);
-			compsettings_bool_widget("Enable World Raindrops", gs->timecycle_wetness_world_raindrop_enable);
-			compsettings_float_widget("World Raindrop Scale", gs->timecycle_wetness_world_raindrop_scalar, 0.0f, 10.0f, 0.005f);
+			ImGui::Widget_CategoryWithVerticalLabel("World", [&]() {
+				ImGui::PushID("world");
+				compsettings_bool_widget("Enable Wetness Variation", gs->timecycle_wetness_world_variation_enable);
+				compsettings_bool_widget("Enable Puddle Layer", gs->timecycle_wetness_world_puddle_layer_enable);
+				compsettings_bool_widget("Enable World Raindrops", gs->timecycle_wetness_world_raindrop_enable);
+				compsettings_float_widget("World Raindrop Scale", gs->timecycle_wetness_world_raindrop_scalar, 0.0f, 10.0f, 0.005f);
 
-			ImGui::Spacing(0, 4.0f);
-			compsettings_bool_widget("Enable World Occlusion Check", gs->timecycle_wetness_world_occlusion_check_enable);
-			compsettings_bool_widget("Enable Occlusion Smoothing", gs->timecycle_wetness_world_occlusion_smoothing_enable);
-			ImGui::PopID();
-
-
-			ImGui::Spacing(0, inbetween_spacing);
-			ImGui::PushFont(shared::imgui::font::BOLD);
-			ImGui::TextUnformatted("::  Ped Wetness");
-			ImGui::PopFont();
-			ImGui::Spacing(0, 4);
-
-			ImGui::PushID("ped");
-			compsettings_bool_widget("Enable Ped Raindrops", gs->timecycle_wetness_ped_raindrop_enable);
-			compsettings_float_widget("Ped Raindrop Scale", gs->timecycle_wetness_ped_raindrop_scalar, 0.0f, 10.0f, 0.005f);
-			ImGui::PopID();
+				ImGui::Spacing(0, 4.0f);
+				ImGui::Style_BoldOrangeTextPush();
+				compsettings_bool_widget("Enable World Occlusion Check", gs->timecycle_wetness_world_occlusion_check_enable);
+				compsettings_bool_widget("Enable Occlusion Smoothing", gs->timecycle_wetness_world_occlusion_smoothing_enable);
+				ImGui::Style_BoldOrangeTextPop();
+				ImGui::PopID();
+			});
 
 
 			ImGui::Spacing(0, inbetween_spacing);
-			ImGui::PushFont(shared::imgui::font::BOLD);
-			ImGui::TextUnformatted("::  Vehicle Wetness");
-			ImGui::PopFont();
-			ImGui::Spacing(0, 4);
+			ImGui::Widget_CategoryWithVerticalLabel("Ped", [&]() {
+				ImGui::PushID("ped");
+				compsettings_bool_widget("Enable Ped Raindrops", gs->timecycle_wetness_ped_raindrop_enable);
+				compsettings_float_widget("Ped Raindrop Scale", gs->timecycle_wetness_ped_raindrop_scalar, 0.0f, 10.0f, 0.005f);
+				ImGui::PopID();
+			});
 
-			ImGui::PushID("vehicle");
-			compsettings_bool_widget("Enable Vehicle Raindrops", gs->timecycle_wetness_vehicle_raindrop_enable);
-			compsettings_float_widget("Vehicle Raindrop Scale", gs->timecycle_wetness_vehicle_raindrop_scalar, 0.0f, 10.0f, 0.005f);
-			ImGui::PopID();
+
+			ImGui::Spacing(0, inbetween_spacing);
+			ImGui::Widget_CategoryWithVerticalLabel("Vehicle", [&]() {
+				ImGui::PushID("vehicle");
+				compsettings_bool_widget("Enable Vehicle Raindrops", gs->timecycle_wetness_vehicle_raindrop_enable);
+				compsettings_float_widget("Vehicle Raindrop Scale", gs->timecycle_wetness_vehicle_raindrop_scalar, 0.0f, 10.0f, 0.005f);
+				ImGui::PopID();
+			});
 
 			ImGui::EndDisabled();
 		}
@@ -1699,7 +1694,9 @@ namespace gta4
 		ImGui::Spacing(0, 4);
 
 		compsettings_bool_widget("Enable Rain - Remix Particle System", gs->rain_particle_system_enabled);
-
+		ImGui::Style_BoldOrangeTextPush();
+		compsettings_bool_widget("Rain - Expensive Collision Testing", gs->remix_override_enable_particle_tlas_collision);
+		ImGui::Style_BoldOrangeTextPop();
 
 		ImGui::Spacing(0, inbetween_spacing);
 		ImGui::SeparatorText(" Vehicle Lights ");
@@ -1814,6 +1811,8 @@ namespace gta4
 			SET_CHILD_WIDGET_WIDTH_MAN(140.0f); ImGui::SliderFloat("FreeCam Upward Speed", &im->m_freecam_up_speed, 0.01f, 10.0f, "%.2f");
 			//SET_CHILD_WIDGET_WIDTH_MAN(140.0f); ImGui::DragFloat("FreeCam Upward Offset", &im->m_freecam_up_offset, 0.0001f, 0, 0, "%.5f");
 			ImGui::EndDisabled();
+
+			ImGui::Spacing(0.0f, 4.0f);
 		}
 	}
 
@@ -1999,6 +1998,7 @@ namespace gta4
 	void cont_mapsettings_marker_manipulation()
 	{
 		auto& markers = map_settings::get_map_settings().map_markers;
+		ImGui::Spacing(0, 4);
 		ImGui::PushFont(shared::imgui::font::BOLD);
 		if (ImGui::Button("Copy All Markers to Clipboard   " ICON_FA_SAVE, ImVec2(ImGui::GetContentRegionAvail().x * 0.5f, 0)))
 		{
@@ -2173,6 +2173,8 @@ namespace gta4
 			ImGui::EndTable();
 		}
 
+		ImGui::Spacing(0, 4);
+
 		ImGui::Style_ColorButtonPush(imgui::get()->ImGuiCol_ButtonGreen, true);
 		if (ImGui::Button("++ Marker"))
 		{
@@ -2268,6 +2270,11 @@ namespace gta4
 				selection->index = (std::uint32_t)temp_num;
 			}
 
+			SET_CHILD_WIDGET_WIDTH;
+			ImGui::DragFloat("Cull Distance", &selection->cull_distance, 0.05f, 0.0f, FLT_MAX, "%.2f", ImGuiSliderFlags_AlwaysClamp);
+
+			ImGui::Spacing();
+
 			//ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.6f, 0.5f));
 			ImGui::Widget_PrettyDragVec3("Origin", &selection->origin.x, true, 80.0f, 0.01f,
 				-FLT_MAX, FLT_MAX, "X", "Y", "Z");
@@ -2290,10 +2297,7 @@ namespace gta4
 				ImGui::PopStyleVar();
 			}
 
-			SET_CHILD_WIDGET_WIDTH;
-			ImGui::DragFloat("Cull Distance", &selection->cull_distance, 0.05f, 0.0f, FLT_MAX, "%.2f", ImGuiSliderFlags_AlwaysClamp);
-
-			ImGui::Spacing(0, 6);
+			ImGui::Spacing(0, SEPARATOR_SPACING);
 			ImGui::SeparatorText("  Spawn On:   ");
 			ImGui::Spacing(0, 6);
 
@@ -2345,6 +2349,7 @@ namespace gta4
 		auto& allowed_lights = map_settings::get_map_settings().allow_lights;
 		auto& light_overrides = map_settings::get_map_settings().light_overrides;
 
+		ImGui::Spacing(0, 4);
 		reload_mapsettings_button_with_popup("Light-Tweaks");
 
 		ImGui::Spacing(0, 8.0f);
@@ -2361,7 +2366,7 @@ namespace gta4
 		ImGui::Checkbox("Ignore Filler Lights (Game Setting)", gs->translate_game_lights_ignore_filler_lights.get_as<bool*>());
 			TT(gs->translate_game_lights_ignore_filler_lights.get_tooltip_string().c_str());
 
-		ImGui::Spacing(0, 8.0f);
+		ImGui::Spacing(0, SEPARATOR_SPACING);
 
 		{
 			if (ImGui::CollapsingHeader("Ignore Lights"))
@@ -2452,109 +2457,119 @@ namespace gta4
 				}
 
 				ImGui::EndDisabled();
+
+				ImGui::Spacing(0, 4.0f);
+				ImGui::Separator();
+				ImGui::Spacing(0, 4.0f);
 			}
 
 
-			ImGui::Spacing(0.0f, 12.0f);
-
-
-			if (ImGui::CollapsingHeader("Allow Lights"))
+			if (const auto filler_ignored = gs->translate_game_lights_ignore_filler_lights._bool(); filler_ignored)
 			{
-				ImGui::BeginDisabled(!gs->translate_game_lights_ignore_filler_lights.get_as<bool>());
+				ImGui::Spacing(0.0f, 4.0f);
+				if (ImGui::CollapsingHeader("Allow Lights"))
 				{
-					ImGui::PushFont(shared::imgui::font::BOLD);
-					if (ImGui::Button("Copy Allowed to Clipboard   " ICON_FA_SAVE, ImVec2(ImGui::GetContentRegionAvail().x, 0)))
+					ImGui::BeginDisabled(!filler_ignored);
 					{
-						ImGui::LogToClipboard();
-						ImGui::LogText("%s", shared::common::toml_ext::build_allow_lights_array(allowed_lights).c_str());
-						ImGui::LogFinish();
-					} ImGui::PopFont();
-
-					ImGui::EndDisabled();
-				}
-
-				ImGui::Spacing(0, 8.0f);
-
-				ImGui::BeginDisabled(!im->m_dbg_visualize_api_light_hashes || !gs->translate_game_lights_ignore_filler_lights.get_as<bool>());
-				ImGui::PushID("AllowLights");
-
-				ImGui::Spacing(0, 8.0f);
-				if (!im->m_dbg_visualize_api_light_hashes) {
-					ImGui::SeparatorText("Nearby filler lights (Double-Click to Ignore) ~ Enable 'Visualize Light Hashes'");
-				}
-				else {
-					ImGui::SeparatorText("Nearby filler lights (Double-Click to Ignore)");
-				}
-
-				ImGui::Spacing(0.0f, 8.0f);
-
-				//if (gs->translate_game_lights_ignore_filler_lights.get_as<bool>())
-				{
-					static ImGuiTextFilter filter_allow_lights;
-					if (ImGui::BeginListBox("##allow_lights", ImVec2(ImGui::GetContentRegionAvail().x, 140)))
-					{
-						for (size_t i = 0; i < im->visualized_api_lights.size(); ++i)
+						ImGui::PushFont(shared::imgui::font::BOLD);
+						if (ImGui::Button("Copy Allowed to Clipboard   " ICON_FA_SAVE, ImVec2(ImGui::GetContentRegionAvail().x, 0)))
 						{
-							const auto& light = im->visualized_api_lights[i];
-							//const bool is_ignored = light.ignored;
-							const bool is_allowed = light.allowed_filler;
+							ImGui::LogToClipboard();
+							ImGui::LogText("%s", shared::common::toml_ext::build_allow_lights_array(allowed_lights).c_str());
+							ImGui::LogFinish();
+						} ImGui::PopFont();
 
-							// only add lights that are ignored (filler or manually) and alive for more than 5 frames
-							if (/*is_ignored && */ light.is_filler && light.m_frames_since_addition > 5u)
+						ImGui::EndDisabled();
+					}
+
+					ImGui::Spacing(0, 8.0f);
+
+					ImGui::BeginDisabled(!im->m_dbg_visualize_api_light_hashes || !gs->translate_game_lights_ignore_filler_lights.get_as<bool>());
+					ImGui::PushID("AllowLights");
+
+					ImGui::Spacing(0, 8.0f);
+					if (!im->m_dbg_visualize_api_light_hashes) {
+						ImGui::SeparatorText("Nearby filler lights (Double-Click to Ignore) ~ Enable 'Visualize Light Hashes'");
+					}
+					else {
+						ImGui::SeparatorText("Nearby filler lights (Double-Click to Ignore)");
+					}
+
+					ImGui::Spacing(0.0f, 8.0f);
+
+					//if (gs->translate_game_lights_ignore_filler_lights.get_as<bool>())
+					{
+						static ImGuiTextFilter filter_allow_lights;
+						if (ImGui::BeginListBox("##allow_lights", ImVec2(ImGui::GetContentRegionAvail().x, 140)))
+						{
+							for (size_t i = 0; i < im->visualized_api_lights.size(); ++i)
 							{
-								char hash_str[17];
-								std::snprintf(hash_str, sizeof(hash_str), "%llx", static_cast<unsigned long long>(light.hash));
-								if (!filter_allow_lights.PassFilter(hash_str)) {
-									continue;
-								}
+								const auto& light = im->visualized_api_lights[i];
+								//const bool is_ignored = light.ignored;
+								const bool is_allowed = light.allowed_filler;
 
-								if (is_allowed)
+								// only add lights that are ignored (filler or manually) and alive for more than 5 frames
+								if (/*is_ignored && */ light.is_filler && light.m_frames_since_addition > 5u)
 								{
-									ImGui::PushFont(shared::imgui::font::FONTS::BOLD);
-									ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.2f, 0.8f, 0.1f, 1.0f));
-								}
+									char hash_str[17];
+									std::snprintf(hash_str, sizeof(hash_str), "%llx", static_cast<unsigned long long>(light.hash));
+									if (!filter_allow_lights.PassFilter(hash_str)) {
+										continue;
+									}
 
-								if (ImGui::Selectable(shared::utils::va("%llx", light.hash), false, ImGuiSelectableFlags_AllowDoubleClick))
-								{
-									if (ImGui::IsMouseDoubleClicked(0))
+									if (is_allowed)
 									{
-										if (allowed_lights.contains(light.hash))
+										ImGui::PushFont(shared::imgui::font::FONTS::BOLD);
+										ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.2f, 0.8f, 0.1f, 1.0f));
+									}
+
+									if (ImGui::Selectable(shared::utils::va("%llx", light.hash), false, ImGuiSelectableFlags_AllowDoubleClick))
+									{
+										if (ImGui::IsMouseDoubleClicked(0))
 										{
-											auto it = std::find(allowed_lights.begin(), allowed_lights.end(), light.hash);
-											if (it != allowed_lights.end()) {
-												allowed_lights.erase(it);
+											if (allowed_lights.contains(light.hash))
+											{
+												auto it = std::find(allowed_lights.begin(), allowed_lights.end(), light.hash);
+												if (it != allowed_lights.end()) {
+													allowed_lights.erase(it);
+												}
+											}
+											else {
+												allowed_lights.insert(light.hash);
 											}
 										}
-										else {
-											allowed_lights.insert(light.hash);
-										}
+									}
+
+									if (is_allowed)
+									{
+										ImGui::PopStyleColor();
+										ImGui::PopFont();
 									}
 								}
-
-								if (is_allowed)
-								{
-									ImGui::PopStyleColor();
-									ImGui::PopFont();
-								}
 							}
+							ImGui::EndListBox();
 						}
-						ImGui::EndListBox();
-					}
 
-					filter_allow_lights.Draw("##Filter", ImGui::GetContentRegionAvail().x
-						- ImGui::GetFrameHeight()
-						- ImGui::GetStyle().FramePadding.x + 3.0f);
+						filter_allow_lights.Draw("##Filter", ImGui::GetContentRegionAvail().x
+							- ImGui::GetFrameHeight()
+							- ImGui::GetStyle().FramePadding.x + 3.0f);
 
-					ImGui::SameLine();
-					if (ImGui::Button("X", ImVec2(ImGui::GetFrameHeight(), ImGui::GetFrameHeight()))) {
-						filter_allow_lights.Clear();
+						ImGui::SameLine();
+						if (ImGui::Button("X", ImVec2(ImGui::GetFrameHeight(), ImGui::GetFrameHeight()))) {
+							filter_allow_lights.Clear();
+						}
 					}
+					ImGui::EndDisabled();
+					ImGui::PopID();
+
+					ImGui::Spacing(0, 4.0f);
+					ImGui::Separator();
+					ImGui::Spacing(0, 4.0f);
 				}
-				ImGui::EndDisabled();
-				ImGui::PopID();
 			}
+			
 
-			ImGui::Spacing(0.0f, 8.0f);
+			ImGui::Spacing(0.0f, 4.0f);
 
 			if (ImGui::CollapsingHeader("Light Overrides"))
 			{
@@ -2754,7 +2769,10 @@ namespace gta4
 				}
 				ImGui::EndDisabled();
 				ImGui::PopID();
+				ImGui::Separator();
 			}
+
+			ImGui::Spacing(0, 4);
 		}
 	}
 
@@ -2771,6 +2789,7 @@ namespace gta4
 		const auto& im = imgui::get();
 		auto& ac = map_settings::get_map_settings().anticull_meshes;
 		
+		ImGui::Spacing(0, 4);
 		ImGui::PushFont(shared::imgui::font::BOLD);
 		if (ImGui::Button("Copy to Clipboard   " ICON_FA_SAVE, ImVec2(ImGui::GetContentRegionAvail().x * 0.5f, 0)))
 		{
@@ -2961,6 +2980,8 @@ namespace gta4
 				++it;
 			}
 		}
+
+		ImGui::Spacing(0.0f, 4.0f);
 	}
 
 	void imgui::tab_map_settings()
@@ -3593,7 +3614,7 @@ namespace gta4
 		auto& colors = style.Colors;
 		colors[ImGuiCol_Text] = ImVec4(0.92f, 0.92f, 0.92f, 1.00f);
 		colors[ImGuiCol_TextDisabled] = ImVec4(0.38f, 0.38f, 0.38f, 1.00f);
-		colors[ImGuiCol_WindowBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.96f);
+		colors[ImGuiCol_WindowBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.97f);
 		colors[ImGuiCol_ChildBg] = ImVec4(0.21f, 0.21f, 0.21f, 0.80f);
 		colors[ImGuiCol_PopupBg] = ImVec4(0.28f, 0.28f, 0.28f, 1.00f);
 		colors[ImGuiCol_Border] = ImVec4(0.15f, 0.15f, 0.15f, 0.00f);
@@ -3652,8 +3673,11 @@ namespace gta4
 		ImGuiCol_ButtonGreen = ImVec4(0.3f, 0.4f, 0.05f, 0.7f);
 		ImGuiCol_ButtonYellow = ImVec4(0.4f, 0.3f, 0.1f, 0.8f);
 		ImGuiCol_ButtonRed = ImVec4(0.48f, 0.15f, 0.15f, 1.00f);
-		ImGuiCol_ContainerBackground = ImVec4(0.17f, 0.17f, 0.17f, 0.7f);
+		ImGuiCol_ContainerBackground = ImVec4(0.17f, 0.17f, 0.17f, 0.875f);
 		ImGuiCol_ContainerBorder = ImVec4(0.477f, 0.39f, 0.25f, 0.90f);
+
+		ImGuiCol_VerticalFadeContainerBackgroundStart = ImVec4(0.0f, 0.0f, 0.0f, 0.65f);
+		ImGuiCol_VerticalFadeContainerBackgroundEnd = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
 	}
 
 	void init_fonts()

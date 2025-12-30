@@ -366,6 +366,13 @@ namespace gta4
 				30
 			};
 
+			variable remix_override_enable_particle_tlas_collision = {
+				"remix_override_enable_particle_tlas_collision",
+				("This setting enables TLAS collision detection on supported particle systems (rain).\n"
+				 "This may impact performance and is still wip so its disabled by default."),
+				false
+			};
+
 
 			// ----------------------------------
 			// culling related settings

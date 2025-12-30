@@ -4,6 +4,7 @@
 #include "imgui_internal.h"
 #include "imgui_helper.hpp"
 
+#include "gta4/modules/imgui.hpp"
 #include "gta4/modules/natives.hpp"
 #include "shared/globals.hpp"
 
@@ -349,13 +350,26 @@ namespace ImGui
 
 	// #
 
-	void Style_InvisibleSelectorPush() {
+	void Style_InvisibleSelectorPush() 
+	{
 		PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0, 0, 0, 0));
 		PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0, 0, 0, 0));
 	}
 
 	void Style_InvisibleSelectorPop() {
 		PopStyleColor(2);
+	}
+
+	void Style_BoldOrangeTextPush()
+	{
+		PushFont(shared::imgui::font::BOLD);
+		PushStyleColor(ImGuiCol_Text, ImVec4(0.940f, 0.630f, 0.010f, 1.000f));
+	}
+
+	void Style_BoldOrangeTextPop()
+	{
+		PopStyleColor(1);
+		PopFont();
 	}
 
 	// #
@@ -659,16 +673,17 @@ namespace ImGui
 		bool dirty = false;
 
 		PushID(ID);
-		PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 4));
+		const float item_spacing_x = 2.0f;
+		PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(item_spacing_x, 4));
 
 		const float line_height = GetFrameHeight();
-		const auto  button_size = ImVec2(line_height - 2.0f, line_height);
+		const auto  button_size = ImVec2(line_height + 4.0f, line_height);
 		const float widget_spacing = 4.0f;
 
 		//ImVec2 label_size = CalcTextSize(ID, nullptr, true);
 		//label_size.x = ImMax(label_size.x, 80.0f);
 
-		const float widget_width_horz = (GetContentRegionAvail().x - 3.0f * button_size.x - 2.0f * widget_spacing -
+		const float widget_width_horz = (GetContentRegionAvail().x - (3.0f * button_size.x) - (3.0f * item_spacing_x) - 2.0f * widget_spacing -
 			(show_label ? label_size + GetStyle().ItemInnerSpacing.x + GetStyle().FramePadding.y : 0.0f)) * 0.333333f;
 
 		/*const float widget_width_vert = (GetContentRegionAvail().x - 3.0f * button_size.x - 2.0f * widget_spacing -
@@ -687,7 +702,7 @@ namespace ImGui
 		if (left_label_button(x_str, button_size, ImVec4(0.84f, 0.55f, 0.53f, 1.0f), ImVec4(0.21f, 0.16f, 0.16f, 1.0f))) {
 			vec_in[0] = 0.0f; dirty = true;
 		}
-
+		//ImGui::Spacing(2,0); ImGui::SameLine();
 		SetNextItemWidth(!narrow_window ? widget_width_horz : -1);
 		if (DragFloat("##X", &vec_in[0], speed, min, max, "%.2f")) {
 			dirty = true;
@@ -1073,5 +1088,127 @@ namespace ImGui
 		Spacing(0, 4);
 
 		return GetItemRectSize().y + 6.0f;
+	}
+
+	float Widget_CategoryWithVerticalLabel(const char* category_text, const std::function<void()>& callback, const ImVec4* text_color, const ImVec4* line_color)
+	{
+		const auto im = gta4::imgui::get();
+
+		const ImVec4 default_text_color = GetStyleColorVec4(ImGuiCol_Text);
+		const ImVec4 default_line_color = ImVec4(0.4f, 0.4f, 0.4f, 1.0f);
+		
+		const ImVec4 final_text_color = text_color ? *text_color : default_text_color;
+		const ImVec4 final_line_color = line_color ? *line_color : default_line_color;
+
+		const auto draw_list = GetWindowDrawList();
+		ImFont* font = GetFont();
+
+		// Save starting position
+		const ImVec2 start_pos = GetCursorScreenPos();
+		const ImVec2 text_size = CalcTextSize(category_text);
+		
+		// When text is rotated 90° counter-clockwise, the text's width becomes its height
+		// We need horizontal space = font height
+		const float font_height = text_size.y;
+		const float text_area_width = font_height; // Font height
+		const float line_spacing = 8.0f; // Space between text and line
+		const float line_thickness = 2.0f;
+		const float content_spacing = 12.0f; // Space between line and content
+		const float total_left_margin = text_area_width + line_spacing + line_thickness + content_spacing;
+
+		// Move cursor to the right to make space for vertical text, line, and spacing
+		SetCursorScreenPos(ImVec2(start_pos.x + total_left_margin, start_pos.y));
+
+		// Split draw list into channels for proper layering
+		// Channel 0: gradient (background)
+		// Channel 1: content (foreground)
+		draw_list->ChannelsSplit(2);
+		draw_list->ChannelsSetCurrent(1); // Draw content on foreground channel
+
+		// Draw content in a group to measure its height
+		BeginGroup();
+		Spacing(0, 10.0f); // Top padding
+		if (callback) {
+			callback();
+		}
+		Spacing(0, 10.0f); // Bottom padding
+		EndGroup();
+
+		// Get the actual height of the content group
+		const ImVec2 content_rect_size = GetItemRectSize();
+		const float content_height = content_rect_size.y;
+		
+		// Switch to background channel to draw gradient, text, and line
+		draw_list->ChannelsSetCurrent(0);
+
+		// Calculate position for the rotated text (centered vertically along content)
+		const float text_center_y = start_pos.y + content_height * 0.5f;
+		const float text_x = start_pos.x;
+		
+		// Render text vertices at origin first
+		const ImVec2 temp_pos = ImVec2(0.0f, 0.0f);
+		const size_t vtx_begin = draw_list->VtxBuffer.Size;
+		
+		const ImVec4 clip_rect = ImVec4(-FLT_MAX, -FLT_MAX, FLT_MAX, FLT_MAX);
+		PushFont(shared::imgui::font::BOLD_LARGE);
+		const float font_size = GetFontSize();
+		font->RenderText(draw_list, font_size, temp_pos, ColorConvertFloat4ToU32(final_text_color), 
+			clip_rect, category_text, nullptr, 0.0f, false);
+		PopFont();
+		const size_t vtx_end = draw_list->VtxBuffer.Size;
+		
+		// Transform vertices for -90 degree rotation
+		// After rotation: original (x,y) becomes (y, -x)
+		for (size_t i = vtx_begin; i < vtx_end; i++)
+		{
+			ImDrawVert& vtx = draw_list->VtxBuffer[i];
+			const float x = vtx.pos.x;
+			const float y = vtx.pos.y;
+			
+			// Rotate and translate to final position
+			// Keep X consistent (at text_x), center Y along content height
+			vtx.pos.x = text_x + y;
+			vtx.pos.y = text_center_y - x + text_size.x * 0.5f;
+		}
+
+		// Draw vertical line between text and content
+		const float line_x = start_pos.x + 18.0f + line_spacing;
+		const ImVec2 line_start = ImVec2(line_x, start_pos.y);
+		const ImVec2 line_end = ImVec2(line_x, start_pos.y + content_height);
+		draw_list->AddLine(line_start, line_end, ColorConvertFloat4ToU32(final_line_color), line_thickness);
+		
+		// Draw left gradient rectangle from text to line (fades from transparent to line)
+		{
+			const float left_gradient_start_x = start_pos.x - 4.0f;
+			const float left_gradient_end_x = line_x;
+			const ImVec2 left_gradient_pmin = ImVec2(left_gradient_start_x, start_pos.y);
+			const ImVec2 left_gradient_pmax = ImVec2(left_gradient_end_x, start_pos.y + content_height);
+			
+			const auto col_left = ColorConvertFloat4ToU32(ImVec4(im->ImGuiCol_VerticalFadeContainerBackgroundEnd));   // Transparent on the left
+			const auto col_right = ColorConvertFloat4ToU32(ImVec4(im->ImGuiCol_VerticalFadeContainerBackgroundStart)); // Semi-transparent at the line
+			draw_list->AddRectFilledMultiColor(left_gradient_pmin, left_gradient_pmax, col_left, col_right, col_right, col_left);
+		}
+		
+		// Draw right gradient rectangle from line to right edge (fades from line into content)
+		{
+			const auto& style = GetStyle();
+			const auto window = GetCurrentWindow();
+			const float gradient_start_x = line_x;
+			const float gradient_end_x = window->WorkRect.Max.x + style.WindowPadding.x * 0.5f;
+			const ImVec2 gradient_pmin = ImVec2(gradient_start_x, start_pos.y);
+			const ImVec2 gradient_pmax = ImVec2(gradient_end_x, start_pos.y + content_height);
+			
+			const auto col_left = ColorConvertFloat4ToU32(ImVec4(im->ImGuiCol_VerticalFadeContainerBackgroundStart));  // Semi-transparent at the line
+			const auto col_right = ColorConvertFloat4ToU32(ImVec4(im->ImGuiCol_VerticalFadeContainerBackgroundEnd));  // Transparent on the right
+			draw_list->AddRectFilledMultiColor(gradient_pmin, gradient_pmax, col_left, col_right, col_right, col_left);
+		}
+		
+		// Merge channels so background is drawn first, then content on top
+		draw_list->ChannelsMerge();
+
+		// Move cursor to the next row (below this widget)
+		SetCursorScreenPos(ImVec2(start_pos.x, start_pos.y + content_height));
+
+		return content_height;
 	}
 }
