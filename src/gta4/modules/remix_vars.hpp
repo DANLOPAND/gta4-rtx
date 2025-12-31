@@ -140,7 +140,8 @@ namespace gta4
 		static void				parse_rtx_options();
 		static void				parse_and_apply_conf_with_lerp(const std::string& conf_name, const std::uint64_t& identifier, const EASE_TYPE ease, float duration, float delay = 0.0f, float delay_transition_back = 0.0f);
 
-		//static void				reset(std::string map_name);
+		//static void			reset(std::string map_name);
+		static void				init_once_on_ingame_frame();
 		static void				on_client_frame();
 
 		struct interpolate_entry_s
@@ -186,6 +187,7 @@ namespace gta4
 
 	private:
 		bool m_initialized = false;
+		bool m_init_once_on_ingame_frame = false;
 
 		std::function<bool()> m_is_paused_callback;
 		bool* m_is_game_paused_ptr = nullptr;

@@ -539,6 +539,29 @@ namespace gta4
 	}
 
 
+	void remix_vars::init_once_on_ingame_frame()
+	{
+		if (const auto v = remix_vars::get(); 
+			!v->m_init_once_on_ingame_frame)
+		{
+			v->m_init_once_on_ingame_frame = true;
+
+			// make sure the remix options reflects the comp setting as we can't set this option every second
+			// because it clears the cache of all particle systems
+			// rtx.particles.forceScreenSpaceCollision needs to be FALSE upon starting the game so that the toggle works properly
+			{
+				const auto cs = comp_settings::get();
+				const auto particles_forceScreenSpaceCollision = get_option("rtx.particles.forceScreenSpaceCollision");
+				if (particles_forceScreenSpaceCollision->second.current.enabled == cs->remix_override_enable_particle_tlas_collision._bool())
+				{
+					remix_vars::option_value val{ .enabled = !cs->remix_override_enable_particle_tlas_collision._bool() };
+					set_option(particles_forceScreenSpaceCollision, val, false, true);
+				}
+			}
+		}
+	}
+
+
 	std::uint32_t framecounter = 0u;
 
 	// Interpolates all variables on the 'interpolate_stack' and removes them once they reach their goal. \n
@@ -558,6 +581,8 @@ namespace gta4
 				if (framecounter++ > 60)
 				{
 					framecounter = 0u;
+
+					init_once_on_ingame_frame();
 
 					// Remix sets 'rtx.di.initialSampleCount' to hardcoded values on start
 					// and we def. need more then 3 samples to get somewhat good looking vehicle lights
