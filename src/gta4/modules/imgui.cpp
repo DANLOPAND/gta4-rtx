@@ -747,6 +747,36 @@ namespace gta4
 			ImGui::Checkbox("FF Alphablended Emissives Assign IgnoreTransparency", &im->m_dbg_emissive_ff_alphablend_test1);
 			ImGui::Checkbox("FF Alphablended Emissives Alphablend", &im->m_dbg_emissive_ff_alphablend_enable_alphablend);
 
+			ImGui::Spacing(0, TREENODE_SPACING_INSIDE);
+			ImGui::SeparatorText("Emissive Intensity Debug Switches");
+
+			ImGui::Widget_CategoryWithVerticalLabel("Renderer", [&]() 
+			{
+				ImGui::PushID("intens");
+				ImGui::Checkbox("Disable Veh SwitchOn", &im->m_dbg_emissive_disable_veh_switch_on);
+				ImGui::Checkbox("Disable OnEmissiveMultiplier", &im->m_dbg_emissive_disable_on_emissive_multi);
+				ImGui::Checkbox("Disable PsConst72 VehLightsEmissive", &im->m_dbg_emissive_disable_const77_lightsemissive);
+				ImGui::Checkbox("Disable PsConst66 EmissiveNight", &im->m_dbg_emissive_disable_const66_emissivenight);
+				ImGui::Checkbox("Disable PsConst66 Default", &im->m_dbg_emissive_disable_const66_default);
+				ImGui::Checkbox("Disable PsConst66 EmissiveStrong", &im->m_dbg_emissive_disable_const66_emissivestrong);
+				ImGui::Checkbox("Disable PsConst51 TFACTOR EmsMulti", &im->m_dbg_emissive_disable_const51_tfactor_ems_multi);
+				ImGui::PopID();
+			});
+
+			ImGui::Spacing(0, SEPARATOR_SPACING);
+
+			ImGui::Widget_CategoryWithVerticalLabel("Renderer FF", [&]()
+				{
+					ImGui::PushID("intensFF");
+					ImGui::Checkbox("Disable FF EmissiveNight (Night)", &im->m_dbg_emissive_disable_ff_emissivenight_nighttime);
+					ImGui::Checkbox("Disable FF EmissiveNight (Day 0)", &im->m_dbg_emissive_disable_ff_emissivenight_daytime);
+					ImGui::Checkbox("Disable FF NOT EmissiveNight", &im->m_dbg_emissive_disable_ff_not_emissivenight);
+					ImGui::Checkbox("Disable AlphaFF", &im->m_dbg_emissive_disable_alpha_ff);
+					ImGui::PopID();
+				});
+
+			ImGui::Spacing(0, TREENODE_SPACING_INSIDE);
+
 			ImGui::TreePop();
 		}
 
@@ -940,6 +970,10 @@ namespace gta4
 #if DEBUG
 		if (ImGui::Button("Timecycle Vars - Debug Single Frame", ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
 			im->m_dbg_debug_single_frame_timecycle_remix_vars = true;
+		}
+
+		if (ImGui::Button("Emissive Intensity - Debug Single Frame", ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
+			im->m_dbg_debug_single_frame_emissive_intensity_vars = true;
 		}
 #endif
 
@@ -3421,6 +3455,7 @@ namespace gta4
 
 		// resets after one frame
 		m_dbg_debug_single_frame_timecycle_remix_vars = false;
+		m_dbg_debug_single_frame_emissive_intensity_vars = false;
 
 #define ADD_TAB(NAME, FUNC) \
 	ImGui::PushStyleColor(ImGuiCol_ChildBg, ImGui::ColorConvertFloat4ToU32(ImVec4(0, 0, 0, 0)));			\

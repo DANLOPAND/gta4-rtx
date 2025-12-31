@@ -24,6 +24,9 @@ namespace gta4
 	bool g_rendered_first_primitive = false;
 	bool g_applied_hud_hack = false; // was hud "injection" applied this frame
 
+	std::uint32_t g_model_hash = 0u;
+	std::uint32_t g_model_reference = 0u;
+
 	namespace tex_addons
 	{
 		bool initialized = false;
@@ -265,20 +268,24 @@ namespace gta4
 
 	void on_constant_emissiveMultiplier(IDirect3DDevice9* dev, const float& intensity)
 	{
-		auto& ctx = renderer::get()->dc_ctx;
+		if (!imgui::get()->m_dbg_emissive_disable_on_emissive_multi)
+		{
+			auto& ctx = renderer::get()->dc_ctx;
 
-		ctx.save_tss(dev, D3DTSS_COLOROP);
-		ctx.save_tss(dev, D3DTSS_COLORARG1);
-		ctx.save_tss(dev, D3DTSS_COLORARG2);
+			ctx.save_tss(dev, D3DTSS_COLOROP);
+			ctx.save_tss(dev, D3DTSS_COLORARG1);
+			ctx.save_tss(dev, D3DTSS_COLORARG2);
 
-		dev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-		dev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-		dev->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+			dev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+			dev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+			dev->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
 
-		ctx.save_rs(dev, D3DRS_SRCBLEND);
-		dev->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
+			ctx.save_rs(dev, D3DRS_SRCBLEND);
+			dev->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
 
-		renderer::set_remix_emissive_intensity(dev, intensity);
+			renderer::set_remix_emissive_intensity(dev, intensity);
+			//ctx.info.shaderconst_emissive_intensity = intensity;
+		}
 	}
 
 	// ----
@@ -902,19 +909,40 @@ namespace gta4
 							}
 							else if (register_num == 72u && pidx == GTA_VEHICLE_LIGHTSEMISSIVE)
 							{
-								const float intensity = *constant_data_struct->constants[dataPoolIndex].float_arr * gs->vehicle_lights_emissive_scalar.get_as<float>();
+								const float intensity = *constant_data_struct->constants[dataPoolIndex].float_arr * gs->vehicle_lights_emissive_scalar._float();
 								{
-									on_constant_emissiveMultiplier(shared::globals::d3d_device, intensity); 
-									//renderer::set_remix_modifier(shared::globals::d3d_device, RemixModifier::RemoveVertexColorKeepAlpha);
-									//set_remix_modifier(shared::globals::d3d_device, ctx, RemixModifier::EnableVertexColor); // required when 'isVertexColorBakedLighting' is turned on
-
-									/*if (gs->vehicle_lights_dual_render_proxy_texture.get_as<bool>())
+									if (!im->m_dbg_emissive_disable_const77_lightsemissive)
 									{
-										ctx.modifiers.dual_render_with_specified_texture = true;
-										ctx.modifiers.dual_render_texture = tex_addons::veh_light_ems_glass;
-										ctx.modifiers.dual_render_reset_remix_modifiers = true;
-										ctx.modifiers.dual_render_mode_blend_diffuse = true;
-									}*/
+										on_constant_emissiveMultiplier(shared::globals::d3d_device, intensity);
+
+#if DEBUG
+										if (imgui::get()->m_dbg_debug_single_frame_emissive_intensity_vars)
+										{
+											const char* model_name = "[MDL:NULL]";
+											if (g_model_hash)
+											{
+												const auto it = game::g_modelHashToName.find(g_model_hash);
+												if (it != game::g_modelHashToName.end()) {
+													model_name = it->second;
+												}
+											}
+
+											shared::common::log("OnPsConstants", std::format("[Constant 72] VehicleLightsEmissive :: {:.2f} = constant * vehicle_lights_emissive_scalar ... call on_constant_emissiveMultiplier {}",
+												intensity, model_name));
+										}
+#endif
+
+										//renderer::set_remix_modifier(shared::globals::d3d_device, RemixModifier::RemoveVertexColorKeepAlpha);
+										//set_remix_modifier(shared::globals::d3d_device, ctx, RemixModifier::EnableVertexColor); // required when 'isVertexColorBakedLighting' is turned on
+
+										/*if (gs->vehicle_lights_dual_render_proxy_texture.get_as<bool>())
+										{
+											ctx.modifiers.dual_render_with_specified_texture = true;
+											ctx.modifiers.dual_render_texture = tex_addons::veh_light_ems_glass;
+											ctx.modifiers.dual_render_reset_remix_modifiers = true;
+											ctx.modifiers.dual_render_mode_blend_diffuse = true;
+										}*/
+									}
 								}
 							}
 							else if (register_num == 72u && is_vehicle_paint)
@@ -980,11 +1008,51 @@ namespace gta4
 								case GTA_EMISSIVENIGHT_ALPHA:
 								case GTA_EMISSIVENIGHT:
 
-									if (*game::m_game_clock_hours <= 6 || *game::m_game_clock_hours >= 19) {
-										renderer::set_remix_emissive_intensity(shared::globals::d3d_device, *constant_data_struct->constants[dataPoolIndex].float_arr * gs->emissive_night_surfaces_emissive_scalar.get_as<float>());
+									if (*game::m_game_clock_hours <= 6 || *game::m_game_clock_hours >= 19) 
+									{
+										if (!im->m_dbg_emissive_disable_const66_emissivenight)
+										{
+											renderer::set_remix_emissive_intensity(shared::globals::d3d_device, *constant_data_struct->constants[dataPoolIndex].float_arr* gs->emissive_night_surfaces_emissive_scalar._float());
+
+#if DEBUG
+											if (imgui::get()->m_dbg_debug_single_frame_emissive_intensity_vars)
+											{
+												const char* model_name = "[MDL:NULL]";
+												if (g_model_hash)
+												{
+													const auto it = game::g_modelHashToName.find(g_model_hash);
+													if (it != game::g_modelHashToName.end()) {
+														model_name = it->second;
+													}
+												}
+
+												shared::common::log("OnPsConstants", std::format("[Constant 66] EmissiveNight :: NIGHT time :: {:.2f} = constant * emissive_night_surfaces_emissive_scalar :: {}",
+													*constant_data_struct->constants[dataPoolIndex].float_arr * gs->emissive_night_surfaces_emissive_scalar._float(), model_name));
+											}
+#endif
+										}
 									}
-									else {
-										renderer::set_remix_emissive_intensity(shared::globals::d3d_device, 0.0f);
+									else 
+									{
+										if (!im->m_dbg_emissive_disable_const66_emissivenight)
+										{
+											renderer::set_remix_emissive_intensity(shared::globals::d3d_device, 0.0f);
+#if DEBUG
+											if (imgui::get()->m_dbg_debug_single_frame_emissive_intensity_vars)
+											{
+												const char* model_name = "[MDL:NULL]";
+												if (g_model_hash)
+												{
+													const auto it = game::g_modelHashToName.find(g_model_hash);
+													if (it != game::g_modelHashToName.end()) {
+														model_name = it->second;
+													}
+												}
+
+												shared::common::log("OnPsConstants", std::format("[Constant 66] EmissiveNight :: DAY time :: {:.2f} = hardcoded 0 :: {}", 0.0f, model_name));
+											}
+#endif
+										}
 									}
 
 									//renderer::set_remix_emissive_intensity(shared::globals::d3d_device,
@@ -996,27 +1064,88 @@ namespace gta4
 								//case GTA_EMISSIVE:
 								//case GTA_GLASS_EMISSIVE:
 								//case GTA_GLASS_EMISSIVENIGHT:
-									renderer::set_remix_emissive_intensity(shared::globals::d3d_device,
-										*constant_data_struct->constants[dataPoolIndex].float_arr * gs->emissive_surfaces_emissive_scalar.get_as<float>());
+
+									if (!im->m_dbg_emissive_disable_const66_default)
+									{
+										renderer::set_remix_emissive_intensity(shared::globals::d3d_device,
+											*constant_data_struct->constants[dataPoolIndex].float_arr* gs->emissive_surfaces_emissive_scalar._float());
+#if DEBUG
+										if (imgui::get()->m_dbg_debug_single_frame_emissive_intensity_vars)
+										{
+											const char* model_name = "[MDL:NULL]";
+											if (g_model_hash)
+											{
+												const auto it = game::g_modelHashToName.find(g_model_hash);
+												if (it != game::g_modelHashToName.end()) {
+													model_name = it->second;
+												}
+											}
+
+											shared::common::log("OnPsConstants", std::format("[Constant 66] {} :: {:.2f} = constant * emissive_surfaces_emissive_scalar :: {}",
+												ctx.info.shader_name,
+												*constant_data_struct->constants[dataPoolIndex].float_arr * gs->emissive_surfaces_emissive_scalar._float(),
+												model_name));
+										}
+#endif
+									}
+									
 									break;
 
 								case GTA_EMISSIVESTRONG_ALPHA:
 								case GTA_EMISSIVESTRONG:
-									renderer::set_remix_emissive_intensity(shared::globals::d3d_device,
-										*constant_data_struct->constants[dataPoolIndex].float_arr * gs->emissive_strong_surfaces_emissive_scalar.get_as<float>()/*, true*/);
+
+									if (!im->m_dbg_emissive_disable_const66_emissivestrong)
+									{
+										renderer::set_remix_emissive_intensity(shared::globals::d3d_device,
+											*constant_data_struct->constants[dataPoolIndex].float_arr * gs->emissive_strong_surfaces_emissive_scalar.get_as<float>()/*, true*/);
+#if DEBUG
+										if (imgui::get()->m_dbg_debug_single_frame_emissive_intensity_vars)
+										{
+											const char* model_name = "[MDL:NULL]";
+											if (g_model_hash)
+											{
+												const auto it = game::g_modelHashToName.find(g_model_hash);
+												if (it != game::g_modelHashToName.end()) {
+													model_name = it->second;
+												}
+											}
+
+											shared::common::log("OnPsConstants", std::format("[Constant 66] EmissiveStrong :: {:.2f} = constant * emissive_strong_surfaces_emissive_scalar :: {}",
+												*constant_data_struct->constants[dataPoolIndex].float_arr * gs->emissive_strong_surfaces_emissive_scalar.get_as<float>(), model_name));
+										}
+#endif
+									}
+									
 									break;
 								}
 							}
 							else if (register_num == 51u && (pidx == GTA_EMISSIVENIGHT || pidx == GTA_EMISSIVENIGHT_ALPHA))
 							{
-								ctx.info.shaderconst_uses_emissive_multiplier = true;
+								if (!im->m_dbg_emissive_disable_const51_tfactor_ems_multi)
+								{
+									ctx.info.shaderconst_uses_emissive_multiplier = true;
 
-								Vector4D color = constant_data_struct->constants[dataPoolIndex].float_arr;
+									Vector4D color = constant_data_struct->constants[dataPoolIndex].float_arr;
+									ctx.info.device_ptr->SetRenderState(D3DRS_TEXTUREFACTOR, D3DCOLOR_COLORVALUE(color.x, color.y, color.z, color.w));
+									ctx.info.device_ptr->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+									ctx.info.device_ptr->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+									ctx.info.device_ptr->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_TFACTOR);
+#if DEBUG
+									if (imgui::get()->m_dbg_debug_single_frame_emissive_intensity_vars)
+									{
+										const char* model_name = "[MDL:NULL]";
+										if (g_model_hash)
+										{
+											const auto it = game::g_modelHashToName.find(g_model_hash);
+											if (it != game::g_modelHashToName.end()) {
+												model_name = it->second;
+											}
+										}
 
-								ctx.info.device_ptr->SetRenderState(D3DRS_TEXTUREFACTOR, D3DCOLOR_COLORVALUE(color.x, color.y, color.z, color.w));
-								ctx.info.device_ptr->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-								ctx.info.device_ptr->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-								ctx.info.device_ptr->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_TFACTOR);
+										shared::common::log("OnPsConstants", std::format("[Constant 51] EmissiveNight TFACTOR COLOR :: set shaderconst_uses_emissive_multiplier to TRUE :: {}", model_name));
+									}
+#endif
+								}
 							}
 						}
 
@@ -1534,9 +1663,6 @@ namespace gta4
 		return hr;
 	}
 
-	std::uint32_t g_model_hash = 0u;
-	std::uint32_t g_model_reference = 0u;
-
 	HRESULT renderer::on_draw_indexed_prim(IDirect3DDevice9* dev, const D3DPRIMITIVETYPE& PrimitiveType, const INT& BaseVertexIndex, const UINT& MinVertexIndex, const UINT& NumVertices, const UINT& startIndex, const UINT& primCount)
 	{
 		if (!is_initialized() || shared::globals::imgui_is_rendering) {
@@ -1548,6 +1674,7 @@ namespace gta4
 		static auto gs = comp_settings::get();
 
 		bool render_with_ff = false;
+		const auto& pidx = ctx.info.preset_index;
 
 		if (!shared::globals::imgui_is_rendering)
 		{
@@ -1627,7 +1754,7 @@ namespace gta4
 			// true if none of the below checks were true
 			bool not_part_of_large_if_check = false;
 
-			const auto& pidx = ctx.info.preset_index;
+			
 
 			if ( (  pidx == GTA_ALPHA || pidx == GTA_DECAL || pidx == GTA_DECAL_GLUE || pidx == GTA_NORMAL_ALPHA || pidx == GTA_NORMAL_DECAL 
 				 || pidx == GTA_NORMAL_SPEC_ALPHA || pidx == GTA_NORMAL_SPEC_DECAL || pidx == GTA_SPEC_ALPHA || pidx == GTA_SPEC_DECAL ) 
@@ -2170,8 +2297,28 @@ namespace gta4
 
 				if (ctx.modifiers.is_vehicle_using_switch_on_state)
 				{
-					if (!ctx.modifiers.is_vehicle_on) {
-						on_constant_emissiveMultiplier(shared::globals::d3d_device, 0.0f);
+					if (!ctx.modifiers.is_vehicle_on) 
+					{
+						if (!im->m_dbg_emissive_disable_veh_switch_on) 
+						{
+							on_constant_emissiveMultiplier(shared::globals::d3d_device, 0.0f);
+#if DEBUG
+							if (imgui::get()->m_dbg_debug_single_frame_emissive_intensity_vars)
+							{
+								const char* model_name = "[MDL:NULL]";
+								if (g_model_hash)
+								{
+									const auto it = game::g_modelHashToName.find(g_model_hash);
+									if (it != game::g_modelHashToName.end()) {
+										model_name = it->second;
+									}
+								}
+
+								shared::common::log("DrawIndexedPrim", std::format("[!is_vehicle_on] g_is_rendering_vehicle :: {:.2f} = hardcoded :: call on_constant_emissiveMultiplier :: {}",
+									0.0f, model_name));
+							}
+#endif
+						}
 					}
 				}
 
@@ -2415,6 +2562,33 @@ namespace gta4
 			if (!render_with_ff) {
 				im->m_stats._drawcall_indexed_prim_using_vs.track_single();
 			}
+
+#if DEBUG
+			if (imgui::get()->m_dbg_debug_single_frame_emissive_intensity_vars)
+			{
+				if (pidx == GTA_EMISSIVE || pidx == GTA_EMISSIVENIGHT || pidx == GTA_EMISSIVESTRONG ||
+					pidx == GTA_GLASS_EMISSIVE || pidx == GTA_GLASS_EMISSIVENIGHT
+					|| pidx == GTA_EMISSIVENIGHT_ALPHA || pidx == GTA_EMISSIVESTRONG_ALPHA || pidx == GTA_EMISSIVE_ALPHA
+					|| pidx == GTA_GLASS_EMISSIVE || pidx == GTA_GLASS_EMISSIVENIGHT)
+				{
+					const char* model_name = "[MDL:NULL]";
+					if (g_model_hash)
+					{
+						const auto it = game::g_modelHashToName.find(g_model_hash);
+						if (it != game::g_modelHashToName.end()) {
+							model_name = it->second;
+						}
+					}
+
+					Vector model_pos = {
+						game::pCurrentWorldTransform->m[3][0], game::pCurrentWorldTransform->m[3][1], game::pCurrentWorldTransform->m[3][2]
+					};
+
+					shared::common::log("DrawIndexedPrim Ems", std::format("{} :: @ pos: {:.2f}, {:.2f}, {:.2f} :: shader: {}",
+						model_name, model_pos.x, model_pos.y, model_pos.z, ctx.info.shader_name));
+				}
+			}
+#endif
 		}
 
 

@@ -86,6 +86,17 @@ namespace gta4
 		bool m_dbg_render_emissives_with_shaders = false; // was game setting 'render_emissive_surfaces_using_shaders'
 		bool m_dbg_render_emissives_with_shaders_tag_as_decal = true; // was game setting 'assign_decal_category_to_emissive_surfaces'
 
+		bool m_dbg_emissive_disable_veh_switch_on = false;
+		bool m_dbg_emissive_disable_on_emissive_multi = false;
+		bool m_dbg_emissive_disable_const77_lightsemissive = false;
+		bool m_dbg_emissive_disable_const66_emissivenight = false;
+		bool m_dbg_emissive_disable_const66_default = false;
+		bool m_dbg_emissive_disable_const66_emissivestrong = false;
+		bool m_dbg_emissive_disable_const51_tfactor_ems_multi = false;
+		bool m_dbg_emissive_disable_ff_emissivenight_nighttime = false;
+		bool m_dbg_emissive_disable_ff_emissivenight_daytime = false;
+		bool m_dbg_emissive_disable_ff_not_emissivenight = false;
+		bool m_dbg_emissive_disable_alpha_ff = false;
 
 
 		bool m_dbg_skip_draw_indexed_checks = false;
@@ -102,6 +113,8 @@ namespace gta4
 
 		int m_dbg_used_timecycle = -1;
 		bool m_dbg_debug_single_frame_timecycle_remix_vars = false;
+
+		bool m_dbg_debug_single_frame_emissive_intensity_vars = false;
 
 		bool m_dbg_global_wetness_override = false;
 		float m_dbg_global_wetness = 0.0f;

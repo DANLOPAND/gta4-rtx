@@ -16,6 +16,9 @@ namespace gta4
 	extern bool g_rendered_first_primitive;
 	extern bool g_applied_hud_hack;
 
+	extern std::uint32_t g_model_hash;
+	extern std::uint32_t g_model_reference;
+
 	namespace tex_addons
 	{
 		extern bool initialized;
@@ -206,7 +209,22 @@ namespace gta4
 	class drawcall_mod_context
 	{
 	public:
-		
+
+		bool has_saved_renderstate(const D3DRENDERSTATETYPE& state) const
+		{
+			if (saved_render_state_.contains(state)) {
+				return true;
+			}
+
+			return false;
+		}
+
+		bool has_saved_renderstate(const uint32_t& state) const {
+			return has_saved_renderstate((D3DRENDERSTATETYPE)state);
+		}
+
+		// ---
+
 		// set texture 0 transform
 		void set_texture_transform(IDirect3DDevice9* device, const D3DXMATRIX* matrix)
 		{
@@ -525,7 +543,7 @@ namespace gta4
 			Vector global_anim_uv0;
 			Vector global_anim_uv1;
 
-			float shaderconst_emissive_intensity = 0.0f;
+			float shaderconst_emissive_intensity = -1.0f;
 			bool shaderconst_uses_emissive_multiplier = false;
 
 			DWORD rs_alphablendenable = 0u;
@@ -556,7 +574,7 @@ namespace gta4
 				global_anim_uv0.Zero();
 				global_anim_uv1.Zero();
 
-				shaderconst_emissive_intensity = 0.0f;
+				shaderconst_emissive_intensity = -1.0f;
 				shaderconst_uses_emissive_multiplier = false;
 
 				rs_alphablendenable = 0u;

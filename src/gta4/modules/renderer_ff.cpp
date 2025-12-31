@@ -121,21 +121,99 @@ namespace gta4
 
 			// (nope ^ ) ... this breaks traffic lights and removes vertex colors at certain angles?
 			// Only used by EMISSIVENIGHT shader
-			if (!ctx.info.shaderconst_uses_emissive_multiplier /*|| im->m_dbg_emissive_nonalpha_override*/)
+
+			const bool was_emissive_scalar_set = ctx.has_saved_renderstate(RS_169_EMISSIVE_SCALE); //ctx.save_rs(dev, RS_169_EMISSIVE_SCALE); // fixes emissive flicker
+			if (!was_emissive_scalar_set /*!ctx.info.shaderconst_uses_emissive_multiplier*/)
 			{
 				renderer::set_remix_modifier(dev, RemixModifier::EmissiveScalar);
 
 				if (ctx.info.preset_index == GTA_EMISSIVENIGHT || ctx.info.preset_index == GTA_EMISSIVENIGHT_ALPHA)
 				{
-					if (*game::m_game_clock_hours <= 6 || *game::m_game_clock_hours >= 19) {
-						renderer::set_remix_emissive_intensity(dev, gs->emissive_generic_scale.get_as<float>());
-					} else {
-						renderer::set_remix_emissive_intensity(dev, 0.0f);
+					if (*game::m_game_clock_hours <= 6 || *game::m_game_clock_hours >= 19)
+					{
+						if (!im->m_dbg_emissive_disable_ff_emissivenight_nighttime)
+						{
+							renderer::set_remix_emissive_intensity(dev, gs->emissive_generic_scale._float());
+#if DEBUG
+							if (imgui::get()->m_dbg_debug_single_frame_emissive_intensity_vars)
+							{
+								const char* model_name = "[MDL:NULL]";
+								if (g_model_hash)
+								{
+									const auto it = game::g_modelHashToName.find(g_model_hash);
+									if (it != game::g_modelHashToName.end()) {
+										model_name = it->second;
+									}
+								}
+
+								shared::common::log("OnFFEmissives", std::format("[NO-Constant] EmissiveNight :: NIGHT time :: {:.2f} = {}", gs->emissive_generic_scale._float(), model_name));
+							}
+#endif
+						}
+					} 
+					else 
+					{
+						if (!im->m_dbg_emissive_disable_ff_emissivenight_daytime)
+						{
+							renderer::set_remix_emissive_intensity(dev, 0.0f);
+#if DEBUG
+							if (imgui::get()->m_dbg_debug_single_frame_emissive_intensity_vars)
+							{
+								const char* model_name = "[MDL:NULL]";
+								if (g_model_hash)
+								{
+									const auto it = game::g_modelHashToName.find(g_model_hash);
+									if (it != game::g_modelHashToName.end()) {
+										model_name = it->second;
+									}
+								}
+
+								shared::common::log("OnFFEmissives", std::format("[NO-Constant] EmissiveNight :: DAY time :: {:.2f} = hardcoded 0 :: {}", 0.0f, model_name));
+							}
+#endif
+						}
 					}
 				}
-				else {
-					renderer::set_remix_emissive_intensity(dev, gs->emissive_generic_scale.get_as<float>() /*im->m_dbg_emissive_nonalpha_override_scale*/);
+				else 
+				{
+					if (!im->m_dbg_emissive_disable_ff_not_emissivenight)
+					{
+						renderer::set_remix_emissive_intensity(dev, gs->emissive_generic_scale._float() /*im->m_dbg_emissive_nonalpha_override_scale*/);
+#if DEBUG
+						if (imgui::get()->m_dbg_debug_single_frame_emissive_intensity_vars)
+						{
+							const char* model_name = "[MDL:NULL]";
+							if (g_model_hash)
+							{
+								const auto it = game::g_modelHashToName.find(g_model_hash);
+								if (it != game::g_modelHashToName.end()) {
+									model_name = it->second;
+								}
+							}
+
+							shared::common::log("OnFFEmissives", std::format("[NO-Constant] NOT EmissiveNight :: {:.2f} = emissive_generic_scale :: {}", gs->emissive_generic_scale._float(), model_name));
+						}
+#endif
+					}
 				}
+			}
+			else
+			{
+#if DEBUG
+				if (imgui::get()->m_dbg_debug_single_frame_emissive_intensity_vars)
+				{
+					const char* model_name = "[MDL:NULL]";
+					if (g_model_hash)
+					{
+						const auto it = game::g_modelHashToName.find(g_model_hash);
+						if (it != game::g_modelHashToName.end()) {
+							model_name = it->second;
+						}
+					}
+
+					shared::common::log("OnFFEmissives", std::format("Intensity already set. Constant was {:.2f} :: {}", ctx.info.shaderconst_emissive_intensity, model_name));
+				}
+#endif
 			}
 		}
 	}
@@ -193,7 +271,6 @@ namespace gta4
 
 			
 			//float intensity = ctx.info.shaderconst_emissive_intensity;
-
 			//ctx.save_rs(dev, D3DRS_TEXTUREFACTOR); 
 			//dev->SetRenderState(D3DRS_TEXTUREFACTOR, D3DCOLOR_COLORVALUE(intensity, intensity, intensity, intensity));
 
@@ -207,12 +284,32 @@ namespace gta4
 				renderer::set_remix_texture_categories(dev, InstanceCategories::IgnoreTransparencyLayer);
 			}*/
 
-			else if (gs->emissive_alpha_blend_hack._bool())
+			else if (gs->emissive_alpha_blend_hack._bool() && ctx.info.shaderconst_emissive_intensity >= 0.0f)
 			{
-				renderer::set_remix_texture_categories(dev, InstanceCategories::WorldUI | InstanceCategories::DecalStatic);
+				// why did I assign WorldUI here? This creates emissive flicker because remix something is happening on the runtime side
+				renderer::set_remix_texture_categories(dev, /*InstanceCategories::WorldUI |*/ InstanceCategories::DecalStatic);
 
-				renderer::set_remix_modifier(dev, RemixModifier::EmissiveScalar);
-				renderer::set_remix_emissive_intensity(dev, ctx.info.shaderconst_emissive_intensity * gs->emissive_alpha_blend_hack_scale._float());
+				if (!im->m_dbg_emissive_disable_alpha_ff)
+				{
+					renderer::set_remix_modifier(dev, RemixModifier::EmissiveScalar);
+					renderer::set_remix_emissive_intensity(dev, ctx.info.shaderconst_emissive_intensity * gs->emissive_alpha_blend_hack_scale._float());
+#if DEBUG
+					if (imgui::get()->m_dbg_debug_single_frame_emissive_intensity_vars)
+					{
+						const char* model_name = "[MDL:NULL]";
+						if (g_model_hash)
+						{
+							const auto it = game::g_modelHashToName.find(g_model_hash);
+							if (it != game::g_modelHashToName.end()) {
+								model_name = it->second;
+							}
+						}
+
+						shared::common::log("OnFFAlpha", std::format("[CONSTANT] emissive_alpha_blend_hack :: {:.2f} = constant * emissive_alpha_blend_hack_scale :: {}",
+							ctx.info.shaderconst_emissive_intensity * gs->emissive_alpha_blend_hack_scale._float(), model_name));
+					}
+#endif
+				}
 			}
 
 			else if (im->m_dbg_emissive_ff_alphablend_test1) {
