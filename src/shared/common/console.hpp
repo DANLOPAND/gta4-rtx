@@ -1,4 +1,5 @@
 #pragma once
+#include "shared/globals.hpp"
 
 namespace shared::common
 {
@@ -110,6 +111,33 @@ namespace shared::common
 		LOG_TYPE_ERROR,
     };
 
+	inline const char* log_type_to_string(LOG_TYPE type)
+	{
+		switch (type)
+		{
+		case LOG_TYPE::LOG_TYPE_DEFAULT: return "INFO";
+		case LOG_TYPE::LOG_TYPE_STATUS:  return "STATUS";
+		case LOG_TYPE::LOG_TYPE_GREEN:   return "OK";
+		case LOG_TYPE::LOG_TYPE_WARN:    return "WARN";
+		case LOG_TYPE::LOG_TYPE_ERROR:   return "ERROR";
+		default:                         return "UNKNOWN";
+		}
+	}
+
+	inline std::ofstream log_file;
+	inline bool log_file_initiated = false;
+
+	inline void init_log_file()
+	{
+		if (!log_file_initiated)
+		{
+			log_file_initiated = true;
+
+			const std::string file_path = shared::globals::root_path + "\\rtx_comp\\logfile.txt";
+			log_file.open(file_path, std::ios::out | std::ios::trunc);
+		}
+	}
+
 	inline void log(const std::string_view& module_str, const std::string_view& msg, LOG_TYPE type = LOG_TYPE::LOG_TYPE_DEFAULT, bool highlight = false, bool newline_infront = false)
 	{
 		auto colorize = [](const LOG_TYPE& t, const bool h)
@@ -135,7 +163,7 @@ namespace shared::common
 					break;
 				}
 			};
-		
+
 		// width of the inner module field
 		constexpr int inner_width = 14;
 
@@ -151,5 +179,14 @@ namespace shared::common
 		colorize(type, highlight);
 		std::cout << msg << '\n';
 		set_console_color_default();
+
+		init_log_file();
+		if (log_file.is_open())
+		{
+			log_file
+				<< "[" << log_type_to_string(type) << "] "
+				<< "[" << module_str << "] "
+				<< msg << std::endl; // auto flush
+		}
 	}
 }
