@@ -521,7 +521,7 @@ namespace gta4
 				"translate_sunlight_volumetric_radiance_base",
 				("Base volumetric scale of sunlight (Static value, not influenced by the game)\n"
 				"The timecycle fogdensity setting can also influence the volumetric scale when enabled."),
-				1.0f
+				2.0f
 			};
 
 			variable translate_sunlight_timecycle_fogdensity_volumetric_influence_enabled =
