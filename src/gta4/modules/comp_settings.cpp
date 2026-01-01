@@ -196,6 +196,11 @@ namespace gta4
 				ASSIGN(translate_vehicle_vsirens_intensity_offset);
 				ASSIGN(translate_vehicle_vsirens_radius_offset);
 
+				ASSIGN(translate_vehicle_vsirens_secondary_spherelight_enabled);
+				ASSIGN(translate_vehicle_vsirens_secondary_spherelight_radius_offset);
+				ASSIGN(translate_vehicle_vsirens_secondary_spherelight_intensity_offset);
+				ASSIGN(translate_vehicle_vsirens_secondary_spherelight_z_offset);
+				
 				// emissive related settings
 				ASSIGN(vehicle_lights_emissive_scalar);
 				ASSIGN(vehicle_lights_dual_render_proxy_texture);
@@ -288,7 +293,8 @@ namespace gta4
 				ASSIGN(timecycle_bloom_enabled);
 				ASSIGN(timecycle_bloomintensity_scalar);
 				ASSIGN(timecycle_bloomthreshold_scalar);
-
+				ASSIGN(timecycle_bloom_night_min_clamp_enabled);
+				ASSIGN(timecycle_bloom_night_min_clamp_value);
 
 			#undef ASSIGN
 			}

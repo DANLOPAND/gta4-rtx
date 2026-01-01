@@ -49,10 +49,14 @@ namespace gta4
 
 			//auto first_timecycle = reinterpret_cast<game::TimeCycleParams*>(0x15E8910);
 			//auto third_timecycle = reinterpret_cast<game::TimeCycleParams*>(0x15E8B20);
+
+			bool is_playing_cutscene = false;
 			game::TimeCycleParams* timecycle = game::m_pCurrentTimeCycleParams_01;
 
-			if (game::m_dwCutsceneState && *game::m_dwCutsceneState > 0) {
+			if (game::m_dwCutsceneState && *game::m_dwCutsceneState > 0) 
+			{
 				timecycle = game::m_pCurrentTimeCycleParams_Cutscene;
+				is_playing_cutscene = true;
 			}
 
 			// manual override
@@ -89,8 +93,17 @@ namespace gta4
 			if (gs->timecycle_bloom_enabled.get_as<bool>() && rtxBloomBurnIntensity && rtxBloomLuminanceThreshold)
 			{
 				val.value = timecycle->mBloomIntensity * gs->timecycle_bloomintensity_scalar.get_as<float>();
+
+				// allow min clamping at night with no cutscene playing
+				if (gs->timecycle_bloom_night_min_clamp_enabled._bool() && !is_playing_cutscene && 
+					(*game::m_game_clock_hours <= 6 || *game::m_game_clock_hours >= 19)) 
+				{
+					val.value = std::max(gs->timecycle_bloom_night_min_clamp_value._float(), val.value);
+				}
+	
 				vars->set_option(rtxBloomBurnIntensity, val);
 				ASSIGN_IMGUI_VIS_FLOAT(mBloomIntensity);
+				
 
 				val.value = timecycle->mBloomThreshold * gs->timecycle_bloomthreshold_scalar.get_as<float>();
 				vars->set_option(rtxBloomLuminanceThreshold, val);

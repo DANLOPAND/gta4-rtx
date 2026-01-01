@@ -1304,6 +1304,12 @@ namespace gta4
 		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("V-Siren Light Intensity Offset", gs->translate_vehicle_vsirens_intensity_offset, 0.0f, 0.0f, 0.01f));
 		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("V-Siren Light Radius Offset", gs->translate_vehicle_vsirens_radius_offset, 0.0f, 0.0f, 0.01f));
 
+		ImGui::Spacing(0.0f, 2.0f);
+		CLEAR_CACHE_CHECK(clear, compsettings_bool_widget("V-Siren Secondary Spherelight", gs->translate_vehicle_vsirens_secondary_spherelight_enabled));
+		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("V-Siren Spherelight Intensity Offset", gs->translate_vehicle_vsirens_secondary_spherelight_intensity_offset, 0.0f, 0.0f, 0.01f));
+		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("V-Siren Spherelight Radius Offset", gs->translate_vehicle_vsirens_secondary_spherelight_radius_offset, 0.0f, 0.0f, 0.01f));
+		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("V-Siren Spherelight Z Offset", gs->translate_vehicle_vsirens_secondary_spherelight_z_offset, 0.0f, 0.0f, 0.01f));
+
 		if (clear) {
 			remix_lights::clear_light_cache();
 		}
@@ -1583,6 +1589,20 @@ namespace gta4
 			{
 				compsettings_float_widget("Bloom Intensity Scalar", gs->timecycle_bloomintensity_scalar, 0.0f, 0.0f, 0.005f);
 				compsettings_float_widget("Bloom Threshold Scalar", gs->timecycle_bloomthreshold_scalar, 0.0f, 0.0f, 0.005f);
+
+				ImGui::Spacing(0, 4);
+				compsettings_bool_widget("Clamp Min Intensity at Night", gs->timecycle_bloom_night_min_clamp_enabled);
+				ImGui::BeginDisabled(!gs->timecycle_bloom_night_min_clamp_enabled.get_as<bool>());
+				{
+					compsettings_float_widget("Bloom Night Min Value", gs->timecycle_bloom_night_min_clamp_value, 0.0f, 0.0f, 0.005f);
+					ImGui::EndDisabled();
+				}
+
+				ImGui::PushFont(shared::imgui::font::BOLD);
+				ImGui::TextDisabled("Out rtxBloomBurnIntensity: [ %.2f ]", im->m_timecyc_curr_mBloomIntensity_final);
+				ImGui::TextDisabled("Out rtxBloomLuminanceThreshold: [ %.2f ]", im->m_timecyc_curr_mBloomThreshold_final);
+				ImGui::PopFont();
+				
 				ImGui::EndDisabled();
 			}
 		}
@@ -1743,13 +1763,37 @@ namespace gta4
 		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Fake Siren Light Intensity Offset", gs->translate_vehicle_fake_siren_intensity_offset, 0.0f, 0.0f, 0.01f));
 		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Fake Siren Light Radius Offset", gs->translate_vehicle_fake_siren_radius_offset, 0.0f, 0.0f, 0.01f));
 
+		ImGui::Spacing(0.0f, 4.0f);
 		CLEAR_CACHE_CHECK(clear, compsettings_bool_widget("V-Siren Make Spotlight", gs->translate_vehicle_vsirens_make_spotlight));
 		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("V-Siren Light Intensity Offset", gs->translate_vehicle_vsirens_intensity_offset, 0.0f, 0.0f, 0.01f));
 		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("V-Siren Light Radius Offset", gs->translate_vehicle_vsirens_radius_offset, 0.0f, 0.0f, 0.01f));
 
+		ImGui::Spacing(0.0f, 2.0f);
+		CLEAR_CACHE_CHECK(clear, compsettings_bool_widget("V-Siren Secondary Spherelight", gs->translate_vehicle_vsirens_secondary_spherelight_enabled));
+		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("V-Siren Spherelight Intensity Offset", gs->translate_vehicle_vsirens_secondary_spherelight_intensity_offset, 0.0f, 0.0f, 0.01f));
+		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("V-Siren Spherelight Radius Offset", gs->translate_vehicle_vsirens_secondary_spherelight_radius_offset, 0.0f, 0.0f, 0.01f));
+		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("V-Siren Spherelight Z Offset", gs->translate_vehicle_vsirens_secondary_spherelight_z_offset, 0.0f, 0.0f, 0.01f));
+
 		if (clear) {
 			remix_lights::clear_light_cache();
 		}
+
+
+		ImGui::Spacing(0, inbetween_spacing);
+		ImGui::SeparatorText(" Timecycle ");
+		ImGui::Spacing(0, 4);
+
+		ImGui::BeginDisabled(!gs->timecycle_bloom_enabled.get_as<bool>());
+		{
+			compsettings_bool_widget("Clamp Min Intensity at Night", gs->timecycle_bloom_night_min_clamp_enabled);
+			ImGui::BeginDisabled(!gs->timecycle_bloom_night_min_clamp_enabled.get_as<bool>());
+			{
+				compsettings_float_widget("Bloom Night Min Value", gs->timecycle_bloom_night_min_clamp_value, 0.0f, 0.0f, 0.005f);
+				ImGui::EndDisabled();
+			}
+			ImGui::EndDisabled();
+		}
+		
 
 		ImGui::Spacing(0, 4);
 	}

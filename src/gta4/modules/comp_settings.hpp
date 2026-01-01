@@ -635,6 +635,35 @@ namespace gta4
 				25.0f
 			};
 
+
+			variable translate_vehicle_vsirens_secondary_spherelight_enabled =
+			{
+				"translate_vehicle_vsirens_secondary_spherelight_enabled",
+				("Create a secondary spherelight on v-siren lights"),
+				true
+			};
+
+			variable translate_vehicle_vsirens_secondary_spherelight_radius_offset =
+			{
+				"translate_vehicle_vsirens_secondary_spherelight_radius_offset",
+				("Radius offset (in game units) applied to the secondary v-siren light"),
+				2.0f
+			};
+
+			variable translate_vehicle_vsirens_secondary_spherelight_intensity_offset =
+			{
+				"translate_vehicle_vsirens_secondary_spherelight_intensity_offset",
+				("Intensity offset (in game units) applied to the secondary v-siren light"),
+				4.0f
+			};
+
+			variable translate_vehicle_vsirens_secondary_spherelight_z_offset =
+			{
+				"translate_vehicle_vsirens_secondary_spherelight_z_offset",
+				("Z-Axis offset (in game units) applied to the secondary v-siren light"),
+				0.15f
+			};
+
 			// ----------------------------------
 			// emissive related settings
 
@@ -1113,7 +1142,7 @@ namespace gta4
 			variable timecycle_skylight_scalar = {
 				"timecycle_skylight_scalar",
 				("Controls how much the skylight timecycle variable influences 'rtx.skyBrightness'"),
-				0.03f
+				0.02f
 			};
 
 			// -----
@@ -1190,13 +1219,25 @@ namespace gta4
 			variable timecycle_bloomintensity_scalar = {
 				"timecycle_bloomintensity_scalar",
 				("Scales the bloom intensity timecycle variable which influences 'rtx.tonemap.saturation'."),
-				1.0f
+				1.5f
 			};
 
 			variable timecycle_bloomthreshold_scalar = {
 				"timecycle_bloomthreshold_scalar",
 				("Scales the bloom threshold timecycle variable which influences 'rtx.tonemap.luminanceThreshold'."),
 				1.0f
+			};
+
+			variable timecycle_bloom_night_min_clamp_enabled = {
+				"timecycle_bloom_night_min_clamp_enabled",
+				("Lower bound clamp bloom intensity at night with no cutscene playing."),
+				true
+			};
+
+			variable timecycle_bloom_night_min_clamp_value = {
+				"timecycle_bloom_night_min_clamp_value",
+				("Min value of bloom intensity at night with no cutscene playing. Needs 'timecycle_bloom_night_min_clamp_enabled'"),
+				1.5f
 			};
 
 		};

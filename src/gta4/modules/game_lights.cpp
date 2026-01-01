@@ -80,6 +80,26 @@ namespace gta4
 		}
 	}
 
+
+	/**
+	 * Directly add a game light without the need to go through game logic.
+	 * Does not use light translation settings. Always updates - no cache
+	 */
+	void game_lights::add_custom_game_light_sphere(const Vector& pos, const float& radius, const float& intensity, const float& volumetric_scale, const Vector& color)
+	{
+		game::CLightSource def;
+		def.mPosition = pos;
+		def.mColor.x = color.x;
+		def.mColor.y = color.y;
+		def.mColor.z = color.z;
+		def.mRadius = radius;
+		def.mIntensity = intensity;
+		def.mVolumeScale = volumetric_scale;
+		def.mType = game::LT_POINT;
+		m_custom_game_lights.push_back(def);
+	}
+
+
 	/**
 	 * Iterate all game lights this frame 
 	 */
@@ -140,6 +160,20 @@ namespace gta4
 
 		if (comp_settings::get()->translate_game_lights.get_as<bool>() && light_count && light_list)
 		{
+			// custom lights created via game hooks or similar that should not 
+			// go through the entire game logic to then get translated back to remix lights
+			for (auto def : m_custom_game_lights)
+			{
+				const auto hash = calculate_light_hash(def);
+				rml->add_light(def, hash, false, false);
+			}
+
+			// clear after adding all
+			m_custom_game_lights.clear();
+
+			// --
+			// actual game lights
+
 			for (auto i = 0u; i < light_count; i++)
 			{
 				auto& def = light_list[i];
@@ -209,7 +243,10 @@ namespace gta4
 				bool touched_light = false;
 				if (auto it = active_lights.find(hash); it != active_lights.end())
 				{
-					bool should_update = im->m_dbg_visualize_api_light_hashes || it->second.m_def.mFlags & 0x400; // always update if in vis mode
+					const auto always_update = it->second.m_def.mFlags & 0x400; 
+					const auto custom_game_light = it->second.m_def.mFlags & 0x40000;
+
+					bool should_update = im->m_dbg_visualize_api_light_hashes || always_update; // always update if in vis mode -- or light requests it
 					it->second.m_is_filler = is_filler_light;
 
 					// check if most important properties changed - position unchanged as matched a hash
@@ -234,7 +271,7 @@ namespace gta4
 						}
 
 						it->second.m_is_allowed_filler = is_allowed_filler_light;
-						rml->spawn_or_update_remix_sphere_light(it->second, true);
+						rml->spawn_or_update_remix_sphere_light(it->second, true, custom_game_light);
 					}
 
 					touched_light = true;
@@ -480,7 +517,30 @@ namespace gta4
 			light_direction, light_direction,
 			pos,
 			&color.x,
-			ems_scale + gs->translate_vehicle_vsirens_intensity_offset._float(), 0, 0, gs->translate_vehicle_vsirens_radius_offset._float(), 0.0f, 0.0f, 0, 0, 0);
+			ems_scale + gs->translate_vehicle_vsirens_intensity_offset._float(), 
+			0, 0, 
+			gs->translate_vehicle_vsirens_radius_offset._float(), 
+			0.0f, 0.0f, 0, 0, 0);
+
+		if (gs->translate_vehicle_vsirens_secondary_spherelight_enabled._bool())
+		{
+			Vector new_pos = pos;
+
+			//const auto im = imgui::get();
+			//new_pos.x += im->m_debug_vector2.x;
+			//new_pos.y += im->m_debug_vector2.y;
+			//new_pos.z += im->m_debug_vector2.z;
+
+			const float z_offset = gs->translate_vehicle_vsirens_secondary_spherelight_z_offset._float();
+			new_pos.z += (z_offset + 0.01f); // always add a slight offset so code recognizes it as a new light
+
+			game_lights::add_custom_game_light_sphere(
+				new_pos,
+				gs->translate_vehicle_vsirens_secondary_spherelight_radius_offset._float(),
+				ems_scale + gs->translate_vehicle_vsirens_secondary_spherelight_intensity_offset._float(),
+				1.0f,
+				color);
+		}
 	}
 
 

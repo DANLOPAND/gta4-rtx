@@ -51,9 +51,10 @@ namespace gta4
 	 * Spawns or updates a remixApi spherelight
 	 * @param light			The light
 	 * @param update		Is this light getting an update or completely new? 
+	 * @param custom		Is this light custom and not created by the game? 
 	 * @return				True if successfull
 	 */
-	bool remix_lights::spawn_or_update_remix_sphere_light(remix_light_def& light, bool update)
+	bool remix_lights::spawn_or_update_remix_sphere_light(remix_light_def& light, bool update, bool custom)
 	{
 		const auto gs = comp_settings::get();
 		auto msov = map_settings::get_map_settings().light_overrides;
@@ -77,7 +78,7 @@ namespace gta4
 		light.m_ext.position = get_light_position(def, lov).ToRemixFloat3D();
 
 		// scale down lights with larger radii (eg. own vehicle headlight (75 rad))
-		light.m_ext.radius = get_light_radius(def, lov) * gs->translate_game_light_radius_scalar.get_as<float>() * 0.01f;
+		light.m_ext.radius = custom ? def.mRadius : get_light_radius(def, lov) * gs->translate_game_light_radius_scalar.get_as<float>() * 0.01f;
 		light.m_ext.shaping_hasvalue = is_spotlight;
 		light.m_ext.shaping_value = {};
 		light.m_ext.shaping_value.direction = get_light_dir(def, lov).ToRemixFloat3D();
@@ -103,10 +104,16 @@ namespace gta4
 			light.m_info.hash = light.m_hash;
 		}
 		
-		light.m_info.radiance = (
-			  get_light_intensity(def, lov)
-			* get_light_color(def, lov)
-			*  gs->translate_game_light_intensity_scalar.get_as<float>()).ToRemixFloat3D();
+		if (custom) {
+			light.m_info.radiance = (def.mIntensity * Vector(def.mColor)).ToRemixFloat3D();
+		}
+		else
+		{
+			light.m_info.radiance = (
+				get_light_intensity(def, lov)
+				* get_light_color(def, lov)
+				* gs->translate_game_light_intensity_scalar.get_as<float>()).ToRemixFloat3D();
+		}
 
 		const auto& api = shared::common::remix_api::get();
 		return api.m_bridge.CreateLight(&light.m_info, &light.m_handle) == REMIXAPI_ERROR_CODE_SUCCESS;
