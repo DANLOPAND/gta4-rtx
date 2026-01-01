@@ -1669,22 +1669,11 @@ namespace gta4
 		ImGui::Spacing(0, 4);
 	}
 
-	void wip_gs_container()
+	void wip_cs_container()
 	{
 		//const auto& im = imgui::get();
 		const auto& gs = comp_settings::get();
 		const float inbetween_spacing = SEPARATOR_SPACING;
-
-		ImGui::Spacing(0, inbetween_spacing);
-		ImGui::SeparatorText(" Emissives ");
-		ImGui::Spacing(0, 4);
-
-		compsettings_bool_widget("AlphaBlended Emissives Hack", gs->emissive_alpha_blend_hack);
-		ImGui::BeginDisabled(!gs->emissive_alpha_blend_hack._bool());
-		{
-			compsettings_float_widget("AlphaBlended Emissives Hack Scale", gs->emissive_alpha_blend_hack_scale, 0.0f, 100.0f, 0.001f);
-			ImGui::EndDisabled();
-		}
 
 		ImGui::Spacing(0, inbetween_spacing);
 		ImGui::SeparatorText(" Weather ");
@@ -1777,10 +1766,10 @@ namespace gta4
 		ImGui::Unindent(4);
 		ImGui::Spacing(0, 16);
 
-		// gs
+		// cs
 		{
 			static float cont_quick_utilities_height = 0.0f;
-			cont_quick_utilities_height = ImGui::Widget_ContainerWithCollapsingTitle("Comp Settings", cont_quick_utilities_height, wip_gs_container,
+			cont_quick_utilities_height = ImGui::Widget_ContainerWithCollapsingTitle("Comp Settings", cont_quick_utilities_height, wip_cs_container,
 				true, ICON_FA_CAMERA, &ImGuiCol_ContainerBackground, &ImGuiCol_ContainerBorder);
 		}
 	}
@@ -1888,43 +1877,43 @@ namespace gta4
 
 		// rendering related
 		{
-			static float cont_gs_renderer_height = 0.0f;
-			cont_gs_renderer_height = ImGui::Widget_ContainerWithCollapsingTitle("Rendering Related Settings", cont_gs_renderer_height, 
+			static float cont_cs_renderer_height = 0.0f;
+			cont_cs_renderer_height = ImGui::Widget_ContainerWithCollapsingTitle("Rendering Related Settings", cont_cs_renderer_height, 
 				compsettings_rendering_container, false, ICON_FA_CAMERA, &im->ImGuiCol_ContainerBackground, &im->ImGuiCol_ContainerBorder);
 		}
 
 		// culling related
 		{
-			static float cont_gs_renderer_height = 0.0f;
-			cont_gs_renderer_height = ImGui::Widget_ContainerWithCollapsingTitle("Culling Settings", cont_gs_renderer_height,
+			static float cont_cs_renderer_height = 0.0f;
+			cont_cs_renderer_height = ImGui::Widget_ContainerWithCollapsingTitle("Culling Settings", cont_cs_renderer_height,
 				compsettings_culling_container, false, ICON_FA_TV, &im->ImGuiCol_ContainerBackground, &im->ImGuiCol_ContainerBorder);
 		}
 
 		// light related
 		{
-			static float cont_gs_light_height = 0.0f;
-			cont_gs_light_height = ImGui::Widget_ContainerWithCollapsingTitle("Light Related Settings", cont_gs_light_height, 
+			static float cont_cs_light_height = 0.0f;
+			cont_cs_light_height = ImGui::Widget_ContainerWithCollapsingTitle("Light Related Settings", cont_cs_light_height, 
 				compsettings_light_container, false, ICON_FA_LIGHTBULB, &im->ImGuiCol_ContainerBackground, &im->ImGuiCol_ContainerBorder);
 		}
 
 		// emissive related
 		{
-			static float cont_gs_emissive_height = 0.0f;
-			cont_gs_emissive_height = ImGui::Widget_ContainerWithCollapsingTitle("Emissive Related Settings", cont_gs_emissive_height, 
+			static float cont_cs_emissive_height = 0.0f;
+			cont_cs_emissive_height = ImGui::Widget_ContainerWithCollapsingTitle("Emissive Related Settings", cont_cs_emissive_height, 
 				compsettings_emissive_container, false, ICON_FA_RSS, &im->ImGuiCol_ContainerBackground, &im->ImGuiCol_ContainerBorder);
 		}
 
 		// timecycle related
 		{
-			static float cont_gs_timecycle_height = 0.0f;
-			cont_gs_timecycle_height = ImGui::Widget_ContainerWithCollapsingTitle("Timecycle Related Settings", cont_gs_timecycle_height, 
+			static float cont_cs_timecycle_height = 0.0f;
+			cont_cs_timecycle_height = ImGui::Widget_ContainerWithCollapsingTitle("Timecycle Related Settings", cont_cs_timecycle_height, 
 				compsettings_timecycle_container, false, ICON_FA_CLOCK, &im->ImGuiCol_ContainerBackground, &im->ImGuiCol_ContainerBorder);
 		}
 
 		// other
 		{
-			static float cont_gs_other_height = 0.0f;
-			cont_gs_other_height = ImGui::Widget_ContainerWithCollapsingTitle("Other Settings", cont_gs_other_height,
+			static float cont_cs_other_height = 0.0f;
+			cont_cs_other_height = ImGui::Widget_ContainerWithCollapsingTitle("Other Settings", cont_cs_other_height,
 				compsettings_other_container, false, ICON_FA_RANDOM, &im->ImGuiCol_ContainerBackground, &im->ImGuiCol_ContainerBorder);
 		}
 	}
