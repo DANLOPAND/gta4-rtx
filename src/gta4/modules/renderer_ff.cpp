@@ -125,8 +125,6 @@ namespace gta4
 			const bool was_emissive_scalar_set = ctx.has_saved_renderstate(RS_169_EMISSIVE_SCALE); //ctx.save_rs(dev, RS_169_EMISSIVE_SCALE); // fixes emissive flicker
 			if (!was_emissive_scalar_set /*!ctx.info.shaderconst_uses_emissive_multiplier*/)
 			{
-				renderer::set_remix_modifier(dev, RemixModifier::EmissiveScalar);
-
 				if (ctx.info.preset_index == GTA_EMISSIVENIGHT || ctx.info.preset_index == GTA_EMISSIVENIGHT_ALPHA)
 				{
 					if (*game::m_game_clock_hours <= 6 || *game::m_game_clock_hours >= 19)
@@ -291,7 +289,6 @@ namespace gta4
 
 				if (!im->m_dbg_emissive_disable_alpha_ff)
 				{
-					renderer::set_remix_modifier(dev, RemixModifier::EmissiveScalar);
 					renderer::set_remix_emissive_intensity(dev, ctx.info.shaderconst_emissive_intensity * gs->emissive_alpha_blend_hack_scale._float());
 #if DEBUG
 					if (imgui::get()->m_dbg_debug_single_frame_emissive_intensity_vars)
@@ -314,6 +311,14 @@ namespace gta4
 
 			else if (im->m_dbg_emissive_ff_alphablend_test1) {
 				renderer::set_remix_texture_categories(dev, InstanceCategories::IgnoreTransparencyLayer);
+			}
+
+			// TODO? HACK against flickering?
+			if (ctx.info.shaderconst_emissive_intensity < 0.0f)
+			{
+				float const66[4] = {};
+				dev->GetPixelShaderConstantF(66, const66, 1);
+				renderer::set_remix_emissive_intensity(dev, const66[0]);
 			}
 
 			renderer::set_remix_modifier(dev, RemixModifier::RemoveVertexColorKeepAlpha); 

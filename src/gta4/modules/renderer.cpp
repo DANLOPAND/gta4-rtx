@@ -748,7 +748,7 @@ namespace gta4
 								game_device->SetVertexShaderConstantF(register_num, constant_data_struct->constants[dataPoolIndex].float_arr, float_count * game::pShaderConstFloatCountMap[type]);
 							}
 						}
-						else if (register_num == 208u || register_num == 209u && (pidx == GTA_EMISSIVE || pidx == GTA_EMISSIVE_ALPHA))
+						else if ((register_num == 208u || register_num == 209u) && (pidx == GTA_EMISSIVE || pidx == GTA_EMISSIVE_ALPHA))
 						{
 							if (register_num == 208u) {
 								ctx.info.has_global_anim_uv1 = true;
@@ -1007,6 +1007,7 @@ namespace gta4
 								{
 								case GTA_EMISSIVENIGHT_ALPHA:
 								case GTA_EMISSIVENIGHT:
+								case GTA_GLASS_EMISSIVENIGHT:
 
 									if (*game::m_game_clock_hours <= 6 || *game::m_game_clock_hours >= 19) 
 									{
@@ -1058,6 +1059,11 @@ namespace gta4
 									//renderer::set_remix_emissive_intensity(shared::globals::d3d_device,
 									//	*constant_data_struct->constants[dataPoolIndex].float_arr * gs->emissive_night_surfaces_emissive_scalar.get_as<float>());
 
+									break;
+
+								case GTA_GLASS_EMISSIVE:
+									renderer::set_remix_emissive_intensity(shared::globals::d3d_device,
+										*constant_data_struct->constants[dataPoolIndex].float_arr * 1.0f);
 									break;
 
 								default:
@@ -2279,7 +2285,6 @@ namespace gta4
 				if (gs->phone_emissive_override.get_as<bool>())
 				{
 					set_remix_texture_categories(dev, InstanceCategories::WorldUI | InstanceCategories::IgnoreAlphaChannel);
-					set_remix_modifier(dev, RemixModifier::EmissiveScalar);
 					set_remix_emissive_intensity(dev, gs->phone_emissive_scalar.get_as<float>(), false);
 				}
 			}
