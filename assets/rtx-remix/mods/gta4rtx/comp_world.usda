@@ -1196,6 +1196,51 @@ over "RootNode"
                 custom asset inputs:transmittance_texture = @./assets/wtex/glass/89D25A06CADAC98D/89D25_transm_hf.a.rtex.dds@
             }
         }
+
+        over "mat_9B3E1C18DD10FA6C"
+        {
+            over "Shader"
+            {
+                custom bool inputs:blend_enabled = 0
+                custom float inputs:emissive_intensity = 0.25
+                custom asset inputs:emissive_mask_texture = @./assets/wtex/emissives/9B3E1C18DD10FA6C_emissive.e.rtex.dds@
+                custom bool inputs:enable_emission = 1
+                custom bool inputs:use_legacy_alpha_state = 0
+            }
+        }
+
+        over "mat_85F8DF8BB52E15BF" (
+            references = @./materials/AperturePBR_Translucent.usda@</Looks/mat_AperturePBR_Translucent>
+        )
+        {
+            over "Shader"
+            {
+                custom asset inputs:emissive_mask_texture = @@
+                custom bool inputs:enable_emission = 0
+                custom float inputs:ior_constant = 1.6
+                custom float inputs:thin_wall_thickness = 0.1
+                custom bool inputs:thin_walled = 1
+                custom color3f inputs:transmittance_color = (0.71428573, 0.8841774, 1)
+                custom float inputs:transmittance_measurement_distance = 1
+                custom asset inputs:transmittance_texture = @./assets/wtex/glass/85F8DF8BB52E15BF/85F8DF8BB52E15BF_trans.a.rtex.dds@
+                custom bool inputs:use_diffuse_layer = 1
+            }
+        }
+
+        over "mat_91FEBA1ECB5C43BD" (
+            references = @./materials/AperturePBR_Translucent.usda@</Looks/mat_AperturePBR_Translucent>
+        )
+        {
+            over "Shader"
+            {
+                custom float inputs:ior_constant = 1.3
+                custom float inputs:thin_wall_thickness = 0.2
+                custom bool inputs:thin_walled = 1
+                custom color3f inputs:transmittance_color = (1, 0.99999, 0.99999)
+                custom asset inputs:transmittance_texture = @./assets/wtex/glass/91FEBA1ECB5C43BD/91FEBA1ECB5C43BD_trans.a.rtex.dds@
+                custom bool inputs:use_diffuse_layer = 1
+            }
+        }
     }
 
     over "meshes"

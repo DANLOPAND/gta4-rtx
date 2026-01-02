@@ -145,16 +145,16 @@ over "RootNode"
                                 float primvars:particle:gravityForce = -600
                                 bool primvars:particle:hideEmitter = 1
                                 float primvars:particle:initialVelocityConeAngleDegrees = 0
-                                float primvars:particle:initialVelocityFromMotion = 0.1
-                                float primvars:particle:initialVelocityFromNormal = 200
+                                float primvars:particle:initialVelocityFromMotion = 0
+                                float primvars:particle:initialVelocityFromNormal = 0
                                 int primvars:particle:maxNumParticles = 15000
                                 float primvars:particle:maxSpawnSize = 7
+                                float primvars:particle:maxSpeed = 2000
                                 float primvars:particle:maxTimeToLive = 4
                                 float primvars:particle:minSpawnSize = 6
                                 float primvars:particle:minTimeToLive = 3
                                 float primvars:particle:motionTrailMultiplier = 1.6
                                 float primvars:particle:spawnRatePerSecond = 1400
-                                float primvars:particle:maxSpeed = 2000
                             }
                         }
                     }
@@ -231,12 +231,12 @@ over "RootNode"
                                 float primvars:particle:initialVelocityFromNormal = 200
                                 int primvars:particle:maxNumParticles = 7000
                                 float primvars:particle:maxSpawnSize = 7
+                                float primvars:particle:maxSpeed = 2000
                                 float primvars:particle:maxTimeToLive = 4
                                 float primvars:particle:minSpawnSize = 5
                                 float primvars:particle:minTimeToLive = 3
                                 float primvars:particle:motionTrailMultiplier = 1.4
                                 float primvars:particle:spawnRatePerSecond = 300
-                                float primvars:particle:maxSpeed = 2000
                             }
                         }
                     }
@@ -313,12 +313,12 @@ over "RootNode"
                                 float primvars:particle:initialVelocityFromNormal = 200
                                 int primvars:particle:maxNumParticles = 15000
                                 float primvars:particle:maxSpawnSize = 7
+                                float primvars:particle:maxSpeed = 2000
                                 float primvars:particle:maxTimeToLive = 4
                                 float primvars:particle:minSpawnSize = 5
                                 float primvars:particle:minTimeToLive = 4
                                 float primvars:particle:motionTrailMultiplier = 1.5
                                 float primvars:particle:spawnRatePerSecond = 1300
-                                float primvars:particle:maxSpeed = 2000
                             }
                         }
                     }
@@ -395,12 +395,12 @@ over "RootNode"
                                 float primvars:particle:initialVelocityFromNormal = 200
                                 int primvars:particle:maxNumParticles = 7000
                                 float primvars:particle:maxSpawnSize = 7
+                                float primvars:particle:maxSpeed = 2000
                                 float primvars:particle:maxTimeToLive = 4
                                 float primvars:particle:minSpawnSize = 5
                                 float primvars:particle:minTimeToLive = 3
                                 float primvars:particle:motionTrailMultiplier = 1.4
                                 float primvars:particle:spawnRatePerSecond = 300
-                                float primvars:particle:maxSpeed = 2000
                             }
                         }
                     }

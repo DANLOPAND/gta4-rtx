@@ -538,6 +538,23 @@ over "RootNode"
                 custom float inputs:subsurface_volumetric_anisotropy = -0.3564
             }
         }
+
+        over "mat_24D214689393A451"
+        {
+            over "Shader"
+            {
+                custom bool inputs:blend_enabled = 0
+                custom int inputs:blend_type = 0
+                custom bool inputs:subsurface_diffusion_profile = 0
+                custom float inputs:subsurface_measurement_distance = 16
+                custom color3f inputs:subsurface_radius = (1, 0.99999577, 0.99999)
+                custom float inputs:subsurface_radius_scale = 0
+                custom color3f inputs:subsurface_single_scattering_albedo = (0.9034749, 0.61790407, 0.09069631)
+                custom color3f inputs:subsurface_transmittance_color = (0.969112, 0.96189576, 0.93543625)
+                custom float inputs:subsurface_volumetric_anisotropy = 0.5148
+                custom bool inputs:use_legacy_alpha_state = 0
+            }
+        }
     }
 
     over "meshes"

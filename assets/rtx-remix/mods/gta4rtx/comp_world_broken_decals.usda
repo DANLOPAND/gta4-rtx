@@ -119,6 +119,54 @@ over "RootNode"
                 }
             }
         }
+
+        over "mesh_55884F0CE547C6E5" (
+            references = None
+        )
+        {
+            def Xform "ref_8b918add5cb4482f8ac3c429170013ed" (
+                prepend references = @./assets/wmeshfix/dt/trainbridge/fix_m_55884F0CE.usda@
+            )
+            {
+                custom bool IsRemixRef = 1
+                double3 xformOp:rotateXYZ = (0, 0, 0)
+                double3 xformOp:scale = (1, 1, 1)
+                double3 xformOp:translate = (0, 0, 0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+
+                over "XForms"
+                {
+                    float3 xformOp:rotateXYZ = (0, 0, 0)
+                    float3 xformOp:scale = (1, 1, 1)
+                    double3 xformOp:translate = (0, 0, 0)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+
+                    over "World"
+                    {
+                        over "Looks"
+                        {
+                            over "f_188E522"
+                            {
+                                over "Shader"
+                                {
+                                    custom asset inputs:diffuse_texture = @./assets/wmeshfix/dt/trainbridge/188E5222719BA830_alb.a.rtex.dds@
+                                    custom float inputs:metallic_constant = 0.45
+                                    custom float inputs:reflection_roughness_constant = 0.635
+                                }
+                            }
+                        }
+
+                        over "mesh"
+                        {
+                            over "mesh_001"
+                            {
+                                uniform bool doubleSided = 1
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     over "instances"

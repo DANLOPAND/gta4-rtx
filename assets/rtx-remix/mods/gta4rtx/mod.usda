@@ -8,7 +8,7 @@
         string lightspeed_mod_name = "gta4rtx"
         string lightspeed_mod_notes = """made for the gta4 compatibility mod: github.com/xoxor4d/gta4-rtx
 patreon.com/xoxor4d"""
-        string lightspeed_mod_version = "1.1.5"
+        string lightspeed_mod_version = "1.1.6"
     }
     endTimeCode = 1
     startTimeCode = 0
