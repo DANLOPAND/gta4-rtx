@@ -478,7 +478,7 @@ namespace gta4
 	// -----
 
 	// handles "fake" sirenlight waay above the vehicle
-	void veh_vshaped_siren_fake_light_hk(int unk_flag, game::eLightType type, int flag, float* dir, float* otherdir, float* pos, float* color, float intensity, int tex_hash, int txd_hash, float radius, float inner_cone, float outer_cone, int inter_index, int room_index, int shadow_rel_index)
+	void veh_siren_fake_light_hk(int unk_flag, game::eLightType type, int flag, float* dir, float* otherdir, float* pos, float* color, float intensity, int tex_hash, int txd_hash, float radius, float inner_cone, float outer_cone, int inter_index, int room_index, int shadow_rel_index)
 	{
 		//const auto im = imgui::get();
 		const auto gs = comp_settings::get();
@@ -495,7 +495,7 @@ namespace gta4
 
 
 	// normally adds deferred/2d lights into the actual sirens - we create actual lights instead
-	void veh_vshaped_siren_vlights_hk([[maybe_unused]] int unk2, byte r, byte g, byte b, float ems_scale, float* pos,
+	void veh_siren_vlights_hk([[maybe_unused]] int unk2, byte r, byte g, byte b, float ems_scale, float* pos,
 		[[maybe_unused]] float maybe_radius, // some gamesetting - does not seem to be dynamic
 		[[maybe_unused]] float a9_160_0, [[maybe_unused]] float a10_0_2, [[maybe_unused]] float a11_0_0, [[maybe_unused]] float a12_2_0, // all hardcoded
 		[[maybe_unused]] char a13, [[maybe_unused]] char a14,
@@ -544,6 +544,95 @@ namespace gta4
 	}
 
 
+	// normally adds deferred/2d lights into the actual sirens - we create actual lights instead
+	void veh_bar_siren_vlights_hk([[maybe_unused]] int unk2, byte r, byte g, byte b, float ems_scale, float* pos,
+		[[maybe_unused]] float maybe_radius, // some gamesetting - does not seem to be dynamic
+		[[maybe_unused]] float a9_160_0, [[maybe_unused]] float a10_0_2, [[maybe_unused]] float a11_0_0, [[maybe_unused]] float a12_2_0, // all hardcoded
+		[[maybe_unused]] char a13, [[maybe_unused]] char a14,
+		[[maybe_unused]] float* light_direction /*nullptr*/)
+	{
+		//const auto im = imgui::get();
+		const auto gs = comp_settings::get();
+
+		Vector color =
+		{
+			(float)r / 255.0f,
+			(float)g / 255.0f,
+			(float)b / 255.0f
+		};
+
+		/*
+		Vector light_dir = { 0.0f, 1.0f, 0.0f };
+
+		game::AddSceneLight(0,
+			game::eLightType::LT_POINT,
+			0x400, // constantly update lights with 0x400 flag (remix_lights.cpp)
+			&light_dir.x, &light_dir.x,
+			pos,
+			&color.x,
+			ems_scale + (-45.0f + im->m_debug_vector.x),
+			0, 0,
+			maybe_radius + (- 260.0f + im->m_debug_vector.y),
+			0.0f, 0.0f, 0, 0, 0);*/
+
+		game_lights::add_custom_game_light_sphere(
+			pos,
+			maybe_radius * gs->translate_vehicle_barsirens_radius_scalar._float(),
+			ems_scale * gs->translate_vehicle_barsirens_intensity_scalar._float(),
+			1.0f,
+			color);
+	}
+
+
+	// normally adds deferred/2d lights into the actual sirens - we create actual lights instead
+	void veh_firetruck_siren_hk([[maybe_unused]] int unk2, byte r, byte g, byte b, float ems_scale, float* pos,
+		[[maybe_unused]] float maybe_radius, // some gamesetting - does not seem to be dynamic
+		[[maybe_unused]] float a9_160_0, [[maybe_unused]] float a10_0_2, [[maybe_unused]] float a11_0_0, [[maybe_unused]] float a12_2_0, // all hardcoded
+		[[maybe_unused]] char a13, [[maybe_unused]] char a14,
+		[[maybe_unused]] float* light_direction)
+	{
+		//const auto im = imgui::get();
+		const auto gs = comp_settings::get();
+
+		Vector color =
+		{
+			(float)r / 255.0f,
+			(float)g / 255.0f,
+			(float)b / 255.0f
+		};
+
+		game::AddSceneLight(0,
+			gs->translate_vehicle_vsirens_make_spotlight._bool() ? game::eLightType::LT_SPOT : game::eLightType::LT_POINT,
+			0x400, // constantly update lights with 0x400 flag (remix_lights.cpp)
+			light_direction, light_direction,
+			pos,
+			&color.x,
+			ems_scale + gs->translate_vehicle_vsirens_intensity_offset._float(),
+			0, 0,
+			gs->translate_vehicle_vsirens_radius_offset._float(),
+			0.0f, 0.0f, 0, 0, 0);
+
+		if (gs->translate_vehicle_vsirens_secondary_spherelight_enabled._bool())
+		{
+			Vector new_pos = pos;
+
+			//const auto im = imgui::get();
+			//new_pos.x += im->m_debug_vector2.x;
+			//new_pos.y += im->m_debug_vector2.y;
+			//new_pos.z += im->m_debug_vector2.z;
+
+			const float z_offset = gs->translate_vehicle_vsirens_secondary_spherelight_z_offset._float();
+			new_pos.z += (z_offset + 0.01f); // always add a slight offset so code recognizes it as a new light
+
+			game_lights::add_custom_game_light_sphere(
+				new_pos,
+				gs->translate_vehicle_vsirens_secondary_spherelight_radius_offset._float(),
+				ems_scale + gs->translate_vehicle_vsirens_secondary_spherelight_intensity_offset._float(),
+				1.0f,
+				color);
+		}
+	}
+
 	game_lights::game_lights()
 	{
 		p_this = this;
@@ -562,11 +651,15 @@ namespace gta4
 		shared::utils::hook(game::hk_addr__vehicle_single_rearlight, veh_single_rearlight_hk, HOOK_CALL).install()->quick(); // single light mode if one is defect (both use the same func) - 0xA4342D
 
 		// "fake" light ontop of v-shaped sirens
-		shared::utils::hook(game::hk_addr__vehicle_vshaped_sirens_fake_light, veh_vshaped_siren_fake_light_hk, HOOK_CALL).install()->quick(); // v-shaped siren light on cars 0xA40D0A
+		shared::utils::hook(game::hk_addr__vehicle_vshaped_sirens_fake_light, veh_siren_fake_light_hk, HOOK_CALL).install()->quick(); // 0xA40D0A - police / ambulance
+		shared::utils::hook(game::hk_addr__vehicle_firetruck_sirens_fake_light, veh_siren_fake_light_hk, HOOK_CALL).install()->quick(); // 0xA4126E - firetruck
 
 		// replace defered/2d light inside sirens with actual lights
-		shared::utils::hook(game::hk_addr__vehicle_vshaped_sirens_vlight, veh_vshaped_siren_vlights_hk, HOOK_CALL).install()->quick();
+		shared::utils::hook(game::hk_addr__vehicle_vshaped_sirens_vlight, veh_siren_vlights_hk, HOOK_CALL).install()->quick(); // 0xA40AAA - police / ambulance
+		shared::utils::hook(game::hk_addr__vehicle_firetruck_sirens, veh_siren_vlights_hk, HOOK_CALL).install()->quick(); // 0xA4100E - firetruck
 
+		// replace defered/2d light of siren bars
+		shared::utils::hook(game::hk_addr__vehicle_barshaped_sirens, veh_bar_siren_vlights_hk, HOOK_CALL).install()->quick(); // 0xA4146F
 
 		// -----
 		m_initialized = true;

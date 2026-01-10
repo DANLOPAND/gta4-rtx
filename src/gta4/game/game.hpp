@@ -169,8 +169,15 @@ namespace gta4::game
 
 	extern uint32_t hk_addr__vehicle_center_rearlight;
 	extern uint32_t hk_addr__vehicle_single_rearlight;
+
 	extern uint32_t hk_addr__vehicle_vshaped_sirens_fake_light;
+	extern uint32_t hk_addr__vehicle_firetruck_sirens_fake_light;
+
 	extern uint32_t hk_addr__vehicle_vshaped_sirens_vlight;
+	extern uint32_t hk_addr__vehicle_firetruck_sirens;
+
+	extern uint32_t hk_addr__vehicle_barshaped_sirens;
+
 
 	extern uint32_t hk_addr__static_world_culling_check_hk;
 	extern uint32_t nop_addr__static_world_frustum_patch01;

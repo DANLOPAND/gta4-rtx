@@ -1274,41 +1274,77 @@ namespace gta4
 		compsettings_float_widget("SunLight Volumetric Base", gs->translate_sunlight_volumetric_radiance_base, 0.0f, 10.0f, 0.005f);
 
 		ImGui::Spacing(0, inbetween_spacing);
-		ImGui::SeparatorText(" Vehicle ");
+		ImGui::SeparatorText(" Vehicle Headlights / Rearlights ");
 		ImGui::Spacing(0, 4);
 
-		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Headlight Intensity Scalar", gs->translate_vehicle_headlight_intensity_scalar, 0.0f, 0.0f, 0.005f));
-		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Headlight Radius Scalar", gs->translate_vehicle_headlight_radius_scalar, 0.0f, 0.0f, 0.005f));
-
-		ImGui::Spacing(0, 4);
-
-		CLEAR_CACHE_CHECK(clear,compsettings_float_widget("Rearlight Intensity Scalar", gs->translate_vehicle_rearlight_intensity_scalar, 0.0f, 0.0f, 0.005f));
-		CLEAR_CACHE_CHECK(clear,compsettings_float_widget("Rearlight Radius Scalar", gs->translate_vehicle_rearlight_radius_scalar, 0.0f, 0.0f, 0.005f));
-		CLEAR_CACHE_CHECK(clear,compsettings_float_widget("Rearlight Inner ConeAngle Offset", gs->translate_vehicle_rearlight_inner_cone_angle_offset, 0.0f, 0.0f, 0.005f));
-		CLEAR_CACHE_CHECK(clear,compsettings_float_widget("Rearlight Outer ConeAngle Offset", gs->translate_vehicle_rearlight_outer_cone_angle_offset, 0.0f, 0.0f, 0.005f));
-
+		ImGui::Widget_CategoryWithVerticalLabel("Head", [&]()
 		{
-			const auto gs_var_ptr = gs->translate_vehicle_rearlight_direction_offset.get_as<float*>();
-			CLEAR_CACHE_CHECK(clear, ImGui::DragFloat3("Rearlight Direction Offset", gs_var_ptr, 0.005f, 0.0f, 0.0f, "%.2f"));
-			TT(gs->translate_vehicle_rearlight_direction_offset.get_tooltip_string().c_str());
-		}
+			ImGui::PushID("headlight");
+			CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Headlight Intensity Scalar", gs->translate_vehicle_headlight_intensity_scalar, 0.0f, 0.0f, 0.005f));
+			CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Headlight Radius Scalar", gs->translate_vehicle_headlight_radius_scalar, 0.0f, 0.0f, 0.005f));
+			ImGui::PopID();
+		});
 
+		ImGui::Spacing(0, SEPARATOR_SPACING);
+
+		ImGui::Widget_CategoryWithVerticalLabel("Rear", [&]()
+		{
+			ImGui::PushID("rearlight");
+			CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Rearlight Intensity Scalar", gs->translate_vehicle_rearlight_intensity_scalar, 0.0f, 0.0f, 0.005f));
+			CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Rearlight Radius Scalar", gs->translate_vehicle_rearlight_radius_scalar, 0.0f, 0.0f, 0.005f));
+			CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Rearlight Inner ConeAngle Offset", gs->translate_vehicle_rearlight_inner_cone_angle_offset, 0.0f, 0.0f, 0.005f));
+			CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Rearlight Outer ConeAngle Offset", gs->translate_vehicle_rearlight_outer_cone_angle_offset, 0.0f, 0.0f, 0.005f));
+
+			ImGui::Spacing(0, 4);
+
+			{
+				const auto gs_var_ptr = gs->translate_vehicle_rearlight_direction_offset.get_as<float*>();
+				CLEAR_CACHE_CHECK(clear, ImGui::DragFloat3("Rearlight Direction Offset", gs_var_ptr, 0.005f, 0.0f, 0.0f, "%.2f"));
+				TT(gs->translate_vehicle_rearlight_direction_offset.get_tooltip_string().c_str());
+			}
+
+			ImGui::PopID();
+		});
+
+		ImGui::Spacing(0, inbetween_spacing);
+		ImGui::SeparatorText(" Sirens ");
 		ImGui::Spacing(0, 4);
 
-		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Fake Siren Light Z Offset", gs->translate_vehicle_fake_siren_z_offset, 0.0f, 0.0f, 0.005f));
-		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Fake Siren Light Intensity Offset", gs->translate_vehicle_fake_siren_intensity_offset, 0.0f, 0.0f, 0.01f));
-		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Fake Siren Light Radius Offset", gs->translate_vehicle_fake_siren_radius_offset, 0.0f, 0.0f, 0.01f));
+		ImGui::Widget_CategoryWithVerticalLabel("Fake", [&]()
+		{
+			ImGui::PushID("fakesiren");
+			CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Fake Siren Light Z Offset", gs->translate_vehicle_fake_siren_z_offset, 0.0f, 0.0f, 0.005f));
+			CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Fake Siren Light Intensity Offset", gs->translate_vehicle_fake_siren_intensity_offset, 0.0f, 0.0f, 0.01f));
+			CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Fake Siren Light Radius Offset", gs->translate_vehicle_fake_siren_radius_offset, 0.0f, 0.0f, 0.01f));
+			ImGui::PopID();
+		});
 
-		ImGui::Spacing(0.0f, 4.0f);
-		CLEAR_CACHE_CHECK(clear, compsettings_bool_widget("V-Siren Make Spotlight", gs->translate_vehicle_vsirens_make_spotlight));
-		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("V-Siren Light Intensity Offset", gs->translate_vehicle_vsirens_intensity_offset, 0.0f, 0.0f, 0.01f));
-		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("V-Siren Light Radius Offset", gs->translate_vehicle_vsirens_radius_offset, 0.0f, 0.0f, 0.01f));
+		ImGui::Spacing(0, SEPARATOR_SPACING);
 
-		ImGui::Spacing(0.0f, 2.0f);
-		CLEAR_CACHE_CHECK(clear, compsettings_bool_widget("V-Siren Secondary Spherelight", gs->translate_vehicle_vsirens_secondary_spherelight_enabled));
-		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("V-Siren Spherelight Intensity Offset", gs->translate_vehicle_vsirens_secondary_spherelight_intensity_offset, 0.0f, 0.0f, 0.01f));
-		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("V-Siren Spherelight Radius Offset", gs->translate_vehicle_vsirens_secondary_spherelight_radius_offset, 0.0f, 0.0f, 0.01f));
-		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("V-Siren Spherelight Z Offset", gs->translate_vehicle_vsirens_secondary_spherelight_z_offset, 0.0f, 0.0f, 0.01f));
+		ImGui::Widget_CategoryWithVerticalLabel("Siren", [&]()
+		{
+			ImGui::PushID("siren");
+			CLEAR_CACHE_CHECK(clear, compsettings_bool_widget("Siren Make Spotlight", gs->translate_vehicle_vsirens_make_spotlight));
+			CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Siren Light Intensity Offset", gs->translate_vehicle_vsirens_intensity_offset, 0.0f, 0.0f, 0.01f));
+			CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Siren Light Radius Offset", gs->translate_vehicle_vsirens_radius_offset, 0.0f, 0.0f, 0.01f));
+
+			ImGui::Spacing(0.0f, 4.0f);
+			CLEAR_CACHE_CHECK(clear, compsettings_bool_widget("Siren Secondary Spherelight", gs->translate_vehicle_vsirens_secondary_spherelight_enabled));
+			CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Siren Spherelight Intensity Offset", gs->translate_vehicle_vsirens_secondary_spherelight_intensity_offset, 0.0f, 0.0f, 0.01f));
+			CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Siren Spherelight Radius Offset", gs->translate_vehicle_vsirens_secondary_spherelight_radius_offset, 0.0f, 0.0f, 0.01f));
+			CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Siren Spherelight Z Offset", gs->translate_vehicle_vsirens_secondary_spherelight_z_offset, 0.0f, 0.0f, 0.01f));
+			ImGui::PopID();
+		});
+
+		ImGui::Spacing(0, SEPARATOR_SPACING);
+
+		ImGui::Widget_CategoryWithVerticalLabel("Bar", [&]()
+		{
+			ImGui::PushID("barsiren");
+			CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Bar-Siren Intensity Scalar", gs->translate_vehicle_barsirens_intensity_scalar, 0.0f, 0.0f, 0.01f));
+			CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Bar-Siren Radius Scalar", gs->translate_vehicle_barsirens_radius_scalar, 0.0f, 0.0f, 0.01f));
+			ImGui::PopID();
+		});
 
 		if (clear) {
 			remix_lights::clear_light_cache();
@@ -1754,25 +1790,48 @@ namespace gta4
 		ImGui::Style_BoldOrangeTextPop();
 
 		ImGui::Spacing(0, inbetween_spacing);
-		ImGui::SeparatorText(" Vehicle Lights ");
+		ImGui::SeparatorText(" Sirens ");
 		ImGui::Spacing(0, 4);
 
 		bool clear = false;
 
-		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Fake Siren Light Z Offset", gs->translate_vehicle_fake_siren_z_offset, 0.0f, 0.0f, 0.005f));
-		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Fake Siren Light Intensity Offset", gs->translate_vehicle_fake_siren_intensity_offset, 0.0f, 0.0f, 0.01f));
-		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Fake Siren Light Radius Offset", gs->translate_vehicle_fake_siren_radius_offset, 0.0f, 0.0f, 0.01f));
+		ImGui::Widget_CategoryWithVerticalLabel("Fake", [&]()
+		{
+			ImGui::PushID("fakesiren");
+			CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Fake Siren Light Z Offset", gs->translate_vehicle_fake_siren_z_offset, 0.0f, 0.0f, 0.005f));
+			CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Fake Siren Light Intensity Offset", gs->translate_vehicle_fake_siren_intensity_offset, 0.0f, 0.0f, 0.01f));
+			CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Fake Siren Light Radius Offset", gs->translate_vehicle_fake_siren_radius_offset, 0.0f, 0.0f, 0.01f));
+			ImGui::PopID();
+		});
 
-		ImGui::Spacing(0.0f, 4.0f);
-		CLEAR_CACHE_CHECK(clear, compsettings_bool_widget("V-Siren Make Spotlight", gs->translate_vehicle_vsirens_make_spotlight));
-		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("V-Siren Light Intensity Offset", gs->translate_vehicle_vsirens_intensity_offset, 0.0f, 0.0f, 0.01f));
-		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("V-Siren Light Radius Offset", gs->translate_vehicle_vsirens_radius_offset, 0.0f, 0.0f, 0.01f));
+		ImGui::Spacing(0, SEPARATOR_SPACING);
 
-		ImGui::Spacing(0.0f, 2.0f);
-		CLEAR_CACHE_CHECK(clear, compsettings_bool_widget("V-Siren Secondary Spherelight", gs->translate_vehicle_vsirens_secondary_spherelight_enabled));
-		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("V-Siren Spherelight Intensity Offset", gs->translate_vehicle_vsirens_secondary_spherelight_intensity_offset, 0.0f, 0.0f, 0.01f));
-		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("V-Siren Spherelight Radius Offset", gs->translate_vehicle_vsirens_secondary_spherelight_radius_offset, 0.0f, 0.0f, 0.01f));
-		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("V-Siren Spherelight Z Offset", gs->translate_vehicle_vsirens_secondary_spherelight_z_offset, 0.0f, 0.0f, 0.01f));
+		ImGui::Widget_CategoryWithVerticalLabel("Siren", [&]()
+		{
+			ImGui::PushID("vsiren");
+			CLEAR_CACHE_CHECK(clear, compsettings_bool_widget("Siren Make Spotlight", gs->translate_vehicle_vsirens_make_spotlight));
+			CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Siren Light Intensity Offset", gs->translate_vehicle_vsirens_intensity_offset, 0.0f, 0.0f, 0.01f));
+			CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Siren Light Radius Offset", gs->translate_vehicle_vsirens_radius_offset, 0.0f, 0.0f, 0.01f));
+
+			ImGui::Spacing(0.0f, 4.0f);
+			CLEAR_CACHE_CHECK(clear, compsettings_bool_widget("Siren Secondary Spherelight", gs->translate_vehicle_vsirens_secondary_spherelight_enabled));
+			CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Siren Spherelight Intensity Offset", gs->translate_vehicle_vsirens_secondary_spherelight_intensity_offset, 0.0f, 0.0f, 0.01f));
+			CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Siren Spherelight Radius Offset", gs->translate_vehicle_vsirens_secondary_spherelight_radius_offset, 0.0f, 0.0f, 0.01f));
+			CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Siren Spherelight Z Offset", gs->translate_vehicle_vsirens_secondary_spherelight_z_offset, 0.0f, 0.0f, 0.01f));
+			ImGui::PopID();
+		});
+
+		ImGui::Spacing(0, SEPARATOR_SPACING);
+		
+		ImGui::Widget_CategoryWithVerticalLabel("Bar", [&]()
+		{
+			ImGui::PushID("barsiren");
+			CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Bar-Siren Intensity Scalar", gs->translate_vehicle_barsirens_intensity_scalar, 0.0f, 0.0f, 0.01f));
+			CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Bar-Siren Radius Scalar", gs->translate_vehicle_barsirens_radius_scalar, 0.0f, 0.0f, 0.01f));
+			ImGui::PopID();
+		});
+
+		ImGui::Spacing(0, SEPARATOR_SPACING);
 
 		if (clear) {
 			remix_lights::clear_light_cache();

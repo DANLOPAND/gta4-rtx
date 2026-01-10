@@ -153,8 +153,15 @@ namespace gta4::game
 
 	uint32_t hk_addr__vehicle_center_rearlight = 0u;
 	uint32_t hk_addr__vehicle_single_rearlight = 0u;
+
 	uint32_t hk_addr__vehicle_vshaped_sirens_fake_light = 0u;
+	uint32_t hk_addr__vehicle_firetruck_sirens_fake_light = 0u;
+
 	uint32_t hk_addr__vehicle_vshaped_sirens_vlight = 0u;
+	uint32_t hk_addr__vehicle_firetruck_sirens = 0u;
+
+	uint32_t hk_addr__vehicle_barshaped_sirens = 0u;
+	
 
 	uint32_t hk_addr__static_world_culling_check_hk = 0u;
 	uint32_t nop_addr__static_world_frustum_patch01 = 0u;
@@ -634,9 +641,24 @@ namespace gta4::game
 			}
 		} total_pattern_count++;
 
+		if (auto offset = shared::utils::mem::find_pattern("0F 84 ? ? ? ? F3 0F 10 4C 24 ? F3 0F 59 0D ? ? ? ? F3 0F 58 0D ? ? ? ? 0F 28 C1 E8 ? ? ? ? 0F 57 C9 0F 2F C8 76 ? F3 0F 10 64 24 ? F3 0F 59 05 ? ? ? ? F3 0F 59 25 ? ? ? ? F3 0F 10 6C 24 ? F3 0F 10 74 24 ? F3 0F 10 7C 24 ? F3 0F 59 E0 F3 0F 10 05 ? ? ? ? F3 0F 5E 44 24 ? B1", 0x0, "hk_addr__vehicle_firetruck_sirens_fake_light", use_pattern, 0xA4105E); offset)
+		{
+			offset = shared::utils::mem::resolve_relative_jump_address(offset, 6u, 2u) - 8u;
+			// making sure that this a call
+			if (*reinterpret_cast<BYTE*>(offset) == 0xE8)
+			{
+				hk_addr__vehicle_firetruck_sirens_fake_light = offset;
+				found_pattern_count++;
+			}
+		} total_pattern_count++;
+
+
 		PATTERN_OFFSET_SIMPLE(hk_addr__vehicle_vshaped_sirens_vlight, "E8 ? ? ? ? 83 C4 ? EB ? 8B 7C 24 ? 51", 0x0, 0xA40AAA);
+		PATTERN_OFFSET_SIMPLE(hk_addr__vehicle_firetruck_sirens, "E8 ? ? ? ? 83 C4 ? EB ? 51 8D 47", 0x0, 0xA4100E);
 
-
+		PATTERN_OFFSET_SIMPLE(hk_addr__vehicle_barshaped_sirens, "E8 ? ? ? ? 83 C4 ? EB ? 51 83 C0 ? ? ? ? ? ? ? ? 50 8B 44 24", 0x0, 0xA4146F);
+		
+		
 
 		PATTERN_OFFSET_SIMPLE(hk_addr__static_world_culling_check_hk, "55 8B EC 83 E4 ? 83 EC ? 56 8B F1 ? ? 8B 40 ? FF D0 ? ? ? ? ? ? 8D 4C 24 ? 51 8B CE FF 50 ? F3 0F 10 44 24 ? 8B 4D", 0, 0xA31C20);
 		PATTERN_OFFSET_SIMPLE(nop_addr__static_world_frustum_patch01, "0F 84 ? ? ? ? 66 83 7F ? ? 75 ? B9", 0, 0x444C8B);

@@ -201,6 +201,9 @@ namespace gta4
 				ASSIGN(translate_vehicle_vsirens_secondary_spherelight_intensity_offset);
 				ASSIGN(translate_vehicle_vsirens_secondary_spherelight_z_offset);
 				
+				ASSIGN(translate_vehicle_barsirens_intensity_scalar);
+				ASSIGN(translate_vehicle_barsirens_radius_scalar);
+				
 				// emissive related settings
 				ASSIGN(vehicle_lights_emissive_scalar);
 				ASSIGN(vehicle_lights_dual_render_proxy_texture);
