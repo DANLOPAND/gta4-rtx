@@ -448,6 +448,45 @@ namespace gta4
 		}
 	}
 
+	__declspec(naked) void veh_nullptr_crash_fix_stub()
+	{
+		__asm
+		{
+			push    esi;				// og
+			mov     esi, [esp + 0x10];  // og
+
+			test	ecx, ecx; // ecx is moved in to edi after this check and ecx can be a nullptr for some reason
+			jz		NULLPTR;
+			jmp		game::retn_addr__veh_nullptr_crash_fix
+
+		NULLPTR:
+			push    edi; // og
+			jmp		game::retn_addr__veh_nullptr_crash_fix_skip
+		}
+	}
+
+	__declspec(naked) void veh_nullptr_invalid_model_fix_stub()
+	{
+		__asm
+		{
+			cmp		ecx, 0xCDCDCDCD;
+			jz		INVALID_MODEL;
+
+			// model valid:
+			mov     eax, [ecx + 5]; // og
+			and		al, 3;			// og
+			jmp		game::retn_addr__veh_invalid_model_crash_fix;
+
+		INVALID_MODEL:
+			pop     edi;
+			pop     esi;
+			mov     esp, ebp;
+			pop     ebp;
+			retn    0xC;
+
+		}
+	}
+
 	// ---
 
 	typedef void(__cdecl ProcessGameInput_t)(bool);
@@ -544,6 +583,14 @@ namespace gta4
 		// (c) https://github.com/ThirteenAG/GTAIV.EFLC.FusionFix/blob/fcb91f0c9629a25de4941ce55312798d591d109c/source/settings.ixx#L772
 		// FF places a jmp here to allow game vis in certain menus - we always want the game to draw -> nop FF hook
 		shared::utils::hook::nop(game::nop_addr__always_draw_game_in_menus, 5);
+
+		// fix a nullptr access in certain missions (cop cars?) - only happens with FF enabled
+		// might be an FF issue or an issue with siren / vehicle replacements?
+		// https://github.com/xoxor4d/gta4-rtx/issues/49
+		shared::utils::hook(game::retn_addr__veh_nullptr_crash_fix - 5u, veh_nullptr_crash_fix_stub, HOOK_JUMP).install()->quick();
+
+		// detect invalid mesh / part and prevent accessing it - https://github.com/xoxor4d/gta4-rtx/issues/49
+		shared::utils::hook(game::retn_addr__veh_invalid_model_crash_fix - 5u, veh_nullptr_invalid_model_fix_stub, HOOK_JUMP).install()->quick();
 
 		MH_EnableHook(MH_ALL_HOOKS);
 	}

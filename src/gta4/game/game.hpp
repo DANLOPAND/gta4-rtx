@@ -221,6 +221,11 @@ namespace gta4::game
 	extern uint32_t hk_addr__dyn_obj_clear_hash02;
 	extern uint32_t hk_addr__dyn_obj_clear_hash03;
 
+	extern uint32_t retn_addr__veh_nullptr_crash_fix;
+	extern uint32_t retn_addr__veh_nullptr_crash_fix_skip;
+
+	extern uint32_t retn_addr__veh_invalid_model_crash_fix;
+
 	// ---
 
 	extern void init_game_addresses();

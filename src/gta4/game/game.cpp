@@ -203,6 +203,11 @@ namespace gta4::game
 	uint32_t hk_addr__dyn_obj_clear_hash02 = 0u;
 	uint32_t hk_addr__dyn_obj_clear_hash03 = 0u;
 
+	uint32_t retn_addr__veh_nullptr_crash_fix = 0u;
+	uint32_t retn_addr__veh_nullptr_crash_fix_skip = 0u;
+
+	uint32_t retn_addr__veh_invalid_model_crash_fix = 0u;
+
 	// --------------
 
 #define PATTERN_OFFSET_SIMPLE(var, pattern, byte_offset, static_addr) \
@@ -697,6 +702,17 @@ namespace gta4::game
 		if (hk_addr__dyn_obj_grab_model_hash_retn_addr) {
 			hk_addr__dyn_obj_clear_hash03 = shared::utils::mem::resolve_relative_jump_address(hk_addr__dyn_obj_grab_model_hash_retn_addr, 6u, 2u); found_pattern_count++;
 		} total_pattern_count++;
+
+
+		// tire deflation related issue
+		PATTERN_OFFSET_SIMPLE(retn_addr__veh_nullptr_crash_fix, "57 F6 86 ? ? ? ? ? 8B F9 0F 85", 0, 0xAC7AD5);
+		
+		if (const auto offset = shared::utils::mem::find_pattern("0F 85 ? ? ? ? F3 0F 10 87 ? ? ? ? 0F 2E 05", 0, "retn_addr__veh_nullptr_crash_fix_skip", use_pattern, 0xAC7ADF); offset) {
+			retn_addr__veh_nullptr_crash_fix_skip = shared::utils::mem::resolve_relative_jump_address(offset, 6u, 2u); found_pattern_count++;
+		} total_pattern_count++;
+
+		// accessing wrong mesh? 
+		PATTERN_OFFSET_SIMPLE(retn_addr__veh_invalid_model_crash_fix, "3C ? 0F 85 ? ? ? ? E8 ? ? ? ? F3 0F 59 05", 0, 0x9795CA);
 
 		// end GAME_ASM_OFFSETS
 #pragma endregion
