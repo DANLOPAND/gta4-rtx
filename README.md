@@ -49,7 +49,7 @@ RTX Remix has a certain overhead because of how it works and intercepts the game
 You'll experience CPU bottlenecks because of the amount of detailed meshes the game is rendering,  
 which means that the performance you'll see in certain places is not entirely due to pathtracing.  
 
-The mod comes with a custom [Remix Runtime](https://github.com/xoxor4d/dxvk-remix/tree/game/gta4_rebase6) required for a few game specific features   
+The mod comes with a custom [Remix Runtime](https://github.com/xoxor4d/dxvk-remix/tree/game/gta4_rebase7) required for a few game specific features   
 and with [Ultimate ASI Loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases/tag/v9.0.0) to load the Compatibility Mod itself. 
 
 </div>
@@ -62,7 +62,7 @@ and with [Ultimate ASI Loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader
 - Cascaded anti culling of static objects (__wip__)
 - All game lights (including the sun) are translated to remix lights
 - Ability to create overrides for translated game lights (change position, color, intensity etc.)
-- Vehicles now feature two headlights and two rear lights instead of a single, centered ones
+- Vehicles now feature two headlights and two rear lights instead of single, centered ones
 - Dynamic emissive surfaces work (vehicle lights, building-windows, shops etc.)
 - Dynamic wetness that works similar to the original game  
   (only outdoors and with falloff on angled surfaces + raindroplets/impacts)
