@@ -166,6 +166,46 @@ over "RootNode"
                 custom bool inputs:use_diffuse_layer = 1
             }
         }
+
+        over "mat_E36CC624D9A95CFF" (
+            references = @./materials/AperturePBR_Translucent.usda@</Looks/mat_AperturePBR_Translucent>
+        )
+        {
+            over "Shader"
+            {
+                custom color3f inputs:emissive_color_constant = (1, 0, 0)
+                custom float inputs:emissive_intensity = 0.01
+                custom bool inputs:enable_emission = 0
+                custom float inputs:ior_constant = 1.1
+                custom asset inputs:normalmap_texture = @@
+                custom float inputs:thin_wall_thickness = 0.5
+                custom bool inputs:thin_walled = 0
+                custom color3f inputs:transmittance_color = (0.46332043, 0, 0)
+                custom float inputs:transmittance_measurement_distance = 5
+                custom asset inputs:transmittance_texture = @./assets/helper/tex/transm_red_10p_alpha.a.rtex.dds@
+                custom bool inputs:use_diffuse_layer = 1
+            }
+        }
+
+        over "mat_45F9D9197BEB8FBF" (
+            references = @./materials/AperturePBR_Translucent.usda@</Looks/mat_AperturePBR_Translucent>
+        )
+        {
+            over "Shader"
+            {
+                custom color3f inputs:emissive_color_constant = (0.8687259, 0.8687172, 0.8687172)
+                custom float inputs:emissive_intensity = 1
+                custom bool inputs:enable_emission = 0
+                custom float inputs:ior_constant = 1.1
+                custom asset inputs:normalmap_texture = @@
+                custom float inputs:thin_wall_thickness = 1
+                custom bool inputs:thin_walled = 0
+                custom color3f inputs:transmittance_color = (0.87644786, 0.8764391, 0.8764391)
+                custom float inputs:transmittance_measurement_distance = 5
+                custom asset inputs:transmittance_texture = @./assets/helper/tex/transm_white_10p_alpha.a.rtex.dds@
+                custom bool inputs:use_diffuse_layer = 1
+            }
+        }
     }
 
     over "cameras"
