@@ -539,6 +539,15 @@ namespace gta4
 				4.0f
 			};
 
+			variable translate_moonlight_intensity_scalar =
+			{
+				"translate_moonlight_intensity_scalar",
+				("Scale intensity of moonlight. Moonlight is active from 22:00 to 05:00.\n"
+				"Transitions smoothly from sun intensity to moon intensity between 21:00-22:00 and 05:00-06:00.\n"
+				"Clamped from 0.0 to 1.0."),
+				0.23f
+			};
+
 			// --
 
 			variable translate_vehicle_headlight_intensity_scalar =

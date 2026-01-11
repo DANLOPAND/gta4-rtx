@@ -1272,6 +1272,7 @@ namespace gta4
 		compsettings_float_widget("SunLight Intensity Scalar", gs->translate_sunlight_intensity_scalar, 0.0f, 0.0f, 0.005f);
 		compsettings_float_widget("SunLight Angular Diameter Degrees", gs->translate_sunlight_angular_diameter_degrees, 0.0f, 45.0f, 0.005f);
 		compsettings_float_widget("SunLight Volumetric Base", gs->translate_sunlight_volumetric_radiance_base, 0.0f, 10.0f, 0.005f);
+		compsettings_float_widget("MoonLight Intensity Scalar", gs->translate_moonlight_intensity_scalar, 0.0f, 1.0f, 0.005f);
 
 		ImGui::Spacing(0, inbetween_spacing);
 		ImGui::SeparatorText(" Vehicle Headlights / Rearlights ");
@@ -1837,6 +1838,12 @@ namespace gta4
 			remix_lights::clear_light_cache();
 		}
 
+
+		ImGui::Spacing(0, inbetween_spacing);
+		ImGui::SeparatorText(" Lights ");
+		ImGui::Spacing(0, 4);
+
+		compsettings_float_widget("MoonLight Intensity Scalar", gs->translate_moonlight_intensity_scalar, 0.0f, 1.0f, 0.005f);
 
 		ImGui::Spacing(0, inbetween_spacing);
 		ImGui::SeparatorText(" Timecycle ");

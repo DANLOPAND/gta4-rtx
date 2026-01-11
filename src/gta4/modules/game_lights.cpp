@@ -142,10 +142,37 @@ namespace gta4
 					game::helper_timecycle_current_fog_density * gs->translate_sunlight_timecycle_fogdensity_volumetric_influence_scalar.get_as<float>();
 			}
 
+			// calculate time-based intensity multiplier for moonlight
+			float intensity_multiplier = 1.0f;
+			if (game::m_game_clock_hours && game::m_game_clock_minutes)
+			{
+				const int& hour = *game::m_game_clock_hours;
+				const int& minute = *game::m_game_clock_minutes;
+				const float moon_scalar = std::clamp(gs->translate_moonlight_intensity_scalar._float(), 0.0f, 1.0f);
+				
+				if (hour >= 22 || hour < 5) 
+				{
+					// full moon: 22:00-05:00
+					intensity_multiplier = moon_scalar; 
+				}
+				else if (hour == 21)
+				{
+					// fade from sun to moon: 21:00-22:00
+					const float fade_progress = static_cast<float>(minute) / 60.0f; // 0.0 at 21:00, 1.0 at 22:00
+					intensity_multiplier = 1.0f + fade_progress * (moon_scalar - 1.0f); // lerp from 1.0 to moon_scalar
+				}
+				else if (hour == 5)
+				{
+					// fade from moon to sun: 05:00-06:00
+					const float fade_progress = static_cast<float>(minute) / 60.0f; // 0.0 at 05:00, 1.0 at 06:00
+					intensity_multiplier = moon_scalar + fade_progress * (1.0f - moon_scalar); // lerp from moon_scalar to 1.0
+				}
+			}
+
 			l.m_info.sType = REMIXAPI_STRUCT_TYPE_LIGHT_INFO;
 			l.m_info.pNext = &l.m_ext;
 			l.m_info.hash = shared::utils::string_hash64("apilight_distant");
-			l.m_info.radiance = (def.mIntensity * Vector(def.mColor) * gs->translate_sunlight_intensity_scalar.get_as<float>()).ToRemixFloat3D();
+			l.m_info.radiance = (def.mIntensity * Vector(def.mColor) * gs->translate_sunlight_intensity_scalar._float() * intensity_multiplier).ToRemixFloat3D();
 
 			if (api.m_bridge.CreateLight(&l.m_info, &l.m_handle) == REMIXAPI_ERROR_CODE_SUCCESS && l.m_handle) {
 				api.m_bridge.DrawLightInstance(l.m_handle);

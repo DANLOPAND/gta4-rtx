@@ -179,6 +179,7 @@ namespace gta4
 				ASSIGN(translate_sunlight_volumetric_radiance_base);
 				ASSIGN(translate_sunlight_timecycle_fogdensity_volumetric_influence_enabled);
 				ASSIGN(translate_sunlight_timecycle_fogdensity_volumetric_influence_scalar);
+				ASSIGN(translate_moonlight_intensity_scalar);
 
 				ASSIGN(translate_vehicle_headlight_intensity_scalar);
 				ASSIGN(translate_vehicle_headlight_radius_scalar);
