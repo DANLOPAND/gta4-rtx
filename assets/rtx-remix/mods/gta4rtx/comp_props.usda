@@ -555,6 +555,15 @@ over "RootNode"
                 custom bool inputs:use_legacy_alpha_state = 0
             }
         }
+
+        over "mat_CC42CA89274637E0"
+        {
+            over "Shader"
+            {
+                custom float inputs:metallic_constant = 0.90999997
+                custom float inputs:reflection_roughness_constant = 0.275
+            }
+        }
     }
 
     over "meshes"

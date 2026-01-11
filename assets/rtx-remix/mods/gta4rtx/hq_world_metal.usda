@@ -1,0 +1,32 @@
+#usda 1.0
+(
+    upAxis = "Z"
+)
+
+over "RootNode"
+{
+    over "Looks"
+    {
+        over "mat_24DF9C421926EA7F"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./assets/wtex/metal/24DF9C421926EA7F_metalbeam/metal_beam_Albedo.a.rtex.dds@
+                custom float inputs:displace_in = 0
+                custom float inputs:displace_out = 0.03
+                custom asset inputs:height_texture = @./assets/wtex/metal/24DF9C421926EA7F_metalbeam/metal_beam_Displacement.h.rtex.dds@
+                custom asset inputs:metallic_texture = @./assets/wtex/metal/24DF9C421926EA7F_metalbeam/metal_beam_Metalness.m.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/metal/24DF9C421926EA7F_metalbeam/metal_beam_Normal.m.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/metal/24DF9C421926EA7F_metalbeam/metal_beam_Roughness.r.rtex.dds@
+            }
+        }
+
+        over "mat_432A788CDFF4BD70"
+        {
+            over "Shader"
+            {
+            }
+        }
+    }
+}
+

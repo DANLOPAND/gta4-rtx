@@ -1,0 +1,23 @@
+#usda 1.0
+(
+    upAxis = "Z"
+)
+
+over "RootNode"
+{
+    over "Looks"
+    {
+        over "mat_6D26CC218321E89A"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./assets/wtex/sand/6D26CC218321E89A/beachsand_Albedo.a.rtex.dds@
+                custom float inputs:displace_in = 0.1
+                custom asset inputs:height_texture = @./assets/wtex/sand/6D26CC218321E89A/beachsand_Displacement.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/sand/6D26CC218321E89A/beachsand_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/sand/6D26CC218321E89A/beachsand_Roughness.r.rtex.dds@
+            }
+        }
+    }
+}
+

@@ -1,0 +1,294 @@
+#usda 1.0
+(
+    upAxis = "Z"
+)
+
+over "RootNode"
+{
+    over "Looks"
+    {
+        over "mat_B5B112D9E51F09D5"
+        {
+            over "Shader"
+            {
+                custom float inputs:displace_in = 0.05
+                custom asset inputs:height_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Roughness.r.rtex.dds@
+            }
+        }
+
+        over "mat_FE5E8434FF33D279"
+        {
+            over "Shader"
+            {
+                custom float inputs:displace_in = 0.05
+                custom asset inputs:height_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Roughness.r.rtex.dds@
+            }
+        }
+
+        over "mat_44567FFBC98F367D"
+        {
+            over "Shader"
+            {
+                custom asset inputs:height_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Roughness.r.rtex.dds@
+            }
+        }
+
+        over "mat_DEFE78F687D96B8E"
+        {
+            over "Shader"
+            {
+                custom asset inputs:height_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Roughness.r.rtex.dds@
+            }
+        }
+
+        over "mat_BC4B45936E8F12DC"
+        {
+            over "Shader"
+            {
+                custom asset inputs:height_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Roughness.r.rtex.dds@
+            }
+        }
+
+        over "mat_432A788CDFF4BD70"
+        {
+            over "Shader"
+            {
+                custom float inputs:displace_in = 0.025
+                custom asset inputs:height_texture = @./assets/wtex/roads/432A788CDFF4BD70/asphalt_v1_Height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/roads/432A788CDFF4BD70/asphalt_v1_OTH_Normal.n.rtex.dds@
+                custom float inputs:reflection_roughness_constant = 0.51
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/roads/432A788CDFF4BD70/asphalt_v1_Roughness.r.rtex.dds@
+            }
+        }
+
+        over "mat_982CB5F2233A7B5E"
+        {
+            over "Shader"
+            {
+                custom asset inputs:height_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Roughness.r.rtex.dds@
+            }
+        }
+
+        over "mat_A8EB488EB5055A1C"
+        {
+            over "Shader"
+            {
+                custom float inputs:displace_in = 0.02
+                custom float inputs:displace_out = 0
+                custom asset inputs:height_texture = @./assets/wtex/roads/A8EB488EB5055A1C/asphalt_v2_Height.h.rtex.dds@
+                custom asset inputs:metallic_texture = @./assets/wtex/roads/A8EB488EB5055A1C/asphalt_v2_Metalness.m.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/roads/A8EB488EB5055A1C/asphalt_v2_OTH_Normal.n.rtex.dds@
+                custom float inputs:reflection_roughness_constant = 0.51
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/roads/A8EB488EB5055A1C/asphalt_v2_Roughness.r.rtex.dds@
+            }
+        }
+
+        over "mat_C47B3C502C6CEEB7"
+        {
+            over "Shader"
+            {
+                custom asset inputs:height_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Roughness.r.rtex.dds@
+            }
+        }
+
+        over "mat_7B4F0270F0A57B6C"
+        {
+            over "Shader"
+            {
+                custom asset inputs:height_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Roughness.r.rtex.dds@
+            }
+        }
+
+        over "mat_57546D9BC221BA52"
+        {
+            over "Shader"
+            {
+                custom asset inputs:height_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Roughness.r.rtex.dds@
+            }
+        }
+
+        over "mat_1387BD5102F017DF"
+        {
+            over "Shader"
+            {
+                custom asset inputs:height_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Roughness.r.rtex.dds@
+            }
+        }
+
+        over "mat_EFA0E55BCBFCB893"
+        {
+            over "Shader"
+            {
+                custom asset inputs:height_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Roughness.r.rtex.dds@
+            }
+        }
+
+        over "mat_A657894D0130ED22"
+        {
+            over "Shader"
+            {
+                custom asset inputs:height_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Roughness.r.rtex.dds@
+            }
+        }
+
+        over "mat_2967A030E5C4A431"
+        {
+            over "Shader"
+            {
+                custom asset inputs:height_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Roughness.r.rtex.dds@
+            }
+        }
+
+        over "mat_6CA61C39AA50093C"
+        {
+            over "Shader"
+            {
+                custom asset inputs:height_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Roughness.r.rtex.dds@
+            }
+        }
+
+        over "mat_93429FF765FA1C64"
+        {
+            over "Shader"
+            {
+                custom asset inputs:height_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Roughness.r.rtex.dds@
+            }
+        }
+
+        over "mat_9FE2BB900F889A0A"
+        {
+            over "Shader"
+            {
+                custom asset inputs:height_texture = @@
+                custom asset inputs:normalmap_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Roughness.r.rtex.dds@
+            }
+        }
+
+        over "mat_A8B1575160872508"
+        {
+            over "Shader"
+            {
+                custom asset inputs:normalmap_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Roughness.r.rtex.dds@
+            }
+        }
+
+        over "mat_685898113F770ACC"
+        {
+            over "Shader"
+            {
+                custom asset inputs:normalmap_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Roughness.r.rtex.dds@
+            }
+        }
+
+        over "mat_A4D172B853531F6E"
+        {
+            over "Shader"
+            {
+                custom asset inputs:normalmap_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Roughness.r.rtex.dds@
+            }
+        }
+
+        over "mat_78497D1E1EF8B262"
+        {
+            over "Shader"
+            {
+                custom asset inputs:height_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Roughness.r.rtex.dds@
+            }
+        }
+
+        over "mat_9BD72E2F262ACFF8"
+        {
+            over "Shader"
+            {
+                custom asset inputs:normalmap_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Roughness.r.rtex.dds@
+            }
+        }
+
+        over "mat_85349E25FB0ACD7E"
+        {
+            over "Shader"
+            {
+                custom asset inputs:height_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Roughness.r.rtex.dds@
+            }
+        }
+
+        over "mat_100BDE687A9810F8"
+        {
+            over "Shader"
+            {
+                custom asset inputs:height_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Roughness.r.rtex.dds@
+            }
+        }
+
+        over "mat_7CD8534DDDDEC03D"
+        {
+            over "Shader"
+            {
+                custom asset inputs:height_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Roughness.r.rtex.dds@
+            }
+        }
+
+        over "mat_536322F75FFE0836"
+        {
+            over "Shader"
+            {
+                custom asset inputs:height_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Roughness.r.rtex.dds@
+            }
+        }
+
+        over "mat_D05CF026C8C28E55"
+        {
+            over "Shader"
+            {
+                custom asset inputs:normalmap_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/roads/generic_asphalt/generic_asphalt_Roughness.r.rtex.dds@
+            }
+        }
+    }
+}
+

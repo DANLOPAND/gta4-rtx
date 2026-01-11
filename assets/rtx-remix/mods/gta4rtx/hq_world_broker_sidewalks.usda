@@ -1,0 +1,78 @@
+#usda 1.0
+(
+    upAxis = "Z"
+)
+
+over "RootNode"
+{
+    over "Looks"
+    {
+        over "mat_503F2E7FC7E44CD3"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./assets/wtex/sidewalk/503F2E7FC7E44CD3/sidewalk_Albedo.a.rtex.dds@
+                custom float inputs:displace_in = 0.03
+                custom float inputs:displace_out = 0.003
+                custom asset inputs:height_texture = @./assets/wtex/sidewalk/503F2E7FC7E44CD3/sidewalk_Displacement.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/sidewalk/503F2E7FC7E44CD3/sidewalk_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/sidewalk/503F2E7FC7E44CD3/sidewalk_Roughness.r.rtex.dds@
+            }
+        }
+
+        over "mat_AD372A21E084F5C7"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./assets/wtex/sidewalk/AD372A21E084F5C7/sidewalk_c01_Albedo.a.rtex.dds@
+                custom float inputs:displace_in = 0.06
+                custom float inputs:displace_out = 0.007
+                custom asset inputs:height_texture = @./assets/wtex/sidewalk/AD372A21E084F5C7/sidewalk_c01_Displacement.h.rtex.dds@
+                custom asset inputs:metallic_texture = @./assets/wtex/sidewalk/AD372A21E084F5C7/sidewalk_c01_Metalness.m.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/sidewalk/AD372A21E084F5C7/sidewalk_c01_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/sidewalk/AD372A21E084F5C7/sidewalk_c01_Roughness.r.rtex.dds@
+            }
+        }
+
+        over "mat_CA644D0FE31C8302"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./assets/wtex/wood/CA644D0FE31C8302/pier_wood_Albedo.a.rtex.dds@
+                custom float inputs:displace_in = 0.005
+                custom float inputs:displace_out = 0.003
+                custom asset inputs:height_texture = @./assets/wtex/wood/CA644D0FE31C8302/pier_wood_Height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/wood/CA644D0FE31C8302/pier_wood_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/wood/CA644D0FE31C8302/pier_wood_Roughness.r.rtex.dds@
+            }
+        }
+
+        over "mat_52420446D60D2B5C"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./assets/wtex/sidewalk/52420446D60D2B5C/sidewalk_var1_Albedo.a.rtex.dds@
+                custom float inputs:displace_in = 0.1
+                custom float inputs:displace_out = 0.002
+                custom asset inputs:height_texture = @./assets/wtex/sidewalk/52420446D60D2B5C/sidewalk_var1_Height.h.rtex.dds@
+                custom asset inputs:normalmap_texture = @./assets/wtex/sidewalk/52420446D60D2B5C/sidewalk_var1_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/sidewalk/52420446D60D2B5C/sidewalk_var1_Roughness.r.rtex.dds@
+            }
+        }
+
+        over "mat_E82B7323C732F7A5"
+        {
+            over "Shader"
+            {
+                asset inputs:diffuse_texture = @./assets/wtex/sidewalk/E82B7323C732F7A5/sidewalk_c02_Albedo.a.rtex.dds@
+                custom float inputs:displace_in = 0.06
+                custom float inputs:displace_out = 0.005
+                custom asset inputs:height_texture = @./assets/wtex/sidewalk/E82B7323C732F7A5/sidewalk_c02_Height.h.rtex.dds@
+                custom asset inputs:metallic_texture = @@
+                custom asset inputs:normalmap_texture = @./assets/wtex/sidewalk/E82B7323C732F7A5/sidewalk_c02_OTH_Normal.n.rtex.dds@
+                custom asset inputs:reflectionroughness_texture = @./assets/wtex/sidewalk/E82B7323C732F7A5/sidewalk_c02_Roughness.r.rtex.dds@
+            }
+        }
+    }
+}
+
