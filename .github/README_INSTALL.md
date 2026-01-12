@@ -6,9 +6,12 @@
 
 3. Place both files in the same folder (_no need to copy them to your game folder_) and run `GTAIV-Remix-CompMod-Installer.exe` 
 4. Use the File Dialog to select your `GTAIV.exe` which is located in your GTAIV install folder
+
 5. If this is your first time installing, the installer will ask if you want to install a custom Fork of [FusionFix](https://github.com/xoxor4d/GTAIV.EFLC.FusionFix.RTXRemix/releases/tag/4)
   If you already have FusionFix installed, it's definitely recommended to install this because the original, unmodified version has a few incompatibilities with RTX Remix. If you do not have FusionFix installed, you are free to choose. It's not a requirement.
-6. Make sure that you remove all custom launch arguments for GTAIV in Steam (if you have any set)
+
+6. The installer will ask you if you want to download the required [base-remix-mod](https://github.com/xoxor4d/gta4-rtx-base-mod)
+7. Make sure that you remove all custom launch arguments for GTAIV in Steam (if you have any set)
 
 <br>
 
@@ -18,6 +21,31 @@
 3. Open the zip and extract all files contained inside the `GTAIV-Remix-CompatibilityMod` folder into your GTAIV directory (next to the `GTAIV.exe`). Overwrite all when prompted.
 4. If you want to use FusionFix or have it installed already, it's definitely recommended to install my custom fork of [FusionFix](https://github.com/xoxor4d/GTAIV.EFLC.FusionFix.RTXRemix/releases/tag/4) because the original, unmodified version has a few incompatibilities with RTX Remix.  
 You can find the files inside `_installer_options/FusionFix_RTXRemixFork`. Extract the `plugins` & `update` into your GTAIV directory and override any existing files.
+
+5. Download [gta4-rtx-base-mod](https://github.com/xoxor4d/gta4-rtx-base-mod/archive/refs/heads/master.zip) 
+6. Extract the _mods_ folder (inside of `gta4-rtx-base-mod-master`) into your `rtx-remix` folder so that the folder structure looks like this:
+
+```
+.  
+├─ ...
+├─ 📁 steamapps
+│  └─📁 common
+│     └─📁 Grand Theft Auto IV
+│       └─📁 GTAIV
+│         ├── 📜 GTAIV.exe.exe
+│         ├── 📜 d3d9.dll
+│         ├── 📜 ...
+│         │
+│         ├── 📁 rtx_comp
+│         └── 📁 rtx-remix
+│             └─📁 mods
+│               └─📁 gta4rtx
+│                 ├── 📜 comp_cars.usda
+│                 ├── 📜 comp_effects.usda
+│                 ├── 📜 mod.usda
+│                 └── ...
+└── ...  
+```
 
 <br>
 

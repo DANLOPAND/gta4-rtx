@@ -39,7 +39,7 @@ __[Compiling](#compiling)__
 
 First and foremost, __this is not a remaster__. It is a mod that allows the game to be modded with NVIDIA's 
 [RTX Remix](https://github.com/NVIDIAGameWorks/rtx-remix)  
-It does __NOT__ come with enhanced assets. That means no PBR materials nor higher quality meshes.
+[It only comes with a few enhanced assets](https://github.com/xoxor4d/gta4-rtx-base-mod). You'll need actual remix mods made by the community for proper PBR materials.
 
 <br>
 
@@ -48,6 +48,8 @@ RTX Remix has a certain overhead because of how it works and intercepts the game
 
 You'll experience CPU bottlenecks because of the amount of detailed meshes the game is rendering,  
 which means that the performance you'll see in certain places is not entirely due to pathtracing.  
+
+<br>
 
 The mod comes with a custom [Remix Runtime](https://github.com/xoxor4d/dxvk-remix/tree/game/gta4_rebase7) required for a few game specific features   
 and with [Ultimate ASI Loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases/tag/v9.0.0) to load the Compatibility Mod itself. 
@@ -75,7 +77,7 @@ and with [Ultimate ASI Loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader
 - Screenshot Mode and FreeCam Mode
 - FusionFix compatible (custom fork: [GTAIV.EFLC.FusionFix.RTXRemix](https://github.com/xoxor4d/GTAIV.EFLC.FusionFix.RTXRemix))
 - Many many tweakable settings via the in-game __F4__ menu
-- A few PBR materials
+- A few PBR materials, mesh and texture fixes
 - Installer
 
 ###### The bad:
@@ -130,6 +132,7 @@ and with [Ultimate ASI Loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader
 - If you did not setup the global path variable:  
   rename `gta4-rtx.dll` to `a_gta4-rtx.asi` and copy it into your game directory (next to `GTAIV.exe`) 
 - If you have not installed a release build before, make sure to copy everything within the `assets` folder into the game directory
+- Make sure to also install: [gta4-rtx-base-mod](https://github.com/xoxor4d/gta4-rtx-base-mod)
 
 <br>
 <br>
