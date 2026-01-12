@@ -111,6 +111,7 @@ namespace gta4::game
 	uint32_t retn_addr__on_add_frontendhelpertext_stub = 0u;
 	uint32_t func_addr__add_renderfontbufferdc = 0u;
 	uint32_t func_addr__frontendhelpertext_add_drawcmd = 0u;
+	uint32_t retn_addr__radar_background_flicker_fix = 0u;
 
 	uint32_t retn_addr__pre_entity_surfs_stub = 0u;
 	uint32_t hk_addr__post_entity_surfs_stub = 0u;
@@ -515,7 +516,7 @@ namespace gta4::game
 		PATTERN_OFFSET_SIMPLE(retn_addr__on_add_frontendhelpertext_stub, "81 EC ? ? ? ? 53 56 8B 35 ? ? ? ? 57 85 F6", 0, 0x8B6C86);
 		PATTERN_OFFSET_SIMPLE(func_addr__add_renderfontbufferdc, "56 57 E8 ? ? ? ? 8B F0 8B CE", 0, 0x923950);
 		PATTERN_OFFSET_SIMPLE(func_addr__frontendhelpertext_add_drawcmd, "55 8B EC 83 E4 ? 83 EC ? A1 ? ? ? ? 33 C4 89 44 24 ? 56 57 8B 7D ? 85 FF", 0, 0x921DA0);
-
+		PATTERN_OFFSET_SIMPLE(retn_addr__radar_background_flicker_fix, "83 3D ? ? ? ? ? 0F 84 ? ? ? ? ? ? ? ? ? ? ? ? ? ? 89 44 24", 0, 0x902E6E);
 
 		if (const auto offset = shared::utils::mem::find_pattern("83 EC ? 53 56 8B F1 57 0F B7 46 ? 8B 04 85", 0, "retn_addr__pre_entity_surfs_stub", use_pattern, 0x8DCBF6); offset) {
 			retn_addr__pre_entity_surfs_stub = offset; found_pattern_count++;

@@ -3195,6 +3195,35 @@ namespace gta4
 		}
 	}
 
+	// manually inject remix (auto UI detection) when the above fails
+	// which normally results in the radar background flickering
+	void radar_bg_draw_hk()
+	{
+		/*if (!renderer::get()->m_triggered_remix_injection) {
+			int x = 1;
+		}*/
+
+		if (!imgui::get()->m_dbg_disable_hud_fixup2) {
+			renderer::get()->manually_trigger_remix_injection(shared::globals::d3d_device);
+		}
+	}
+
+	// stub before drawing radar bg
+	__declspec (naked) void radar_bg_draw_stub()
+	{
+		__asm
+		{
+			pushad;
+			call	radar_bg_draw_hk;
+			popad;
+
+			xor		eax, esp;			// og
+			mov		[esp + 0x28], eax;	// og
+			jmp		game::retn_addr__radar_background_flicker_fix; // 0x902E6E
+		}
+	}
+
+
 	__declspec (naked) void pre_draw_fx_instance_stub()
 	{
 		__asm
@@ -3425,6 +3454,9 @@ namespace gta4
 		// hack to properly detect UI - we need to "inject" frontend helper text to trigger remix injection asap
 		// doing this fixes the sniper scope + shadow background of radar
 		shared::utils::hook(game::retn_addr__on_add_frontendhelpertext_stub - 5u, on_add_frontendhelpertext_stub, HOOK_JUMP).install()->quick(); // 0x8B6C81
+
+		shared::utils::hook::nop(game::retn_addr__radar_background_flicker_fix - 6u, 6);
+		shared::utils::hook(game::retn_addr__radar_background_flicker_fix - 6u, radar_bg_draw_stub, HOOK_JUMP).install()->quick(); // 0x902E68
 
 		// skip og light rendering
 		shared::utils::hook::conditional_jump_to_jmp(game::cond_jmp_addr__skip_deferred_light_rendering01); // 0x928AE5
