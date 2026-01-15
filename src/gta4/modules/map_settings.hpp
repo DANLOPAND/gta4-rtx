@@ -70,18 +70,47 @@ namespace gta4
 			std::string _internal_comment_buffer;
 		};
 
-		struct map_settings_s
-		{
-			std::vector<marker_settings_s> map_markers;
-			std::unordered_set<uint64_t> ignored_lights;
-			std::unordered_set<uint64_t> allow_lights;
-			std::unordered_map<uint64_t, light_override_s> light_overrides;
-			std::vector<anti_cull_meshes_s> anticull_meshes;
-		};
+	// Category info: holds category name, comment, and all overrides in that category
+	struct light_override_category_info_s
+	{
+		std::string category_name;
+		std::string category_comment;
+		std::unordered_map<uint64_t, light_override_s> overrides; // hash -> override data (for rebuilding TOML)
+
+		std::string _internal_buffer; // For UI category name input
+		std::string _internal_comment_buffer; // For UI category comment input
+	};
+
+	// TOML file info: holds all categories and uncategorized overrides for a specific TOML file
+	struct light_overrides_toml_info_s
+	{
+		std::vector<light_override_category_info_s> categories; // Categorized overrides
+		std::unordered_map<uint64_t, light_override_s> flat_overrides; // Uncategorized overrides (for rebuilding TOML)
+	};
+
+	// TOML file info: holds ignored/allowed lights for a specific TOML file
+	struct lights_toml_info_s
+	{
+		std::unordered_set<uint64_t> ignored_lights; // Hash set for ignored lights in this TOML file
+		std::unordered_set<uint64_t> allow_lights; // Hash set for allowed lights in this TOML file
+	};
+
+	struct map_settings_s
+	{
+		std::vector<marker_settings_s> map_markers;
+		std::unordered_set<uint64_t> ignored_lights; // Flat set: highest priority (for runtime use)
+		std::unordered_set<uint64_t> allow_lights; // Flat set: highest priority (for runtime use)
+		std::unordered_map<uint64_t, light_override_s> light_overrides; // Flat map: highest priority override wins (for runtime use)
+		std::unordered_map<std::string, light_overrides_toml_info_s> light_overrides_toml_info; // TOML filename -> TOML info (preserves all data for rebuilding)
+		std::unordered_map<std::string, lights_toml_info_s> lights_toml_info; // TOML filename -> lights info (preserves all data for ignored/allow lights)
+		std::vector<anti_cull_meshes_s> anticull_meshes;
+	};
 
 		static map_settings_s& get_map_settings() { return m_map_settings; }
 		static void load_settings();
 		static void clear_map_settings();
+		static void rebuild_light_overrides_from_toml_info(); // Rebuilds light_overrides from toml_info based on priority
+		static void rebuild_lights_from_toml_info(); // Rebuilds ignored_lights and allow_lights from toml_info based on priority (excludes hashes with overrides)
 
 	private:
 		bool m_initialized = false;

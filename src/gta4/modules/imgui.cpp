@@ -2,6 +2,7 @@
 #include "imgui.hpp"
 
 #include "comp_settings.hpp"
+#include "imgui_internal.h"
 #include "map_settings.hpp"
 #include "natives.hpp"
 #include "remix_lights.hpp"
@@ -139,12 +140,15 @@ namespace gta4
 		CENTER_URL("Minhook", "https://github.com/TsudaKageyu/minhook");
 		CENTER_URL("Toml11", "https://github.com/ToruNiina/toml11");
 		CENTER_URL("Ultimate-ASI-Loader", "https://github.com/ThirteenAG/Ultimate-ASI-Loader");
-		CENTER_URL("AssaultKifle47", "https://github.com/akifle47");
+		CENTER_URL("Miniz", "https://github.com/richgel999/miniz");
+
 		CENTER_URL("FusionFix", "https://github.com/ThirteenAG/GTAIV.EFLC.FusionFix");
 		CENTER_URL("FusionShaders", "https://github.com/Parallellines0451/GTAIV.EFLC.FusionShaders");
 		CENTER_URL("Rage-Shader-Editor", "https://github.com/ImpossibleEchoes/rage-shader-editor-cpp");
 		CENTER_URL("IV-SDK", "https://github.com/Zolika1351/iv-sdk/");
 		CENTER_URL("IV-SDK-DotNet", "https://github.com/ClonkAndre/IV-SDK-DotNet");
+
+		CENTER_URL("AssaultKifle47", "https://github.com/akifle47");
 		CENTER_URL("DayL", "https://www.gtainside.de/de/user/falcogray");
 		CENTER_URL("Entity", "https://www.youtube.com/@paprykszadolowski8796");
 		CENTER_URL("Gabdeg", "https://www.youtube.com/@gabdeg793");
@@ -2032,9 +2036,25 @@ namespace gta4
 
 	bool reload_mapsettings_popup()
 	{
+		static bool popup_rendered_this_frame = false;
+		static int last_frame_count = -1;
+		
+		// Reset flag if we're in a new frame
+		int current_frame = ImGui::GetFrameCount();
+		if (current_frame != last_frame_count) {
+			popup_rendered_this_frame = false;
+			last_frame_count = current_frame;
+		}
+		
+		// Only render the popup once per frame
+		if (popup_rendered_this_frame) {
+			return false;
+		}
+		
 		bool result = false;
 		if (ImGui::BeginPopupModal("Reload MapSettings?", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings))
 		{
+			popup_rendered_this_frame = true;
 			shared::imgui::draw_background_blur();
 			const auto half_width = ImGui::GetContentRegionMax().x * 0.5f;
 			auto line1_str = "You'll loose all unsaved changes if you continue!";
@@ -2494,13 +2514,15 @@ namespace gta4
 
 		auto& ignored_lights = map_settings::get_map_settings().ignored_lights;
 		auto& allowed_lights = map_settings::get_map_settings().allow_lights;
-		auto& light_overrides = map_settings::get_map_settings().light_overrides;
+		auto& lights_toml_info = map_settings::get_map_settings().lights_toml_info;
 
 		ImGui::Spacing(0, 4);
 		reload_mapsettings_button_with_popup("Light-Tweaks");
 
 		ImGui::Spacing(0, 8.0f);
+		ImGui::Style_BoldOrangeTextPush();
 		ImGui::Checkbox("Visualize Api Light Hashes", &im->m_dbg_visualize_api_light_hashes); TT("Visualize all spawned api light hashes closeby");
+		ImGui::Style_BoldOrangeTextPop();
 
 		ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f, 0);
 		ImGui::BeginDisabled(!im->m_dbg_visualize_api_light_hashes);
@@ -2518,11 +2540,12 @@ namespace gta4
 		{
 			if (ImGui::CollapsingHeader("Ignore Lights"))
 			{
+				ImGui::Spacing(0, 4);
 				ImGui::PushFont(shared::imgui::font::BOLD);
 				if (ImGui::Button("Copy Ignored to Clipboard   " ICON_FA_SAVE, ImVec2(ImGui::GetContentRegionAvail().x, 0)))
 				{
 					ImGui::LogToClipboard();
-					ImGui::LogText("%s", shared::common::toml_ext::build_ignore_lights_array(ignored_lights).c_str());
+					ImGui::LogText("%s", shared::common::toml_ext::build_ignore_lights_array_from_toml_info(lights_toml_info).c_str());
 					ImGui::LogFinish();
 				} ImGui::PopFont();
 
@@ -2539,6 +2562,27 @@ namespace gta4
 
 				ImGui::BeginDisabled(!im->m_dbg_visualize_api_light_hashes);
 
+				// Helper function to find which TOML file contains an ignored hash (returns highest priority)
+				auto find_toml_file_for_ignored_hash = [&lights_toml_info](uint64_t hash) -> std::string
+				{
+					std::vector<std::string> sorted_toml_files;
+					for (const auto& [toml_file, _] : lights_toml_info) {
+						sorted_toml_files.push_back(toml_file);
+					}
+
+					std::sort(sorted_toml_files.begin(), sorted_toml_files.end());
+					
+					for (const auto& toml_file : sorted_toml_files) 
+					{
+						const auto& toml_info = lights_toml_info[toml_file];
+
+						if (toml_info.ignored_lights.contains(hash)) {
+							return toml_file;
+						}
+					}
+
+					return "";
+				};
 
 				static ImGuiTextFilter ignore_filter;
 				if (ImGui::BeginListBox("##ignore_lights", ImVec2(ImGui::GetContentRegionAvail().x, 140)))
@@ -2546,7 +2590,6 @@ namespace gta4
 					for (size_t i = 0; i < im->visualized_api_lights.size(); ++i)
 					{
 						const auto& light = im->visualized_api_lights[i];
-						const bool is_ignored = light.ignored;
 
 						if (light.allowed_filler) {
 							continue;
@@ -2557,38 +2600,143 @@ namespace gta4
 						{
 							char hash_str[17];
 							std::snprintf(hash_str, sizeof(hash_str), "%llx", static_cast<unsigned long long>(light.hash));
-							if (!ignore_filter.PassFilter(hash_str)) {
+							
+							// Get TOML filename for this hash
+							std::string toml_filename = find_toml_file_for_ignored_hash(light.hash);
+							
+							// Check if hash is in any TOML file (not just the flat set, since overrides exclude it)
+							bool hash_in_any_toml = !toml_filename.empty();
+							
+							// Filter by hash or TOML filename
+							if (!ignore_filter.PassFilter(hash_str) && !ignore_filter.PassFilter(toml_filename.c_str())) {
 								continue;
 							}
 
-							if (is_ignored)
+							ImGui::PushID(static_cast<int>(i));
+
+							if (hash_in_any_toml)
 							{
 								ImGui::PushFont(shared::imgui::font::FONTS::BOLD);
 								ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
 							}
 
-							if (ImGui::Selectable(shared::utils::va("%llx", light.hash), false, ImGuiSelectableFlags_AllowDoubleClick))
+							// Hash column (selectable) - use same format as light overrides
+							if (ImGui::Selectable(shared::utils::va("%llx", light.hash), false, ImGuiSelectableFlags_AllowDoubleClick, ImVec2(ImGui::GetContentRegionAvail().x * 0.33f, 0)))
 							{
 								if (ImGui::IsMouseDoubleClicked(0))
 								{
-									if (ignored_lights.contains(light.hash))
+									// Add to highest priority TOML file
+									if (!ignored_lights.contains(light.hash))
 									{
-										auto it = std::find(ignored_lights.begin(), ignored_lights.end(), light.hash);
-										if (it != ignored_lights.end()) {
-											ignored_lights.erase(it);
+										if (!lights_toml_info.empty())
+										{
+											std::vector<std::string> sorted_toml_files;
+											for (const auto& [toml_file, _] : lights_toml_info) {
+												sorted_toml_files.push_back(toml_file);
+											}
+
+											std::sort(sorted_toml_files.begin(), sorted_toml_files.end());
+											
+											if (!sorted_toml_files.empty()) 
+											{
+												lights_toml_info[sorted_toml_files[0]].ignored_lights.insert(light.hash);
+												map_settings::rebuild_lights_from_toml_info();
+											}
 										}
 									}
-									else {
-										ignored_lights.insert(light.hash);
+									else
+									{
+										// Remove from highest priority TOML file
+										std::string existing_toml = find_toml_file_for_ignored_hash(light.hash);
+										if (!existing_toml.empty())
+										{
+											lights_toml_info[existing_toml].ignored_lights.erase(light.hash);
+											map_settings::rebuild_lights_from_toml_info();
+										}
 									}
 								}
 							}
 
-							if (is_ignored)
+							if (hash_in_any_toml)
 							{
 								ImGui::PopStyleColor();
 								ImGui::PopFont();
 							}
+
+							// Context menu - pop style colors before opening
+							if (ImGui::BeginPopupContextItem())
+							{
+								// Show TOML files as sub-menus
+								std::vector<std::string> sorted_toml_files;
+								for (const auto& [toml_file, _] : lights_toml_info) {
+									sorted_toml_files.push_back(toml_file);
+								}
+
+								std::sort(sorted_toml_files.begin(), sorted_toml_files.end());
+
+								for (const auto& toml_file : sorted_toml_files)
+								{
+									auto& toml_info = lights_toml_info[toml_file];
+									const bool hash_in_this_toml = toml_info.ignored_lights.contains(light.hash);
+									
+									if (ImGui::BeginMenu(toml_file.c_str()))
+									{
+										shared::imgui::draw_window_blur();
+										
+										if (hash_in_this_toml)
+										{
+											if (ImGui::MenuItem("Remove from this TOML"))
+											{
+												toml_info.ignored_lights.erase(light.hash);
+												map_settings::rebuild_lights_from_toml_info();
+											}
+										}
+										else
+										{
+											if (ImGui::MenuItem("Add to this TOML"))
+											{
+												// Copy to this TOML file (don't remove from other TOML files)
+												toml_info.ignored_lights.insert(light.hash);
+												map_settings::rebuild_lights_from_toml_info();
+											}
+										}
+										
+										ImGui::EndMenu();
+									}
+								}
+								
+								// Option to remove from all TOML files
+								if (hash_in_any_toml)
+								{
+									ImGui::Spacing(0, 3);
+									ImGui::Separator();
+									ImGui::Spacing(0, 3);
+
+									if (ImGui::MenuItem("Remove from all TOML files"))
+									{
+										for (auto& [toml_file, toml_info] : lights_toml_info) {
+											toml_info.ignored_lights.erase(light.hash);
+										}
+
+										map_settings::rebuild_lights_from_toml_info();
+									}
+								}
+
+								ImGui::EndPopup();
+							}
+
+							// TOML filename column (non-selectable text) - only show if hash is in any TOML
+							if (hash_in_any_toml)
+							{
+								ImGui::SameLine();
+								ImGui::PushFont(shared::imgui::font::BOLD);
+								ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 0.5f, 0.7f, 1.0f));
+								ImGui::Text("%s", toml_filename.empty() ? "" : toml_filename.c_str());
+								ImGui::PopFont();
+								ImGui::PopStyleColor();
+							}
+
+							ImGui::PopID();
 						}
 					}
 					ImGui::EndListBox();
@@ -2610,19 +2758,22 @@ namespace gta4
 				ImGui::Spacing(0, 4.0f);
 			}
 
+			// no spacing here because filler lights might not be ignored and next section not visible
 
 			if (const auto filler_ignored = gs->translate_game_lights_ignore_filler_lights._bool(); filler_ignored)
 			{
-				ImGui::Spacing(0.0f, 4.0f);
+				ImGui::Spacing(0, 4.0f);
+
 				if (ImGui::CollapsingHeader("Allow Lights"))
 				{
+					ImGui::Spacing(0, 4);
 					ImGui::BeginDisabled(!filler_ignored);
 					{
 						ImGui::PushFont(shared::imgui::font::BOLD);
 						if (ImGui::Button("Copy Allowed to Clipboard   " ICON_FA_SAVE, ImVec2(ImGui::GetContentRegionAvail().x, 0)))
 						{
 							ImGui::LogToClipboard();
-							ImGui::LogText("%s", shared::common::toml_ext::build_allow_lights_array(allowed_lights).c_str());
+							ImGui::LogText("%s", shared::common::toml_ext::build_allow_lights_array_from_toml_info(lights_toml_info).c_str());
 							ImGui::LogFinish();
 						} ImGui::PopFont();
 
@@ -2635,6 +2786,7 @@ namespace gta4
 					ImGui::PushID("AllowLights");
 
 					ImGui::Spacing(0, 8.0f);
+
 					if (!im->m_dbg_visualize_api_light_hashes) {
 						ImGui::SeparatorText("Nearby filler lights (Double-Click to Ignore) ~ Enable 'Visualize Light Hashes'");
 					}
@@ -2646,52 +2798,176 @@ namespace gta4
 
 					//if (gs->translate_game_lights_ignore_filler_lights.get_as<bool>())
 					{
+						// Helper function to find which TOML file contains an allowed hash (returns highest priority)
+						auto find_toml_file_for_allowed_hash = [&lights_toml_info](uint64_t hash) -> std::string
+						{
+							std::vector<std::string> sorted_toml_files;
+							for (const auto& [toml_file, _] : lights_toml_info) {
+								sorted_toml_files.push_back(toml_file);
+							}
+
+							std::sort(sorted_toml_files.begin(), sorted_toml_files.end());
+							
+							for (const auto& toml_file : sorted_toml_files) 
+							{
+								const auto& toml_info = lights_toml_info[toml_file];
+
+								if (toml_info.allow_lights.contains(hash)) {
+									return toml_file;
+								}
+							}
+
+							return "";
+						};
+
 						static ImGuiTextFilter filter_allow_lights;
 						if (ImGui::BeginListBox("##allow_lights", ImVec2(ImGui::GetContentRegionAvail().x, 140)))
 						{
 							for (size_t i = 0; i < im->visualized_api_lights.size(); ++i)
 							{
 								const auto& light = im->visualized_api_lights[i];
-								//const bool is_ignored = light.ignored;
-								const bool is_allowed = light.allowed_filler;
 
 								// only add lights that are ignored (filler or manually) and alive for more than 5 frames
 								if (/*is_ignored && */ light.is_filler && light.m_frames_since_addition > 5u)
 								{
 									char hash_str[17];
 									std::snprintf(hash_str, sizeof(hash_str), "%llx", static_cast<unsigned long long>(light.hash));
-									if (!filter_allow_lights.PassFilter(hash_str)) {
+									
+									// Get TOML filename for this hash
+									std::string toml_filename = find_toml_file_for_allowed_hash(light.hash);
+									
+									// Check if hash is in any TOML file
+									bool hash_in_any_toml = !toml_filename.empty();
+									
+									// Filter by hash or TOML filename
+									if (!filter_allow_lights.PassFilter(hash_str) && !filter_allow_lights.PassFilter(toml_filename.c_str())) {
 										continue;
 									}
 
-									if (is_allowed)
+									ImGui::PushID(static_cast<int>(i));
+
+									if (hash_in_any_toml)
 									{
 										ImGui::PushFont(shared::imgui::font::FONTS::BOLD);
 										ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.2f, 0.8f, 0.1f, 1.0f));
 									}
 
-									if (ImGui::Selectable(shared::utils::va("%llx", light.hash), false, ImGuiSelectableFlags_AllowDoubleClick))
+									// Hash column (selectable) - use same format as light overrides
+									if (ImGui::Selectable(shared::utils::va("%llx", light.hash), false, ImGuiSelectableFlags_AllowDoubleClick, ImVec2(ImGui::GetContentRegionAvail().x * 0.33f, 0)))
 									{
 										if (ImGui::IsMouseDoubleClicked(0))
 										{
-											if (allowed_lights.contains(light.hash))
+											// Add to highest priority TOML file
+											if (!allowed_lights.contains(light.hash))
 											{
-												auto it = std::find(allowed_lights.begin(), allowed_lights.end(), light.hash);
-												if (it != allowed_lights.end()) {
-													allowed_lights.erase(it);
+												if (!lights_toml_info.empty())
+												{
+													std::vector<std::string> sorted_toml_files;
+													for (const auto& [toml_file, _] : lights_toml_info) {
+														sorted_toml_files.push_back(toml_file);
+													}
+
+													std::sort(sorted_toml_files.begin(), sorted_toml_files.end());
+													
+													if (!sorted_toml_files.empty()) 
+													{
+														lights_toml_info[sorted_toml_files[0]].allow_lights.insert(light.hash);
+														map_settings::rebuild_lights_from_toml_info();
+													}
 												}
 											}
-											else {
-												allowed_lights.insert(light.hash);
+											else
+											{
+												// Remove from highest priority TOML file
+												std::string existing_toml = find_toml_file_for_allowed_hash(light.hash);
+												if (!existing_toml.empty())
+												{
+													lights_toml_info[existing_toml].allow_lights.erase(light.hash);
+													map_settings::rebuild_lights_from_toml_info();
+												}
 											}
 										}
 									}
 
-									if (is_allowed)
+									if (hash_in_any_toml)
 									{
 										ImGui::PopStyleColor();
 										ImGui::PopFont();
 									}
+
+									// Context menu - pop style colors before opening
+									if (ImGui::BeginPopupContextItem())
+									{
+										// Show TOML files as sub-menus
+										std::vector<std::string> sorted_toml_files;
+										for (const auto& [toml_file, _] : lights_toml_info) {
+											sorted_toml_files.push_back(toml_file);
+										}
+
+										std::sort(sorted_toml_files.begin(), sorted_toml_files.end());
+
+										for (const auto& toml_file : sorted_toml_files)
+										{
+											auto& toml_info = lights_toml_info[toml_file];
+											const bool hash_in_this_toml = toml_info.allow_lights.contains(light.hash);
+											
+											if (ImGui::BeginMenu(toml_file.c_str()))
+											{
+												shared::imgui::draw_window_blur();
+												
+												if (hash_in_this_toml)
+												{
+													if (ImGui::MenuItem("Remove from this TOML"))
+													{
+														toml_info.allow_lights.erase(light.hash);
+														map_settings::rebuild_lights_from_toml_info();
+													}
+												}
+												else
+												{
+													if (ImGui::MenuItem("Add to this TOML"))
+													{
+														// Copy to this TOML file (don't remove from other TOML files)
+														toml_info.allow_lights.insert(light.hash);
+														map_settings::rebuild_lights_from_toml_info();
+													}
+												}
+												
+												ImGui::EndMenu();
+											}
+										}
+										
+										// Option to remove from all TOML files
+										if (hash_in_any_toml)
+										{
+											ImGui::Spacing(0, 3);
+											ImGui::Separator();
+											ImGui::Spacing(0, 3);
+											if (ImGui::MenuItem("Remove from all TOML files"))
+											{
+												for (auto& [toml_file, toml_info] : lights_toml_info) {
+													toml_info.allow_lights.erase(light.hash);
+												}
+
+												map_settings::rebuild_lights_from_toml_info();
+											}
+										}
+
+										ImGui::EndPopup();
+									}
+
+									// TOML filename column (non-selectable text) - only show if hash is in any TOML
+									if (hash_in_any_toml)
+									{
+										ImGui::SameLine();
+										ImGui::PushFont(shared::imgui::font::BOLD);
+										ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 0.5f, 0.7f, 1.0f));
+										ImGui::Text("%s", toml_filename.empty() ? "" : toml_filename.c_str());
+										ImGui::PopFont();
+										ImGui::PopStyleColor();
+									}
+
+									ImGui::PopID();
 								}
 							}
 							ImGui::EndListBox();
@@ -2714,38 +2990,203 @@ namespace gta4
 					ImGui::Spacing(0, 4.0f);
 				}
 			}
-			
 
-			ImGui::Spacing(0.0f, 4.0f);
+			ImGui::Spacing(0, 4.0f);
 
 			if (ImGui::CollapsingHeader("Light Overrides"))
 			{
+				auto& light_overrides_flat = map_settings::get_map_settings().light_overrides;
+				auto& light_overrides_toml_info = map_settings::get_map_settings().light_overrides_toml_info;
+
+				// Helper function to find the highest priority TOML file that contains a hash
+				auto find_highest_priority_toml_for_hash = [&light_overrides_toml_info](uint64_t hash) -> map_settings::light_overrides_toml_info_s*
+				{
+					// Get sorted TOML filenames (by priority - alphabetical order)
+					std::vector<std::string> sorted_toml_files;
+					for (const auto& [toml_file, _] : light_overrides_toml_info) {
+						sorted_toml_files.push_back(toml_file);
+					}
+
+					std::sort(sorted_toml_files.begin(), sorted_toml_files.end());
+					
+					// Find the first (highest priority) TOML file that contains this hash
+					for (const auto& toml_file : sorted_toml_files) 
+					{
+						auto& toml_info = light_overrides_toml_info[toml_file];
+						
+						// Check if it's in a category
+						for (auto& category : toml_info.categories) 
+						{
+							if (category.overrides.contains(hash)) {
+								return &toml_info;
+							}
+						}
+						
+						// Check flat overrides
+						if (toml_info.flat_overrides.contains(hash)) {
+							return &toml_info;
+						}
+					}
+					
+					return nullptr;
+				};
+
+				// Helper function to get TOML filename for a hash (returns highest priority)
+				auto get_toml_filename_for_hash = [&light_overrides_toml_info](uint64_t hash) -> std::string
+				{
+					// Get sorted TOML filenames (by priority - alphabetical order)
+					std::vector<std::string> sorted_toml_files;
+					for (const auto& [toml_file, _] : light_overrides_toml_info) {
+						sorted_toml_files.push_back(toml_file);
+					}
+
+					std::sort(sorted_toml_files.begin(), sorted_toml_files.end());
+					
+					// Find the first (highest priority) TOML file that contains this hash
+					for (const auto& toml_file : sorted_toml_files) 
+					{
+						const auto& toml_info = light_overrides_toml_info[toml_file];
+						
+						// Check if it's in a category
+						for (const auto& category : toml_info.categories) 
+						{
+							if (category.overrides.contains(hash)) {
+								return toml_file;
+							}
+						}
+						
+						// Check flat overrides
+						if (toml_info.flat_overrides.contains(hash)) {
+							return toml_file;
+						}
+					}
+					
+					return "";
+				};
+
+				// Helper function to find override data from any TOML file (searches all files, returns first found)
+				auto find_override_data_in_any_toml = [&light_overrides_toml_info](uint64_t hash) -> std::optional<map_settings::light_override_s>
+				{
+					// Get sorted TOML filenames (by priority - alphabetical order)
+					std::vector<std::string> sorted_toml_files;
+					for (const auto& [toml_file, _] : light_overrides_toml_info) {
+						sorted_toml_files.push_back(toml_file);
+					}
+
+					std::sort(sorted_toml_files.begin(), sorted_toml_files.end());
+					
+					// Search all TOML files for this hash (highest priority first)
+					for (const auto& toml_file : sorted_toml_files)
+					{
+						const auto& toml_info = light_overrides_toml_info[toml_file];
+						
+						// Check if it's in a category
+						for (const auto& category : toml_info.categories)
+						{
+							if (category.overrides.contains(hash)) {
+								return category.overrides.at(hash);
+							}
+						}
+						
+						// Check flat overrides
+						if (toml_info.flat_overrides.contains(hash)) {
+							return toml_info.flat_overrides.at(hash);
+						}
+					}
+					
+					return std::nullopt;
+				};
+
+				// Helper function to find which TOML file contains a hash (returns filename, empty if not found)
+				auto find_toml_file_containing_hash = [&light_overrides_toml_info](uint64_t hash) -> std::string
+				{
+					// Get sorted TOML filenames (by priority - alphabetical order)
+					std::vector<std::string> sorted_toml_files;
+					for (const auto& [toml_file, _] : light_overrides_toml_info) {
+						sorted_toml_files.push_back(toml_file);
+					}
+
+					std::sort(sorted_toml_files.begin(), sorted_toml_files.end());
+					
+					// Search all TOML files for this hash
+					for (const auto& toml_file : sorted_toml_files) 
+					{
+						const auto& toml_info = light_overrides_toml_info[toml_file];
+						
+						// Check if it's in a category
+						for (const auto& category : toml_info.categories) 
+						{
+							if (category.overrides.contains(hash)) {
+								return toml_file;
+							}
+						}
+						
+						// Check flat overrides
+						if (toml_info.flat_overrides.contains(hash)) {
+							return toml_file;
+						}
+					}
+					
+					return "";
+				};
+
+				// Build set of all hashes in categories and map hash to (toml_file, category_name) - only store highest priority
+				std::unordered_set<uint64_t> hashes_in_categories;
+				std::unordered_map<uint64_t, std::pair<std::string, std::string>> hash_to_toml_and_category; // hash -> (toml_file, category_name)
+				
+				// Get sorted TOML filenames (by priority - alphabetical order)
+				std::vector<std::string> sorted_toml_files_for_map;
+				for (const auto& [toml_file, _] : light_overrides_toml_info) {
+					sorted_toml_files_for_map.push_back(toml_file);
+				}
+
+				std::sort(sorted_toml_files_for_map.begin(), sorted_toml_files_for_map.end());
+				
+				// Iterate in priority order, only store first occurrence (highest priority)
+				for (const auto& toml_file : sorted_toml_files_for_map)
+				{
+					const auto& toml_info = light_overrides_toml_info[toml_file];
+					for (const auto& category : toml_info.categories)
+					{
+						const std::string cat_name = category.category_name.empty() ? "Unnamed" : category.category_name;
+						for (const auto& [hash, _] : category.overrides)
+						{
+							hashes_in_categories.insert(hash);
+
+							// Only store if not already present (first/highest priority wins)
+							if (!hash_to_toml_and_category.contains(hash)) {
+								hash_to_toml_and_category[hash] = {toml_file, cat_name};
+							}
+						}
+					}
+				}
+
+				ImGui::Spacing(0, 4);
 				ImGui::PushFont(shared::imgui::font::BOLD);
-				if (ImGui::Button("Copy Overrides to Clipboard   " ICON_FA_SAVE, ImVec2(ImGui::GetContentRegionAvail().x, 0)))
+				if (ImGui::Button("Copy All Overrides to Clipboard   " ICON_FA_SAVE, ImVec2(ImGui::GetContentRegionAvail().x, 0)))
 				{
 					ImGui::LogToClipboard();
-					ImGui::LogText("%s", shared::common::toml_ext::build_lightweak_array(light_overrides).c_str());
+					ImGui::LogText("%s", shared::common::toml_ext::build_lightweak_mixed_array(light_overrides_toml_info).c_str());
 					ImGui::LogFinish();
-				} ImGui::PopFont();
+				} 
+				ImGui::PopFont();
 
-				ImGui::Spacing(0, 8.0f);
-
-				ImGui::BeginDisabled(!im->m_dbg_visualize_api_light_hashes);
+				// Nearby lights list
 				ImGui::PushID("LightOverrides");
-
 				ImGui::Spacing(0, 8.0f);
+
 				if (!im->m_dbg_visualize_api_light_hashes) {
 					ImGui::SeparatorText("Nearby lights (Select to Tweak) ~ Enable 'Visualize Light Hashes'");
-				}
-				else {
-					ImGui::SeparatorText("Nearby lights (Select to Tweak)");
+				} else {
+					ImGui::SeparatorText("Nearby lights (Select to Tweak) ~ Use Right Click Context Menu");
 				}
 
 				ImGui::Spacing(0.0f, 8.0f);
+				static uint64_t selected_hash = 0u;
 
+				ImGui::BeginDisabled(!im->m_dbg_visualize_api_light_hashes);
 				{
 					static ImGuiTextFilter filter_light_tweaks;
-					static uint64_t selected_hash = 0u;
 					imgui::visualized_api_light_s* selected_vis_light = nullptr;
 
 					if (ImGui::BeginListBox("##lighttweaks", ImVec2(ImGui::GetContentRegionAvail().x, 140)))
@@ -2753,24 +3194,44 @@ namespace gta4
 						for (size_t i = 0; i < im->visualized_api_lights.size(); ++i)
 						{
 							auto& vislight = im->visualized_api_lights[i];
-							const bool has_override = light_overrides.contains(vislight.hash);
+							const bool has_override = light_overrides_flat.contains(vislight.hash);
+							std::string category_name = "";
+							std::string toml_filename = "";
+
+							if (hash_to_toml_and_category.contains(vislight.hash)) 
+							{
+								category_name = hash_to_toml_and_category[vislight.hash].second;
+								toml_filename = hash_to_toml_and_category[vislight.hash].first;
+							} 
+							// Override exists but not in a category, get TOML filename directly
+							else if (has_override) {
+								toml_filename = get_toml_filename_for_hash(vislight.hash);
+							}
 
 							// only add lights that are alive for more than 5 frames
 							if (vislight.m_frames_since_addition > 5u)
 							{
 								char hash_str[17];
 								std::snprintf(hash_str, sizeof(hash_str), "%llx", static_cast<unsigned long long>(vislight.hash));
-								if (!filter_light_tweaks.PassFilter(hash_str)) {
+
+								if (!filter_light_tweaks.PassFilter(hash_str) && !filter_light_tweaks.PassFilter(category_name.c_str()) && !filter_light_tweaks.PassFilter(toml_filename.c_str())) {
 									continue;
 								}
 
+								// Display hash and category in two columns
+								ImGui::PushID(static_cast<int>(vislight.hash));
+								char popup_id[64];
+								std::snprintf(popup_id, sizeof(popup_id), "##ContextMenu_%llx", static_cast<unsigned long long>(vislight.hash));
+								
+								// Hash column selectable
+								// Highlight if in category (green) or has override (green)
 								if (has_override)
 								{
 									ImGui::PushFont(shared::imgui::font::FONTS::BOLD);
 									ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.2f, 0.8f, 0.1f, 1.0f));
 								}
 
-								if (ImGui::Selectable(shared::utils::va("%llx", vislight.hash), selected_hash == vislight.hash)) {
+								if (ImGui::Selectable(shared::utils::va("%llx", vislight.hash), selected_hash == vislight.hash, 0, ImVec2(ImGui::GetContentRegionAvail().x * 0.33f, 0))) {
 									selected_hash = vislight.hash;
 								}
 
@@ -2779,6 +3240,338 @@ namespace gta4
 									ImGui::PopStyleColor();
 									ImGui::PopFont();
 								}
+								
+								// Right-click context menu (must be right after the item)
+								if (ImGui::BeginPopupContextItem(popup_id))
+								{
+									ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8.0f, 8.0f));
+									ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(10.0f, 4.0f));
+
+									// Apply blur and padding similar to tooltip
+									ImGui::PushStyleColor(ImGuiCol_PopupBg, ImVec4(0.124f, 0.124f, 0.124f, 0.776f));
+
+									// Draw blur on the popup window
+									shared::imgui::draw_window_blur();
+
+									const auto padding = 0.0f;
+
+									ImGui::Spacing(0, padding); // top padding
+									ImGui::Spacing(padding, 0); ImGui::SameLine(); // left pad
+									
+									// Header with hash
+									ImGui::PushFont(shared::imgui::font::FONTS::BOLD);
+									ImGui::Text("Hash: 0x%llx", static_cast<unsigned long long>(vislight.hash));
+									ImGui::PopFont();
+
+									ImGui::Spacing(0, 3);
+									ImGui::Separator();
+									ImGui::Spacing(0, 3);
+
+									// Remove override option if it exists
+									if (has_override)
+									{
+										ImGui::Spacing(padding, 0); ImGui::SameLine(); // left pad
+										if (ImGui::MenuItem("Remove Override"))
+										{
+											// Remove from highest priority TOML file only
+											auto* toml_info_ptr = find_highest_priority_toml_for_hash(vislight.hash);
+											if (toml_info_ptr)
+											{
+												// Remove from categories
+												for (auto& category : toml_info_ptr->categories) {
+													category.overrides.erase(vislight.hash);
+												}
+												// Remove from flat overrides
+												toml_info_ptr->flat_overrides.erase(vislight.hash);
+											}
+											
+											// Rebuild flat map from TOML info (will use next priority if available)
+											map_settings::rebuild_light_overrides_from_toml_info();
+										}
+
+										ImGui::Spacing(0, 3);
+										ImGui::Separator();
+										ImGui::Spacing(0, 3);
+									}
+									
+									// Add uncategorized override option if it doesn't exist
+									if (!has_override)
+									{
+										ImGui::Spacing(padding, 0); ImGui::SameLine(); // left pad
+										if (ImGui::MenuItem("Add Override (Uncategorized)"))
+										{
+											map_settings::light_override_s override_data;
+											
+											// Check if override exists in any lower-priority TOML file and copy its data
+											auto existing_override = find_override_data_in_any_toml(vislight.hash);
+
+											// Copy existing override data (don't remove from lower-priority TOML)
+											if (existing_override.has_value()) {
+												override_data = existing_override.value();
+											}
+											else
+											{
+												// Create override from light data
+												override_data = {
+													.pos = vislight.m_def_copy.mPosition,
+													.dir = vislight.m_def_copy.mDirection,
+													.color = vislight.m_def_copy.mColor,
+													.radius = vislight.m_def_copy.mRadius,
+													.intensity = vislight.m_def_copy.mIntensity,
+													.volumetric_scale = vislight.m_def_copy.mVolumeScale,
+												};
+
+												if (vislight.m_def_copy.mType == game::LT_SPOT)
+												{
+													override_data.outer_cone_angle = vislight.m_def_copy.mInnerConeAngle;
+													override_data.inner_cone_angle = vislight.m_def_copy.mOuterConeAngle;
+													override_data.light_type = true;
+												}
+											}
+											
+											// Add to flat map
+											light_overrides_flat[vislight.hash] = override_data;
+											
+											// Add to first (highest priority) TOML file's flat_overrides (for rebuilding)
+											if (!light_overrides_toml_info.empty())
+											{
+												std::vector<std::string> temp_sorted;
+												for (const auto& [toml_file, _] : light_overrides_toml_info) {
+													temp_sorted.push_back(toml_file);
+												}
+
+												std::sort(temp_sorted.begin(), temp_sorted.end());
+												
+												if (!temp_sorted.empty()) {
+													light_overrides_toml_info[temp_sorted[0]].flat_overrides[vislight.hash] = override_data;
+												}
+											}
+										}
+
+										ImGui::Spacing(0, 3);
+										ImGui::Separator();
+										ImGui::Spacing(0, 6);
+									}
+									
+									// Show TOML files as sub-menus with categories
+									if (!light_overrides_toml_info.empty())
+									{
+										ImGui::Spacing(padding, 0); ImGui::SameLine(); // left pad
+										ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetColorU32(ImGuiCol_TextDisabled));
+										ImGui::Text("Add to Category:");
+										ImGui::PopStyleColor();
+										ImGui::Spacing(0, 2);
+
+										// Get sorted TOML filenames (by priority)
+										std::vector<std::string> sorted_toml_files;
+										for (const auto& [toml_file, _] : light_overrides_toml_info) {
+											sorted_toml_files.push_back(toml_file);
+										}
+
+										std::sort(sorted_toml_files.begin(), sorted_toml_files.end());
+
+										for (const auto& toml_file : sorted_toml_files)
+										{
+											auto& toml_info = light_overrides_toml_info[toml_file];
+											
+											if (ImGui::BeginMenu(toml_file.c_str()))
+											{
+												// Draw blur on the popup window
+												shared::imgui::draw_window_blur();
+
+												// Show existing categories in this TOML file
+												for (size_t cat_idx = 0; cat_idx < toml_info.categories.size(); ++cat_idx)
+												{
+													auto& category = toml_info.categories[cat_idx];
+													const bool already_in_this_cat = category.overrides.contains(vislight.hash);
+													const char* cat_name = category.category_name.empty() ? ("Category " + std::to_string(cat_idx)).c_str() : category.category_name.c_str();
+													
+													if (ImGui::MenuItem(cat_name, nullptr, already_in_this_cat, !already_in_this_cat))
+													{
+														// Only remove hash if it's in the same TOML file we're adding to
+														// This is a move operation within the same TOML file (different category)
+														// If adding to a different TOML file, we copy instead of moving
+														std::string existing_toml_file = find_toml_file_containing_hash(vislight.hash);
+														if (!existing_toml_file.empty() && existing_toml_file == toml_file)
+														{
+															// Remove from all categories in this TOML file
+															for (auto& other_category : toml_info.categories) {
+																other_category.overrides.erase(vislight.hash);
+															}
+
+															// Remove from flat overrides in this TOML file
+															toml_info.flat_overrides.erase(vislight.hash);
+														}
+														
+														// Get override data: copy from existing override if it exists, otherwise create from light data
+														map_settings::light_override_s override_data;
+														if (light_overrides_flat.contains(vislight.hash))
+														{
+															// Use existing override data from flat map (which may be from lower-priority TOML)
+															override_data = light_overrides_flat[vislight.hash];
+														}
+														else
+														{
+															// Check if override exists in any lower-priority TOML file and copy its data
+															auto existing_override = find_override_data_in_any_toml(vislight.hash);
+															if (existing_override.has_value())
+															{
+																// Copy existing override data (don't remove from lower-priority TOML)
+																override_data = existing_override.value();
+															}
+															else
+															{
+																// Create override from light data
+																override_data = {
+																	.pos = vislight.m_def_copy.mPosition,
+																	.dir = vislight.m_def_copy.mDirection,
+																	.color = vislight.m_def_copy.mColor,
+																	.radius = vislight.m_def_copy.mRadius,
+																	.intensity = vislight.m_def_copy.mIntensity,
+																	.volumetric_scale = vislight.m_def_copy.mVolumeScale,
+																};
+
+																if (vislight.m_def_copy.mType == game::LT_SPOT)
+																{
+																	override_data.outer_cone_angle = vislight.m_def_copy.mInnerConeAngle;
+																	override_data.inner_cone_angle = vislight.m_def_copy.mOuterConeAngle;
+																	override_data.light_type = true;
+																}
+															}
+															
+															light_overrides_flat[vislight.hash] = override_data;
+														}
+
+														// Add to this category
+														category.overrides[vislight.hash] = override_data;
+														
+														// Rebuild flat map
+														map_settings::rebuild_light_overrides_from_toml_info();
+													}
+												}
+												
+												if (!toml_info.categories.empty())
+												{
+													ImGui::Spacing(0, 3);
+													ImGui::Separator();
+													ImGui::Spacing(0, 3);
+												}
+
+												// Option to create new category in this TOML file
+												if (ImGui::MenuItem("Create New Category"))
+												{
+													// Generate unique category name
+													std::string base_name = "new";
+													std::string new_category_name = base_name + std::to_string(toml_info.categories.size());
+													int counter = 0;
+
+													// Check for duplicates in this TOML file
+													while (std::any_of(toml_info.categories.begin(), toml_info.categories.end(), 
+														[&new_category_name](const auto& cat) {
+															return cat.category_name == new_category_name;
+														}))
+													{
+														new_category_name = base_name + std::to_string(toml_info.categories.size() + counter);
+														counter++;
+													}
+													
+													// Only remove hash if it's in the same TOML file we're adding to
+													// This is a move operation within the same TOML file (different category)
+													// If adding to a different TOML file, we copy instead of moving
+													std::string existing_toml_file = find_toml_file_containing_hash(vislight.hash);
+													if (!existing_toml_file.empty() && existing_toml_file == toml_file)
+													{
+														// Remove from all categories in this TOML file
+														for (auto& other_category : toml_info.categories) {
+															other_category.overrides.erase(vislight.hash);
+														}
+
+														// Remove from flat overrides in this TOML file
+														toml_info.flat_overrides.erase(vislight.hash);
+													}
+													
+													// Create new category
+													map_settings::light_override_category_info_s new_category;
+													new_category.category_name = new_category_name;
+													toml_info.categories.emplace_back(new_category);
+													
+													// Get override data: copy from existing override if it exists, otherwise create from light data
+													map_settings::light_override_s override_data;
+													if (light_overrides_flat.contains(vislight.hash))
+													{
+														// Use existing override data from flat map (which may be from lower-priority TOML)
+														override_data = light_overrides_flat[vislight.hash];
+													}
+													else
+													{
+														// Check if override exists in any lower-priority TOML file and copy its data
+														auto existing_override = find_override_data_in_any_toml(vislight.hash);
+														if (existing_override.has_value())
+														{
+															// Copy existing override data (don't remove from lower-priority TOML)
+															override_data = existing_override.value();
+														}
+														else
+														{
+															// Create override from light data
+															override_data = 
+															{
+																.pos = vislight.m_def_copy.mPosition,
+																.dir = vislight.m_def_copy.mDirection,
+																.color = vislight.m_def_copy.mColor,
+																.radius = vislight.m_def_copy.mRadius,
+																.intensity = vislight.m_def_copy.mIntensity,
+																.volumetric_scale = vislight.m_def_copy.mVolumeScale,
+															};
+
+															if (vislight.m_def_copy.mType == game::LT_SPOT)
+															{
+																override_data.outer_cone_angle = vislight.m_def_copy.mInnerConeAngle;
+																override_data.inner_cone_angle = vislight.m_def_copy.mOuterConeAngle;
+																override_data.light_type = true;
+															}
+														}
+														
+														light_overrides_flat[vislight.hash] = override_data;
+													}
+													
+													// Add light to the new category
+													toml_info.categories.back().overrides[vislight.hash] = override_data;
+													
+													// Rebuild flat map
+													map_settings::rebuild_light_overrides_from_toml_info();
+												}
+												
+												ImGui::EndMenu();
+											}
+										}
+									}
+
+									ImGui::Spacing(0, padding); // bottom padding
+
+									ImGui::PopStyleVar(2);
+									ImGui::PopStyleColor();
+									ImGui::EndPopup();
+								} // end context menu
+								
+								// Category column (non-selectable text) - only show if override exists
+								if (has_override)
+								{
+									// TOML filename column (non-selectable text) - only show if override exists
+									ImGui::SameLine();
+									ImGui::PushFont(shared::imgui::font::BOLD);
+									ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 0.5f, 0.7f, 1.0f));
+									ImGui::Text("%s  //  ", toml_filename.empty() ? "" : toml_filename.c_str());
+									ImGui::PopFont();
+									ImGui::PopStyleColor();
+
+									ImGui::SameLine();
+									ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.7f, 0.7f, 0.7f, 1.0f));
+									ImGui::Text("%s", category_name.empty() ? "(Uncategorized)" : category_name.c_str());
+									ImGui::PopStyleColor();
+								}
+								
+								ImGui::PopID();
 
 								if (selected_hash == vislight.hash) {
 									selected_vis_light = &vislight;
@@ -2786,6 +3579,88 @@ namespace gta4
 							}
 						}
 						ImGui::EndListBox();
+					}
+
+					const bool does_override_exist = selected_hash && light_overrides_flat.contains(selected_hash);
+					bool pending_erase = false;
+
+					// Put buttons on same line as filter
+					if (!does_override_exist && selected_hash)
+					{
+						if (ImGui::Button("Add Override (Uncategorized)", ImVec2(ImGui::GetContentRegionAvail().x * 0.6f, 0)))
+						{
+							map_settings::light_override_s override_data;
+							
+							// Check if override exists in any lower-priority TOML file and copy its data
+							auto existing_override = find_override_data_in_any_toml(selected_hash);
+							if (existing_override.has_value())
+							{
+								// Copy existing override data (don't remove from lower-priority TOML)
+								override_data = existing_override.value();
+							}
+							else if (selected_vis_light)
+							{
+								// Create override from light data
+								override_data = {
+									.pos = selected_vis_light->m_def_copy.mPosition,
+									.dir = selected_vis_light->m_def_copy.mDirection,
+									.color = selected_vis_light->m_def_copy.mColor,
+									.radius = selected_vis_light->m_def_copy.mRadius,
+									.intensity = selected_vis_light->m_def_copy.mIntensity,
+									.volumetric_scale = selected_vis_light->m_def_copy.mVolumeScale,
+								};
+
+								if (selected_vis_light->m_def_copy.mType == game::LT_SPOT)
+								{
+									override_data.outer_cone_angle = selected_vis_light->m_def_copy.mInnerConeAngle;
+									override_data.inner_cone_angle = selected_vis_light->m_def_copy.mOuterConeAngle;
+									override_data.light_type = true;
+								}
+							}
+							
+							// Add to flat map
+							light_overrides_flat[selected_hash] = override_data;
+							
+							// Add to first (highest priority) TOML file's flat_overrides (for rebuilding)
+							if (!light_overrides_toml_info.empty())
+							{
+								std::vector<std::string> temp_sorted;
+								for (const auto& [toml_file, _] : light_overrides_toml_info) {
+									temp_sorted.push_back(toml_file);
+								}
+
+								std::sort(temp_sorted.begin(), temp_sorted.end());
+								
+								if (!temp_sorted.empty()) {
+									light_overrides_toml_info[temp_sorted[0]].flat_overrides[selected_hash] = override_data;
+								}
+							}
+						}
+						ImGui::SameLine();
+					}
+					else if (does_override_exist)
+					{
+						if (ImGui::Button("Remove Override", ImVec2(ImGui::GetContentRegionAvail().x * 0.6f, 0))) 
+						{
+							// Remove from highest priority TOML file only
+							auto* toml_info_ptr = find_highest_priority_toml_for_hash(selected_hash);
+							if (toml_info_ptr)
+							{
+								// Remove from categories
+								for (auto& category : toml_info_ptr->categories) {
+									category.overrides.erase(selected_hash);
+								}
+
+								// Remove from flat overrides
+								toml_info_ptr->flat_overrides.erase(selected_hash);
+							}
+							
+							// Rebuild flat map from TOML info (will use next priority if available)
+							map_settings::rebuild_light_overrides_from_toml_info();
+
+							pending_erase = true;
+						}
+						ImGui::SameLine();
 					}
 
 					filter_light_tweaks.Draw("##Filter", ImGui::GetContentRegionAvail().x
@@ -2797,100 +3672,145 @@ namespace gta4
 						filter_light_tweaks.Clear();
 					}
 
-					const bool does_override_exist = selected_hash && light_overrides.contains(selected_hash);
-					if (!does_override_exist)
+					// Show tweaking UI if override exists (and wasn't just erased)
+					if (does_override_exist && !pending_erase)
 					{
-						if (ImGui::Button("Add Override", ImVec2(ImGui::GetContentRegionAvail().x, 0))) 
-						{
-							if (selected_vis_light)
-							{
-								light_overrides[selected_hash] =
-								{
-									.pos = selected_vis_light->m_def_copy.mPosition,
-									.dir = selected_vis_light->m_def_copy.mDirection,
-									.color = selected_vis_light->m_def_copy.mColor,
-									.radius = selected_vis_light->m_def_copy.mRadius,
-									.intensity = selected_vis_light->m_def_copy.mIntensity,
-									.volumetric_scale = selected_vis_light->m_def_copy.mVolumeScale,
-								};
-
-								if (selected_vis_light->m_def_copy.mType == game::LT_SPOT)
-								{
-									auto& l = light_overrides[selected_hash];
-									l.outer_cone_angle = selected_vis_light->m_def_copy.mInnerConeAngle; // yes
-									l.inner_cone_angle = selected_vis_light->m_def_copy.mOuterConeAngle; // yes
-									l.light_type = true;
-								}
-							}
-							else {
-								light_overrides[selected_hash] = {};
-							}
-						}
-					}
-					else
-					{
-						bool pending_erase = false;
-						if (ImGui::Button("Remove Override", ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
-							pending_erase = true;
-						}
-
 						ImGui::Spacing(0, 12);
 
-						auto& l = light_overrides[selected_hash];
-						ImGui::Checkbox("##Tweak Pos", &l._use_pos); TT("Tweak Pos");
+						// Helper lambda to sync changes from flat map to highest priority TOML file
+						auto sync_override_to_toml = [&light_overrides_flat, &light_overrides_toml_info](uint64_t hash)
+							{
+								if (!light_overrides_flat.contains(hash)) {
+									return;
+								}
+							
+								const auto& override_data = light_overrides_flat[hash];
+								
+								// Find highest priority TOML file that contains this hash
+								std::vector<std::string> sorted_toml_files;
+								for (const auto& [toml_file, _] : light_overrides_toml_info) {
+									sorted_toml_files.push_back(toml_file);
+								}
+
+								std::sort(sorted_toml_files.begin(), sorted_toml_files.end());
+								
+								// Update in the first (highest priority) TOML file that contains this hash
+								for (const auto& toml_file : sorted_toml_files) 
+								{
+									auto& toml_info = light_overrides_toml_info[toml_file];
+									
+									// Check if it's in a category
+									bool found_in_category = false;
+									for (auto& category : toml_info.categories)
+									{
+										if (category.overrides.contains(hash)) 
+										{
+											category.overrides[hash] = override_data;
+											found_in_category = true;
+											break;
+										}
+									}
+									
+									// If not in a category, check flat overrides
+									if (!found_in_category && toml_info.flat_overrides.contains(hash)) {
+										toml_info.flat_overrides[hash] = override_data;
+									}
+									
+									// If we found it in this TOML file, we're done (highest priority)
+									if (found_in_category || toml_info.flat_overrides.contains(hash)) {
+										break;
+									}
+								}
+							};
+
+						auto& l = light_overrides_flat[selected_hash];
+
+						if (ImGui::Checkbox("##Tweak Pos", &l._use_pos)) {
+							sync_override_to_toml(selected_hash);
+						} TT("Tweak Pos");
 						ImGui::SameLine(0, 6);
 						ImGui::BeginDisabled(!l._use_pos);
-						ImGui::DragFloat3("Pos Override", &l.pos.x, 0.025f, 0, 0, "%.2f");
+						if (ImGui::DragFloat3("Pos Override", &l.pos.x, 0.025f, 0, 0, "%.2f")) {
+							sync_override_to_toml(selected_hash);
+						}
 						ImGui::EndDisabled();
 
-						ImGui::Checkbox("##Tweak Dir", &l._use_dir); TT("Tweak Dir");
+						if (ImGui::Checkbox("##Tweak Dir", &l._use_dir)) {
+							sync_override_to_toml(selected_hash);
+						} TT("Tweak Dir");
 						ImGui::SameLine(0, 6);
 						ImGui::BeginDisabled(!l._use_dir);
 						if (ImGui::DragFloat3("Dir Override", &l.dir.x, 0.025f, 0, 0, "%.2f")) {
 							l.dir.Normalize();
+							sync_override_to_toml(selected_hash);
 						}
 						ImGui::EndDisabled();
 
-						ImGui::Checkbox("##Tweak Color", &l._use_color); TT("Tweak Color");
+						if (ImGui::Checkbox("##Tweak Color", &l._use_color)) {
+							sync_override_to_toml(selected_hash);
+						} TT("Tweak Color");
 						ImGui::SameLine(0, 6);
 						ImGui::BeginDisabled(!l._use_color);
-						ImGui::ColorEdit3("Color Override", &l.color.x);
+						if (ImGui::ColorEdit3("Color Override", &l.color.x)) {
+							sync_override_to_toml(selected_hash);
+						}
 						ImGui::EndDisabled();
 
-						ImGui::Checkbox("##Tweak Radius", &l._use_radius); TT("Tweak Radius");
+						if (ImGui::Checkbox("##Tweak Radius", &l._use_radius)) {
+							sync_override_to_toml(selected_hash);
+						} TT("Tweak Radius");
 						ImGui::SameLine(0, 6);
 						ImGui::BeginDisabled(!l._use_radius);
-						ImGui::DragFloat("Radius Override", &l.radius, 0.025f, 0.0f, 0.0f, "%.2f");
+						if (ImGui::DragFloat("Radius Override", &l.radius, 0.025f, 0.0f, 0.0f, "%.2f")) {
+							sync_override_to_toml(selected_hash);
+						}
 						ImGui::EndDisabled();
 
-						ImGui::Checkbox("##Tweak Intensity", &l._use_intensity); TT("Tweak Intensity");
+						if (ImGui::Checkbox("##Tweak Intensity", &l._use_intensity)) {
+							sync_override_to_toml(selected_hash);
+						} TT("Tweak Intensity");
 						ImGui::SameLine(0, 6);
 						ImGui::BeginDisabled(!l._use_intensity);
-						ImGui::DragFloat("Intensity Override", &l.intensity, 0.025f, 0.0f, 0.0f, "%.2f");
+						if (ImGui::DragFloat("Intensity Override", &l.intensity, 0.025f, 0.0f, 0.0f, "%.2f")) {
+							sync_override_to_toml(selected_hash);
+						}
 						ImGui::EndDisabled();
 
-						ImGui::Checkbox("##Tweak VolumetricScale", &l._use_volumetric_scale); TT("Tweak VolumetricScale");
+						if (ImGui::Checkbox("##Tweak VolumetricScale", &l._use_volumetric_scale)) {
+							sync_override_to_toml(selected_hash);
+						} TT("Tweak VolumetricScale");
 						ImGui::SameLine(0, 6);
 						ImGui::BeginDisabled(!l._use_volumetric_scale);
-						ImGui::DragFloat("VolumetricScale Override", &l.volumetric_scale, 0.025f, 0.0f, 10.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp);
+						if (ImGui::DragFloat("VolumetricScale Override", &l.volumetric_scale, 0.025f, 0.0f, 10.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp)) {
+							sync_override_to_toml(selected_hash);
+						}
 						ImGui::EndDisabled();
 
-						ImGui::Checkbox("##Tweak Light Type", &l._use_light_type); TT("Tweak Light Type");
+						if (ImGui::Checkbox("##Tweak Light Type", &l._use_light_type)) {
+							sync_override_to_toml(selected_hash);
+						} TT("Tweak Light Type");
 						ImGui::SameLine(0, 6);
 						ImGui::BeginDisabled(!l._use_light_type);
-						ImGui::Checkbox("Light Type (False: Sphere -- True: Spot)", &l.light_type);
+						if (ImGui::Checkbox("Light Type (False: Sphere -- True: Spot)", &l.light_type)) {
+							sync_override_to_toml(selected_hash);
+						}
 						ImGui::EndDisabled();
 
-						ImGui::Checkbox("##Tweak OuterConeAngle", &l._use_outer_cone_angle); TT("Tweak OuterConeAngle");
+						if (ImGui::Checkbox("##Tweak OuterConeAngle", &l._use_outer_cone_angle)) {
+							sync_override_to_toml(selected_hash);
+						} TT("Tweak OuterConeAngle");
 						ImGui::SameLine(0, 6);
 						ImGui::BeginDisabled(!l._use_outer_cone_angle);
 						float temp_outer_angle = RAD2DEG(l.outer_cone_angle);
 						if (ImGui::DragFloat("OuterConeAngle Override", &temp_outer_angle, 0.025f, 0.0f, 180.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp)) {
 							l.outer_cone_angle = DEG2RAD(temp_outer_angle);
+							sync_override_to_toml(selected_hash);
 						}
 						ImGui::EndDisabled();
 
-						ImGui::Checkbox("##Tweak InnerConeAngle", &l._use_inner_cone_angle); TT("Tweak InnerConeAngle");
+						if (ImGui::Checkbox("##Tweak InnerConeAngle", &l._use_inner_cone_angle)) {
+							sync_override_to_toml(selected_hash);
+						} TT("Tweak InnerConeAngle");
 						ImGui::SameLine(0, 6);
 						ImGui::BeginDisabled(!l._use_inner_cone_angle);
 						float temp_inner_angle = RAD2DEG(l.inner_cone_angle);
@@ -2900,26 +3820,357 @@ namespace gta4
 							if (temp_inner_angle > temp_outer_angle) {
 								l.outer_cone_angle = DEG2RAD(temp_inner_angle);
 							}
+							sync_override_to_toml(selected_hash);
 						}
 						ImGui::EndDisabled();
 
-						SET_CHILD_WIDGET_WIDTH;
-						ImGui::InputText("Comment", &l.comment);
-
-						if (pending_erase)
+						//SET_CHILD_WIDGET_WIDTH;
+						if (ImGui::InputText("Comment", &l.comment))
 						{
-							if (const auto it = light_overrides.find(selected_hash); it != light_overrides.end()) {
-								light_overrides.erase(it);
+							// Sync comment to all TOML files that contain this light
+							for (auto& [toml_file, toml_info] : light_overrides_toml_info)
+							{
+								// Sync to categories
+								for (auto& category : toml_info.categories)
+								{
+									if (category.overrides.contains(selected_hash)) {
+										category.overrides[selected_hash].comment = l.comment;
+									}
+								}
+								// Sync to flat overrides
+								if (toml_info.flat_overrides.contains(selected_hash)) {
+									toml_info.flat_overrides[selected_hash].comment = l.comment;
+								}
 							}
 						}
 					}
 				}
 				ImGui::EndDisabled();
 				ImGui::PopID();
-				ImGui::Separator();
-			}
 
-			ImGui::Spacing(0, 4);
+				ImGui::Spacing(0, 12);
+				ImGui::Separator();
+				ImGui::Spacing(0, 4);
+
+				// Categories section - organized by TOML files
+
+				// Count nearby lights
+				std::unordered_set<uint64_t> nearby_hashes;
+				for (const auto& vislight : im->visualized_api_lights)
+				{
+					if (vislight.m_frames_since_addition > 5u) {
+						nearby_hashes.insert(vislight.hash);
+					}
+				}
+
+				ImGui::Spacing(0, 8);
+
+				static uint64_t selected_hash_for_categories = 0u;
+				selected_hash_for_categories = selected_hash; // Sync with the list selection
+
+				// Get sorted TOML filenames (by priority - alphabetical order)
+				std::vector<std::string> sorted_toml_files;
+				for (const auto& [toml_file, _] : light_overrides_toml_info) {
+					sorted_toml_files.push_back(toml_file);
+				}
+
+				std::sort(sorted_toml_files.begin(), sorted_toml_files.end());
+
+				// Show TOML files as TreeNodes
+				for (const auto& toml_file : sorted_toml_files)
+				{
+					auto& toml_info = light_overrides_toml_info[toml_file];
+					
+					ImGui::PushID(toml_file.c_str());
+
+					int pushed_treenode_color = 0;
+					ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.060f, 0.060f, 0.060f, 0.275f)); pushed_treenode_color++;
+					ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.360f, 0.360f, 0.360f, 0.275f)); pushed_treenode_color++;
+
+					// TOML file TreeNode with export and add category buttons
+					if (ImGui::TreeNodeEx(toml_file.c_str(), ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_FramePadding))
+					{
+						const auto og_fpx = ImGui::GetStyle().FramePadding.x;
+						ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(12, og_fpx - 4.0f));
+						ImGui::PopStyleColor(pushed_treenode_color); pushed_treenode_color = 0;
+
+						// Calculate button positions - ensure buttons align with TreeNode header line height
+						const float frame_height = ImGui::GetFrameHeight();
+						const float export_button_width = ImGui::CalcTextSize(ICON_FA_SAVE " Export").x + ImGui::GetStyle().FramePadding.x * 2;
+						const float add_category_button_width = ImGui::CalcTextSize(ICON_FA_PLUS "  Category").x + ImGui::GetStyle().FramePadding.x * 2;
+						const float spacing = ImGui::GetStyle().ItemSpacing.x;
+						const float total_buttons_width = export_button_width + add_category_button_width + spacing;
+
+						// Position "Add new Category" button to the left of Export button
+						ImGui::SameLine(ImGui::GetContentRegionAvail().x - total_buttons_width + ImGui::GetStyle().FramePadding.x);
+						ImGui::SetItemAllowOverlap();
+
+						// center y inside treenode header
+						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 3);
+
+						ImGui::Style_ColorButtonPush(imgui::get()->ImGuiCol_ButtonGreen, false);
+						ImGui::PushFont(shared::imgui::font::BOLD);
+						if (ImGui::Button(ICON_FA_PLUS "  Category", ImVec2(add_category_button_width, frame_height)))
+						{
+							// Generate unique category name
+							std::string base_name = "new";
+							std::string new_category_name = base_name + std::to_string(toml_info.categories.size());
+							int counter = 0;
+
+							// Check for duplicates in this TOML file
+							while (std::any_of(toml_info.categories.begin(), toml_info.categories.end(),
+								[&new_category_name](const auto& cat)
+								{
+									return cat.category_name == new_category_name;
+								}))
+							{
+								new_category_name = base_name + std::to_string(toml_info.categories.size() + counter);
+								counter++;
+							}
+
+							map_settings::light_override_category_info_s new_category;
+							new_category.category_name = new_category_name;
+							toml_info.categories.emplace_back(new_category);
+						}
+						ImGui::PopFont();
+						ImGui::Style_ColorButtonPop();
+
+						// Position Export button
+						ImGui::SameLine();
+						ImGui::SetItemAllowOverlap();
+
+						// center y inside treenode header
+						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 3);
+
+						ImGui::PushFont(shared::imgui::font::BOLD);
+						if (ImGui::Button(ICON_FA_SAVE " Export", ImVec2(export_button_width, frame_height)))
+						{
+							ImGui::LogToClipboard();
+							ImGui::LogText("%s", shared::common::toml_ext::build_lightweak_toml_file(toml_file, toml_info).c_str());
+							ImGui::LogFinish();
+						}
+						ImGui::PopFont();
+
+						// Reset cursor position after buttons
+						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + frame_height - ImGui::GetTextLineHeight());
+
+						//ImGui::Spacing(0, 4);
+
+						ImGui::PopStyleVar();
+						ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(20, 6));
+
+						ImGui::Widget_CategoryWithVerticalLabel(toml_file.c_str(), [&]()
+							{
+								// Show categories for this TOML file
+								for (auto cat_it = toml_info.categories.begin(); cat_it != toml_info.categories.end(); )
+								{
+									auto& category = *cat_it;
+									bool pending_cat_removal = false;
+
+									ImGui::PushID(shared::utils::va("light_cat_%zu", std::distance(toml_info.categories.begin(), cat_it)));
+
+									// Count nearby lights in this category
+									int nearby_count = 0;
+									for (const auto& [hash, _] : category.overrides)
+									{
+										if (nearby_hashes.contains(hash)) {
+											nearby_count++;
+										}
+									}
+
+									SET_CHILD_WIDGET_WIDTH_MAN(80);
+
+									const auto header_y = ImGui::GetCursorPosY();
+									const auto section_name = category.category_name.empty() ? ("Category " + std::to_string(std::distance(toml_info.categories.begin(), cat_it))).c_str() : category.category_name.c_str();
+									bool header_open = ImGui::CollapsingHeader(section_name);
+									
+									const auto post_header_y = ImGui::GetCursorPosY();
+									const auto nearby_overrides_str = shared::utils::va("%d / %zu total overrides nearby", nearby_count, category.overrides.size());
+									const auto nearby_overrides_str_size = ImGui::CalcTextSize(nearby_overrides_str);
+
+									ImGui::SetCursorPos(ImVec2(
+										ImGui::GetContentRegionAvail().x - nearby_overrides_str_size.x + 30.0f,
+										header_y + ImGui::GetStyle().FramePadding.y) /*(ImGui::GetFrameHeight() * 0.5f) + (nearby_overrides_str_size.y * 0.5f))*/);
+
+									ImGui::PushFont(shared::imgui::font::REGULAR_SMALL);
+									ImGui::TextUnformatted(nearby_overrides_str);
+									ImGui::PopFont();
+
+									ImGui::SetCursorPosY(post_header_y);
+									
+									if (header_open)
+									{
+										ImGui::Spacing(0, 4);
+
+										// Export single category button
+										ImGui::PushFont(shared::imgui::font::BOLD);
+										if (ImGui::Button("Copy Category to Clipboard   " ICON_FA_SAVE, ImVec2(ImGui::GetContentRegionAvail().x, 0)))
+										{
+											ImGui::LogToClipboard();
+											ImGui::LogText("%s", shared::common::toml_ext::build_lightweak_single_category(category).c_str());
+											ImGui::LogFinish();
+										}
+										ImGui::PopFont();
+
+										ImGui::Spacing(0, 4);
+
+										// Category name input
+										if (category._internal_buffer.empty()) {
+											category._internal_buffer = category.category_name;
+										}
+
+										SET_CHILD_WIDGET_WIDTH_MAN(ImGui::GetContentRegionAvail().x * 0.4f - 18);
+										if (ImGui::InputText("Category Name", &category._internal_buffer, ImGuiInputTextFlags_EnterReturnsTrue))
+										{
+											if (!category._internal_buffer.empty()) // do not allow empty name
+											{
+												category.category_name = category._internal_buffer;
+												category._internal_buffer.clear();
+											}
+										}
+										else if (!ImGui::IsItemActive() && ImGui::IsItemDeactivated()) {
+											category._internal_buffer = category.category_name; // Reset buffer if user clicked away without pressing Enter
+										} TT("Press ENTER to update category name");
+
+										ImGui::Spacing(0, 4);
+
+										// Category comment input
+										if (category._internal_comment_buffer.empty()) {
+											category._internal_comment_buffer = category.category_comment;
+										}
+
+										SET_CHILD_WIDGET_WIDTH_MAN(ImGui::GetContentRegionAvail().x * 0.4f - 18);
+										if (ImGui::InputText("Comment", &category._internal_comment_buffer)) {
+											category.category_comment = category._internal_comment_buffer;
+										}
+
+										ImGui::Spacing(0, 4);
+
+										// Button to add selected hash to this category and remove category on same line
+										const float button_width = ImGui::GetContentRegionAvail().x;
+										const float add_button_width = button_width * 0.6f;
+										const float remove_button_width = button_width * 0.4f - ImGui::GetStyle().ItemSpacing.x;
+
+										ImGui::BeginDisabled(!selected_hash_for_categories || category.overrides.contains(selected_hash_for_categories));
+										{
+											if (ImGui::Button(shared::utils::va("Add (0x%llx) to Category", static_cast<unsigned long long>(selected_hash_for_categories)), ImVec2(add_button_width, 0)))
+											{
+												// Only remove hash if it's in the same TOML file we're adding to
+												// This is a move operation within the same TOML file (different category)
+												// If adding to a different TOML file, we copy instead of moving
+												std::string existing_toml_file = find_toml_file_containing_hash(selected_hash_for_categories);
+												if (!existing_toml_file.empty() && existing_toml_file == toml_file)
+												{
+													// Remove from all categories in this TOML file
+													for (auto& other_category : toml_info.categories) {
+														other_category.overrides.erase(selected_hash_for_categories);
+													}
+
+													// Remove from flat overrides in this TOML file
+													toml_info.flat_overrides.erase(selected_hash_for_categories);
+												}
+
+												// Get override data: copy from existing override if it exists, otherwise create from light data
+												map_settings::light_override_s override_data;
+												if (light_overrides_flat.contains(selected_hash_for_categories))
+												{
+													// Use existing override data from flat map (which may be from lower-priority TOML)
+													override_data = light_overrides_flat[selected_hash_for_categories];
+												}
+												else
+												{
+													// Check if override exists in any lower-priority TOML file and copy its data
+													auto existing_override = find_override_data_in_any_toml(selected_hash_for_categories);
+													if (existing_override.has_value())
+													{
+														// Copy existing override data (don't remove from lower-priority TOML)
+														override_data = existing_override.value();
+													}
+													else
+													{
+														// Create override from selected light
+														for (const auto& vislight : im->visualized_api_lights)
+														{
+															if (vislight.hash == selected_hash_for_categories)
+															{
+																override_data = 
+																{
+																	.pos = vislight.m_def_copy.mPosition,
+																	.dir = vislight.m_def_copy.mDirection,
+																	.color = vislight.m_def_copy.mColor,
+																	.radius = vislight.m_def_copy.mRadius,
+																	.intensity = vislight.m_def_copy.mIntensity,
+																	.volumetric_scale = vislight.m_def_copy.mVolumeScale,
+																};
+
+																if (vislight.m_def_copy.mType == game::LT_SPOT)
+																{
+																	override_data.outer_cone_angle = vislight.m_def_copy.mInnerConeAngle;
+																	override_data.inner_cone_angle = vislight.m_def_copy.mOuterConeAngle;
+																	override_data.light_type = true;
+																}
+																break;
+															}
+														}
+													}
+
+													light_overrides_flat[selected_hash_for_categories] = override_data;
+												}
+
+												category.overrides[selected_hash_for_categories] = override_data;
+
+												// Rebuild flat map
+												map_settings::rebuild_light_overrides_from_toml_info();
+											}
+										}
+										ImGui::EndDisabled();
+
+										ImGui::SameLine();
+
+										ImGui::Style_ColorButtonPush(imgui::get()->ImGuiCol_ButtonRed, true);
+										if (ImGui::Button(ICON_FA_TIMES "  Category", ImVec2(remove_button_width, 0)))
+										{
+											// Remove all overrides in this category (this category is in the current TOML file)
+											// We only need to remove from this category since we're working within a specific TOML file
+											// The category will be removed entirely, so no need to remove individual hashes
+
+											// Rebuild flat map (will use next priority if available for each hash)
+											map_settings::rebuild_light_overrides_from_toml_info();
+
+											pending_cat_removal = true;
+										}
+										ImGui::Style_ColorButtonPop();
+
+										ImGui::Spacing(0, 14);
+									}
+
+									if (pending_cat_removal) {
+										cat_it = toml_info.categories.erase(cat_it);
+									} else {
+										++cat_it;
+									}
+
+									ImGui::PopID();
+
+									if (toml_info.categories.size() > 1 && cat_it != toml_info.categories.end()) {
+										ImGui::Spacing(0, 4);
+									}
+								}
+							});
+
+						ImGui::PopStyleVar(1);
+						
+						ImGui::TreePop();
+					}
+
+					if (pushed_treenode_color) {
+						ImGui::PopStyleColor(pushed_treenode_color); pushed_treenode_color = 0;
+					}
+
+					ImGui::PopID();
+					ImGui::Spacing(0, 10);
+				}
+			}
 		}
 	}
 
@@ -2963,7 +4214,7 @@ namespace gta4
 		ImGui::Spacing(0, 12);
 
 		ImGui::Style_ColorButtonPush(imgui::get()->ImGuiCol_ButtonGreen, true);
-		if (ImGui::Button("Add new Category", ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
+		if (ImGui::Button(ICON_FA_PLUS "  Category", ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
 			ac.emplace_back(map_settings::anti_cull_meshes_s { .distance = 0, .comment = "new" + std::to_string(ac.size())});
 		}
 		ImGui::Style_ColorButtonPop();
@@ -3890,3 +5141,6 @@ namespace gta4
 		shared::common::log("ImGui", "Module initialized.", shared::common::LOG_TYPE::LOG_TYPE_DEFAULT, false);
 	}
 }
+
+
+

@@ -86,6 +86,8 @@ namespace ImGui
 	void Style_BoldOrangeTextPush();
 	void Style_BoldOrangeTextPop();
 
+	bool BeginTooltipBlurEx(int tooltip_flags, ImGuiWindowFlags extra_window_flags);
+
 	// #
 
 	void SetItemTooltipBlur(const char* fmt, ...);

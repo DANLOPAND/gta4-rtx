@@ -374,7 +374,7 @@ namespace ImGui
 
 	// #
 
-	bool BeginTooltipBlurEx(ImGuiTooltipFlags tooltip_flags, ImGuiWindowFlags extra_window_flags)
+	bool BeginTooltipBlurEx(int tooltip_flags, ImGuiWindowFlags extra_window_flags)
 	{
 		ImGuiContext& g = *GImGui;
 
@@ -417,7 +417,9 @@ namespace ImGui
 			// (0.124f, 0.124f, 0.124f, 0.776f)
 			PushStyleColor(ImGuiCol_PopupBg, ImVec4(0.124f, 0.124f, 0.124f, 0.776f));
 
-			if (!BeginTooltipBlurEx(ImGuiTooltipFlags_OverridePrevious, ImGuiWindowFlags_None)) {
+			if (!BeginTooltipBlurEx(ImGuiTooltipFlags_OverridePrevious, ImGuiWindowFlags_None))
+			{
+				PopStyleColor();
 				return;
 			}
 			PopStyleColor();
@@ -1105,7 +1107,7 @@ namespace ImGui
 
 		// Save starting position
 		const ImVec2 start_pos = GetCursorScreenPos();
-		const ImVec2 text_size = CalcTextSize(category_text);
+		ImVec2 text_size = CalcTextSize(category_text);
 		
 		// When text is rotated 90° counter-clockwise, the text's width becomes its height
 		// We need horizontal space = font height
@@ -1152,8 +1154,16 @@ namespace ImGui
 		const ImVec4 clip_rect = ImVec4(-FLT_MAX, -FLT_MAX, FLT_MAX, FLT_MAX);
 		PushFont(shared::imgui::font::BOLD_LARGE);
 		const float font_size = GetFontSize();
+		
+		bool use_dot_label_text = false;
+		if (text_size.x > content_height)
+		{
+			use_dot_label_text = true;
+			text_size = CalcTextSize("...");
+		}
+
 		font->RenderText(draw_list, font_size, temp_pos, ColorConvertFloat4ToU32(final_text_color), 
-			clip_rect, category_text, nullptr, 0.0f, false);
+			clip_rect, use_dot_label_text ? "..." : category_text, nullptr, 0.0f, false);
 		PopFont();
 		const size_t vtx_end = draw_list->VtxBuffer.Size;
 		
