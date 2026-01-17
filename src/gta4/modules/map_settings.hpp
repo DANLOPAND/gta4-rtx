@@ -48,6 +48,7 @@ namespace gta4
 			float volumetric_scale = 1.0f;
 			bool light_type = false;
 			std::string comment;
+			std::vector<light_override_s> attached_lights; // Attached lights for this override
 
 			bool _use_pos = false;
 			bool _use_dir = false;

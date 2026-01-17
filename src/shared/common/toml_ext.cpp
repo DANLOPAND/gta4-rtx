@@ -313,6 +313,92 @@ namespace shared::common::toml_ext
 		return toml_str;
 	}
 
+	/// Helper function to build override properties string (without hash, without attached lights)
+	/// @param override_data The override data to build properties from
+	/// @return String containing comma-separated properties
+	std::string build_override_properties(const gta4::map_settings::light_override_s& override_data)
+	{
+		std::string toml_str = "";
+
+		if (override_data._use_pos) {
+			toml_str += "pos = [" + format_float(override_data.pos.x) + ", " + format_float(override_data.pos.y) + ", " + format_float(override_data.pos.z) + "]";
+		}
+
+		if (override_data._use_dir) {
+			if (!toml_str.empty()) toml_str += ", ";
+			toml_str += "dir = [" + format_float(override_data.dir.x) + ", " + format_float(override_data.dir.y) + ", " + format_float(override_data.dir.z) + "]";
+		}
+
+		if (override_data._use_color) {
+			if (!toml_str.empty()) toml_str += ", ";
+			toml_str += "color = [" + format_float(override_data.color.x) + ", " + format_float(override_data.color.y) + ", " + format_float(override_data.color.z) + "]";
+		}
+
+		if (override_data._use_radius) {
+			if (!toml_str.empty()) toml_str += ", ";
+			toml_str += "radius = " + format_float(override_data.radius);
+		}
+
+		if (override_data._use_intensity) {
+			if (!toml_str.empty()) toml_str += ", ";
+			toml_str += "intensity = " + format_float(override_data.intensity);
+		}
+
+		if (override_data._use_outer_cone_angle) {
+			if (!toml_str.empty()) toml_str += ", ";
+			toml_str += "outer_cone_angle = " + format_float(override_data.outer_cone_angle);
+		}
+
+		if (override_data._use_inner_cone_angle) {
+			if (!toml_str.empty()) toml_str += ", ";
+			toml_str += "inner_cone_angle = " + format_float(override_data.inner_cone_angle);
+		}
+
+		if (override_data._use_volumetric_scale) {
+			if (!toml_str.empty()) toml_str += ", ";
+			toml_str += "volumetric_scale = " + format_float(override_data.volumetric_scale);
+		}
+
+		if (override_data._use_light_type) {
+			if (!toml_str.empty()) toml_str += ", ";
+			toml_str += "light_type = " + (override_data.light_type ? "true"s : "false"s);
+		}
+
+		return toml_str;
+	}
+
+	/// Helper function to build attached lights array string
+	/// @param attached_lights The vector of attached lights
+	/// @param indent_prefix The prefix for indentation (e.g., "        " for 8 spaces)
+	/// @return String containing the attached array or empty string if no attached lights
+	std::string build_attached_lights_array(const std::vector<gta4::map_settings::light_override_s>& attached_lights, const std::string& indent_prefix)
+	{
+		if (attached_lights.empty()) {
+			return "";
+		}
+
+		std::string toml_str = ", attached = [";
+		bool first_attached = true;
+		for (const auto& attached_light : attached_lights)
+		{
+			if (!first_attached) {
+				toml_str += ",\n";
+			}
+
+			if (!attached_light.comment.empty()) {
+				toml_str += "\n" + indent_prefix + "    # " + attached_light.comment + "\n";
+			}
+			else if (first_attached) {
+				toml_str += "\n";
+			}
+
+			toml_str += indent_prefix + "    { " + build_override_properties(attached_light) + " }";
+			first_attached = false;
+		}
+		toml_str += "\n" + indent_prefix + "]";
+		return toml_str;
+	}
+
 	/// Builds a string containing a complete TOML file's LIGHT_OVERRIDES
 	/// @return the final string in toml format
 	std::string build_lightweak_toml_file([[maybe_unused]] const std::string& filename, const gta4::map_settings::light_overrides_toml_info_s& toml_info)
@@ -347,43 +433,13 @@ namespace shared::common::toml_ext
 				}
 
 				toml_str += "        { hash = " + std::format("0x{:X}", hash);
-
-				if (override_data._use_pos) {
-					toml_str += ", pos = [" + format_float(override_data.pos.x) + ", " + format_float(override_data.pos.y) + ", " + format_float(override_data.pos.z) + "]";
+				
+				const std::string props = build_override_properties(override_data);
+				if (!props.empty()) {
+					toml_str += ", " + props;
 				}
 
-				if (override_data._use_dir) {
-					toml_str += ", dir = [" + format_float(override_data.dir.x) + ", " + format_float(override_data.dir.y) + ", " + format_float(override_data.dir.z) + "]";
-				}
-
-				if (override_data._use_color) {
-					toml_str += ", color = [" + format_float(override_data.color.x) + ", " + format_float(override_data.color.y) + ", " + format_float(override_data.color.z) + "]";
-				}
-
-				if (override_data._use_radius) {
-					toml_str += ", radius = " + format_float(override_data.radius);
-				}
-
-				if (override_data._use_intensity) {
-					toml_str += ", intensity = " + format_float(override_data.intensity);
-				}
-
-				if (override_data._use_outer_cone_angle) {
-					toml_str += ", outer_cone_angle = " + format_float(override_data.outer_cone_angle);
-				}
-
-				if (override_data._use_inner_cone_angle) {
-					toml_str += ", inner_cone_angle = " + format_float(override_data.inner_cone_angle);
-				}
-
-				if (override_data._use_volumetric_scale) {
-					toml_str += ", volumetric_scale = " + format_float(override_data.volumetric_scale);
-				}
-
-				if (override_data._use_light_type) {
-					toml_str += ", light_type = " + (override_data.light_type ? "true"s : "false"s);
-				}
-
+				toml_str += build_attached_lights_array(override_data.attached_lights, "        ");
 				toml_str += " },\n";
 				first_done = true;
 			}
@@ -406,43 +462,13 @@ namespace shared::common::toml_ext
 			}
 
 			toml_str += "    { hash = " + std::format("0x{:X}", hash);
-
-			if (override_data._use_pos) {
-				toml_str += ", pos = [" + format_float(override_data.pos.x) + ", " + format_float(override_data.pos.y) + ", " + format_float(override_data.pos.z) + "]";
+			
+			const std::string props = build_override_properties(override_data);
+			if (!props.empty()) {
+				toml_str += ", " + props;
 			}
 
-			if (override_data._use_dir) {
-				toml_str += ", dir = [" + format_float(override_data.dir.x) + ", " + format_float(override_data.dir.y) + ", " + format_float(override_data.dir.z) + "]";
-			}
-
-			if (override_data._use_color) {
-				toml_str += ", color = [" + format_float(override_data.color.x) + ", " + format_float(override_data.color.y) + ", " + format_float(override_data.color.z) + "]";
-			}
-
-			if (override_data._use_radius) {
-				toml_str += ", radius = " + format_float(override_data.radius);
-			}
-
-			if (override_data._use_intensity) {
-				toml_str += ", intensity = " + format_float(override_data.intensity);
-			}
-
-			if (override_data._use_outer_cone_angle) {
-				toml_str += ", outer_cone_angle = " + format_float(override_data.outer_cone_angle);
-			}
-
-			if (override_data._use_inner_cone_angle) {
-				toml_str += ", inner_cone_angle = " + format_float(override_data.inner_cone_angle);
-			}
-
-			if (override_data._use_volumetric_scale) {
-				toml_str += ", volumetric_scale = " + format_float(override_data.volumetric_scale);
-			}
-
-			if (override_data._use_light_type) {
-				toml_str += ", light_type = " + (override_data.light_type ? "true"s : "false"s);
-			}
-
+			toml_str += build_attached_lights_array(override_data.attached_lights, "    ");
 			toml_str += " },\n";
 		}
 
@@ -480,43 +506,13 @@ namespace shared::common::toml_ext
 			}
 
 			toml_str += "        { hash = " + std::format("0x{:X}", hash);
-
-			if (override_data._use_pos) {
-				toml_str += ", pos = [" + format_float(override_data.pos.x) + ", " + format_float(override_data.pos.y) + ", " + format_float(override_data.pos.z) + "]";
+			
+			const std::string props = build_override_properties(override_data);
+			if (!props.empty()) {
+				toml_str += ", " + props;
 			}
 
-			if (override_data._use_dir) {
-				toml_str += ", dir = [" + format_float(override_data.dir.x) + ", " + format_float(override_data.dir.y) + ", " + format_float(override_data.dir.z) + "]";
-			}
-
-			if (override_data._use_color) {
-				toml_str += ", color = [" + format_float(override_data.color.x) + ", " + format_float(override_data.color.y) + ", " + format_float(override_data.color.z) + "]";
-			}
-
-			if (override_data._use_radius) {
-				toml_str += ", radius = " + format_float(override_data.radius);
-			}
-
-			if (override_data._use_intensity) {
-				toml_str += ", intensity = " + format_float(override_data.intensity);
-			}
-
-			if (override_data._use_outer_cone_angle) {
-				toml_str += ", outer_cone_angle = " + format_float(override_data.outer_cone_angle);
-			}
-
-			if (override_data._use_inner_cone_angle) {
-				toml_str += ", inner_cone_angle = " + format_float(override_data.inner_cone_angle);
-			}
-
-			if (override_data._use_volumetric_scale) {
-				toml_str += ", volumetric_scale = " + format_float(override_data.volumetric_scale);
-			}
-
-			if (override_data._use_light_type) {
-				toml_str += ", light_type = " + (override_data.light_type ? "true"s : "false"s);
-			}
-
+			toml_str += build_attached_lights_array(override_data.attached_lights, "        ");
 			toml_str += " },\n";
 		}
 
@@ -604,43 +600,13 @@ namespace shared::common::toml_ext
 					}
 
 					toml_str += "        { hash = " + std::format("0x{:X}", hash);
-
-					if (override_data._use_pos) {
-						toml_str += ", pos = [" + format_float(override_data.pos.x) + ", " + format_float(override_data.pos.y) + ", " + format_float(override_data.pos.z) + "]";
+					
+					const std::string props = build_override_properties(override_data);
+					if (!props.empty()) {
+						toml_str += ", " + props;
 					}
 
-					if (override_data._use_dir) {
-						toml_str += ", dir = [" + format_float(override_data.dir.x) + ", " + format_float(override_data.dir.y) + ", " + format_float(override_data.dir.z) + "]";
-					}
-
-					if (override_data._use_color) {
-						toml_str += ", color = [" + format_float(override_data.color.x) + ", " + format_float(override_data.color.y) + ", " + format_float(override_data.color.z) + "]";
-					}
-
-					if (override_data._use_radius) {
-						toml_str += ", radius = " + format_float(override_data.radius);
-					}
-
-					if (override_data._use_intensity) {
-						toml_str += ", intensity = " + format_float(override_data.intensity);
-					}
-
-					if (override_data._use_outer_cone_angle) {
-						toml_str += ", outer_cone_angle = " + format_float(override_data.outer_cone_angle);
-					}
-
-					if (override_data._use_inner_cone_angle) {
-						toml_str += ", inner_cone_angle = " + format_float(override_data.inner_cone_angle);
-					}
-
-					if (override_data._use_volumetric_scale) {
-						toml_str += ", volumetric_scale = " + format_float(override_data.volumetric_scale);
-					}
-
-					if (override_data._use_light_type) {
-						toml_str += ", light_type = " + (override_data.light_type ? "true"s : "false"s);
-					}
-
+					toml_str += build_attached_lights_array(override_data.attached_lights, "        ");
 					toml_str += " },\n";
 				}
 
@@ -672,43 +638,13 @@ namespace shared::common::toml_ext
 				}
 
 				toml_str += "    { hash = " + std::format("0x{:X}", hash);
-
-				if (override_data._use_pos) {
-					toml_str += ", pos = [" + format_float(override_data.pos.x) + ", " + format_float(override_data.pos.y) + ", " + format_float(override_data.pos.z) + "]";
+				
+				const std::string props = build_override_properties(override_data);
+				if (!props.empty()) {
+					toml_str += ", " + props;
 				}
 
-				if (override_data._use_dir) {
-					toml_str += ", dir = [" + format_float(override_data.dir.x) + ", " + format_float(override_data.dir.y) + ", " + format_float(override_data.dir.z) + "]";
-				}
-
-				if (override_data._use_color) {
-					toml_str += ", color = [" + format_float(override_data.color.x) + ", " + format_float(override_data.color.y) + ", " + format_float(override_data.color.z) + "]";
-				}
-
-				if (override_data._use_radius) {
-					toml_str += ", radius = " + format_float(override_data.radius);
-				}
-
-				if (override_data._use_intensity) {
-					toml_str += ", intensity = " + format_float(override_data.intensity);
-				}
-
-				if (override_data._use_outer_cone_angle) {
-					toml_str += ", outer_cone_angle = " + format_float(override_data.outer_cone_angle);
-				}
-
-				if (override_data._use_inner_cone_angle) {
-					toml_str += ", inner_cone_angle = " + format_float(override_data.inner_cone_angle);
-				}
-
-				if (override_data._use_volumetric_scale) {
-					toml_str += ", volumetric_scale = " + format_float(override_data.volumetric_scale);
-				}
-
-				if (override_data._use_light_type) {
-					toml_str += ", light_type = " + (override_data.light_type ? "true"s : "false"s);
-				}
-
+				toml_str += build_attached_lights_array(override_data.attached_lights, "    ");
 				toml_str += " },\n";
 			}
 			

@@ -2742,9 +2742,21 @@ namespace gta4
 					ImGui::EndListBox();
 				}
 
+				ImGui::BeginGroup();
+				const auto screenpos_prefilter = ImGui::GetCursorScreenPos();
 				ignore_filter.Draw("##Filter", ImGui::GetContentRegionAvail().x
 					- ImGui::GetFrameHeight()
 					- ImGui::GetStyle().FramePadding.x + 3.0f);
+
+				if (!ignore_filter.IsActive())
+				{
+					ImGui::SetCursorScreenPos(ImVec2(screenpos_prefilter.x + 12.0f, screenpos_prefilter.y + 5.0f));
+					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.4f, 0.4f, 0.4f, 0.6f));
+					ImGui::TextUnformatted("Filter ..");
+					ImGui::PopStyleColor();
+				}
+				ImGui::EndGroup();
+
 
 				ImGui::SameLine();
 				if (ImGui::Button("X", ImVec2(ImGui::GetFrameHeight(), ImGui::GetFrameHeight()))) {
@@ -2789,8 +2801,7 @@ namespace gta4
 
 					if (!im->m_dbg_visualize_api_light_hashes) {
 						ImGui::SeparatorText("Nearby filler lights (Double-Click to Ignore) ~ Enable 'Visualize Light Hashes'");
-					}
-					else {
+					} else {
 						ImGui::SeparatorText("Nearby filler lights (Double-Click to Ignore)");
 					}
 
@@ -2973,9 +2984,20 @@ namespace gta4
 							ImGui::EndListBox();
 						}
 
+						ImGui::BeginGroup();
+						const auto screenpos_prefilter = ImGui::GetCursorScreenPos();
 						filter_allow_lights.Draw("##Filter", ImGui::GetContentRegionAvail().x
 							- ImGui::GetFrameHeight()
 							- ImGui::GetStyle().FramePadding.x + 3.0f);
+
+						if (!filter_allow_lights.IsActive())
+						{
+							ImGui::SetCursorScreenPos(ImVec2(screenpos_prefilter.x + 12.0f, screenpos_prefilter.y + 5.0f));
+							ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.4f, 0.4f, 0.4f, 0.6f));
+							ImGui::TextUnformatted("Filter ..");
+							ImGui::PopStyleColor();
+						}
+						ImGui::EndGroup();
 
 						ImGui::SameLine();
 						if (ImGui::Button("X", ImVec2(ImGui::GetFrameHeight(), ImGui::GetFrameHeight()))) {
@@ -3663,9 +3685,21 @@ namespace gta4
 						ImGui::SameLine();
 					}
 
+					ImGui::BeginGroup();
+					const auto screenpos_prefilter = ImGui::GetCursorScreenPos();
 					filter_light_tweaks.Draw("##Filter", ImGui::GetContentRegionAvail().x
 						- ImGui::GetFrameHeight()
 						- ImGui::GetStyle().FramePadding.x + 3.0f);
+
+					if (!filter_light_tweaks.IsActive())
+					{
+						ImGui::SetCursorScreenPos(ImVec2(screenpos_prefilter.x + 12.0f, screenpos_prefilter.y + 5.0f));
+						ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.4f, 0.4f, 0.4f, 0.6f));
+						ImGui::TextUnformatted("Filter ..");
+						ImGui::PopStyleColor();
+					}
+
+					ImGui::EndGroup();
 
 					ImGui::SameLine();
 					if (ImGui::Button("X", ImVec2(ImGui::GetFrameHeight(), ImGui::GetFrameHeight()))) {
@@ -3694,6 +3728,8 @@ namespace gta4
 
 								std::sort(sorted_toml_files.begin(), sorted_toml_files.end());
 								
+								bool found_anywhere = false;
+								
 								// Update in the first (highest priority) TOML file that contains this hash
 								for (const auto& toml_file : sorted_toml_files) 
 								{
@@ -3707,6 +3743,7 @@ namespace gta4
 										{
 											category.overrides[hash] = override_data;
 											found_in_category = true;
+											found_anywhere = true;
 											break;
 										}
 									}
@@ -3714,6 +3751,7 @@ namespace gta4
 									// If not in a category, check flat overrides
 									if (!found_in_category && toml_info.flat_overrides.contains(hash)) {
 										toml_info.flat_overrides[hash] = override_data;
+										found_anywhere = true;
 									}
 									
 									// If we found it in this TOML file, we're done (highest priority)
@@ -3721,129 +3759,470 @@ namespace gta4
 										break;
 									}
 								}
+								
+								// If override doesn't exist in any TOML file yet, create it in the highest priority TOML file
+								// This is needed when the main override has no properties but has attached lights
+								if (!found_anywhere && !sorted_toml_files.empty())
+								{
+									// Check if override has any properties or attached lights - if so, save it
+									const bool has_properties = override_data._use_pos || override_data._use_dir || 
+										override_data._use_color || override_data._use_radius || override_data._use_intensity ||
+										override_data._use_outer_cone_angle || override_data._use_inner_cone_angle ||
+										override_data._use_volumetric_scale || override_data._use_light_type;
+									const bool has_attached_lights = !override_data.attached_lights.empty();
+									
+									if (has_properties || has_attached_lights)
+									{
+										// Add to highest priority TOML file's flat_overrides
+										light_overrides_toml_info[sorted_toml_files[0]].flat_overrides[hash] = override_data;
+									}
+								}
 							};
 
 						auto& l = light_overrides_flat[selected_hash];
+						
+						// Get all lights for this hash (main + attached)
+						struct light_entry_s
+						{
+							bool is_main;
+							size_t attached_index; // Only valid if !is_main
+						};
+						
+						std::vector<light_entry_s> all_lights;
+						all_lights.push_back({true, 0});
+						
+						// Get attached lights from the override (if it exists)
+						const auto& attached_list = l.attached_lights;
+						for (size_t i = 0; i < attached_list.size(); ++i) {
+							all_lights.push_back({false, i});
+						}
+						
+						// Track which light is currently selected for editing
+						static std::unordered_map<uint64_t, size_t> selected_light_index; // hash -> index in all_lights
+						if (!selected_light_index.contains(selected_hash)) {
+							selected_light_index[selected_hash] = 0; // Default to main light
+						}
+						
+						size_t& current_light_idx = selected_light_index[selected_hash];
+						if (current_light_idx >= all_lights.size()) {
+							current_light_idx = 0;
+						}
+						
+						// Helper function to get current light entry (fresh each time to avoid invalidation)
+						auto get_current_light_entry = [&]() -> light_entry_s& {
+							return all_lights[current_light_idx];
+						};
+						
+						// Helper function to get current light reference (fresh each time to avoid invalidation)
+						auto get_current_light = [&]() -> map_settings::light_override_s&
+						{
+							auto& entry = get_current_light_entry();
+							if (entry.is_main) {
+								return l;
+							} else {
+								return l.attached_lights[entry.attached_index];
+							}
+						};
+						
+						// List of all lights for this hash
+						ImGui::SeparatorText(shared::utils::va("Lights for hash [0x%llx]  -  Select Light from List to Edit", static_cast<unsigned long long>(selected_hash)));
+						
+						/*static float dbgfloat01 = 1.0f, dbgfloat02 = 0.0f, dbgfloat03 = 0.0f, dbgfloat04 = 0.0f;
+						ImGui::Begin("DevSettings");
+						ImGui::DragFloat("DevFloat1", &dbgfloat01, 0.005f);
+						ImGui::DragFloat("DevFloat2", &dbgfloat02, 0.005f);
+						ImGui::DragFloat("DevFloat3", &dbgfloat03, 0.005f);
+						ImGui::DragFloat("DevFloat4", &dbgfloat04, 0.005f);
+						ImGui::End();*/
 
-						if (ImGui::Checkbox("##Tweak Pos", &l._use_pos)) {
+						const float row_height = ImGui::GetFrameHeight() * 0.8f;
+
+						if (ImGui::BeginTable("##lights_list", 2, ImGuiTableFlags_SizingStretchProp))
+						{
+							ImGui::TableSetupColumn("Light", ImGuiTableColumnFlags_WidthStretch, 1.0f);
+							ImGui::TableSetupColumn("##x", ImGuiTableColumnFlags_WidthFixed, row_height + 4);
+
+							for (size_t i = 0; i < all_lights.size(); ++i)
+							{
+								ImGui::TableNextRow(ImGuiTableRowFlags_None, row_height);
+
+								const auto& entry = all_lights[i];
+								const bool selected = (current_light_idx == i);
+
+								ImGui::TableNextColumn();
+
+								std::string display_name;
+								if (entry.is_main) {
+									display_name = shared::utils::va("0 - Main Light [0x%llx]", static_cast<unsigned long long>(selected_hash));
+								}
+								else
+								{
+									std::string comment;
+									if (entry.attached_index < l.attached_lights.size()) {
+										comment = l.attached_lights[entry.attached_index].comment;
+									}
+
+									if (comment.empty()) {
+										comment = "Attached light";
+									}
+
+									display_name = shared::utils::va("%zu - %s", entry.attached_index + 1, comment.c_str());
+								}
+
+								// Left padding
+								ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetStyle().FramePadding.x);
+
+								// Interaction only (no background)
+								if (ImGui::Selectable(display_name.c_str(), selected, ImGuiSelectableFlags_AllowItemOverlap, ImVec2(0, 20.0f))) {
+									current_light_idx = i;
+								}
+
+								// Delete button
+								ImGui::TableNextColumn();
+								if (!entry.is_main)
+								{
+									ImGui::PushID(static_cast<int>(i));
+									ImGui::Style_DeleteButtonPush();
+
+									if (ImGui::Button("x", ImVec2(row_height -2.0f, row_height -1.3f)))
+									{
+										l.attached_lights.erase(l.attached_lights.begin() + entry.attached_index);
+										sync_override_to_toml(selected_hash);
+
+										if (current_light_idx > i) {
+											current_light_idx--;
+										}
+											
+										else if (current_light_idx == i) {
+											current_light_idx = 0;
+										}
+									}
+
+									ImGui::Style_DeleteButtonPop();
+									ImGui::PopID();
+								}
+							}
+
+							ImGui::EndTable();
+						}
+						
+						ImGui::Spacing(0, 4);
+						
+						// Button to attach new light (below the table)
+						if (ImGui::Button("Attach New Light to Hash", ImVec2(ImGui::GetContentRegionAvail().x, 0)))
+						{
+							// Get current light fresh to avoid invalid reference
+							auto& current_light_ref = get_current_light();
+							
+							// Create a duplicate of the current light with 0.1 unit offset
+							map_settings::light_override_s new_attached_light = current_light_ref;
+							
+							// If position isn't set, use default from game light
+							if (!new_attached_light._use_pos && selected_vis_light) {
+								new_attached_light.pos = selected_vis_light->m_def_copy.mPosition;
+							}
+
+							new_attached_light.pos.x += 0.1f;
+							new_attached_light.pos.y += 0.1f;
+							new_attached_light.pos.z += 0.1f;
+							new_attached_light._use_pos = true;
+							
+							new_attached_light.comment = "Attached light #" + std::to_string(l.attached_lights.size());
+							
+							l.attached_lights.emplace_back(new_attached_light);
+							sync_override_to_toml(selected_hash);
+							
+							// Rebuild all_lights to get the new entry
+							all_lights.clear();
+							all_lights.push_back({true, 0});
+
+							for (size_t i = 0; i < l.attached_lights.size(); ++i) {
+								all_lights.push_back({false, i});
+							}
+							
+							// Select the newly added light (last entry)
+							current_light_idx = all_lights.size() - 1;
+						}
+						
+						ImGui::Spacing(0, 4);
+						
+						// Show which light is being edited
+						{
+							auto& entry = get_current_light_entry();
+							ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.7f, 0.7f, 0.9f, 1.0f));
+							ImGui::SeparatorText(entry.is_main ? "Editing main light" :
+								shared::utils::va("Editing attached light %zu", entry.attached_index + 1));
+							ImGui::PopStyleColor();
+							ImGui::Spacing(0, 4);
+						}
+
+						// Get current light reference fresh each time to avoid invalidation
+						map_settings::light_override_s& current_light = get_current_light();
+						
+						// Helper to get default value from game light
+						auto get_default_pos = [&]() -> Vector {
+							return selected_vis_light ? selected_vis_light->m_def_copy.mPosition : Vector{};
+						};
+
+						auto get_default_dir = [&]() -> Vector {
+							return selected_vis_light ? selected_vis_light->m_def_copy.mDirection : Vector{};
+						};
+
+						auto get_default_color = [&]() -> Vector {
+							return selected_vis_light ? Vector(selected_vis_light->m_def_copy.mColor) : Vector{1.0f, 1.0f, 1.0f};
+						};
+
+						auto get_default_radius = [&]() -> float {
+							return selected_vis_light ? selected_vis_light->m_def_copy.mRadius : 5.0f;
+						};
+
+						auto get_default_intensity = [&]() -> float {
+							return selected_vis_light ? selected_vis_light->m_def_copy.mIntensity : 5.0f;
+						};
+
+						auto get_default_volumetric_scale = [&]() -> float {
+							return selected_vis_light ? selected_vis_light->m_def_copy.mVolumeScale : 1.0f;
+						};
+
+						auto get_default_outer_cone = [&]() -> float
+						{
+							if (selected_vis_light && selected_vis_light->m_def_copy.mType == game::LT_SPOT) {
+								return selected_vis_light->m_def_copy.mInnerConeAngle;
+							}
+							return 1.5f;
+						};
+
+						auto get_default_inner_cone = [&]() -> float 
+						{
+							if (selected_vis_light && selected_vis_light->m_def_copy.mType == game::LT_SPOT) {
+								return selected_vis_light->m_def_copy.mOuterConeAngle;
+							}
+							return 0.78f;
+						};
+
+						bool was_use_pos = current_light._use_pos;
+						if (ImGui::Checkbox("##Tweak Pos", &current_light._use_pos)) 
+						{
+							// Initialize with default value if enabling for the first time
+							if (current_light._use_pos && !was_use_pos) {
+								current_light.pos = get_default_pos();
+							}
+
 							sync_override_to_toml(selected_hash);
 						} TT("Tweak Pos");
+
 						ImGui::SameLine(0, 6);
-						ImGui::BeginDisabled(!l._use_pos);
-						if (ImGui::DragFloat3("Pos Override", &l.pos.x, 0.025f, 0, 0, "%.2f")) {
+						ImGui::BeginDisabled(!current_light._use_pos);
+						Vector pos_value = current_light._use_pos ? current_light.pos : get_default_pos();
+						if (ImGui::DragFloat3("Pos Override", &pos_value.x, 0.025f, 0, 0, "%.2f"))
+						{
+							current_light.pos = pos_value;
+							current_light._use_pos = true;
 							sync_override_to_toml(selected_hash);
 						}
 						ImGui::EndDisabled();
 
-						if (ImGui::Checkbox("##Tweak Dir", &l._use_dir)) {
+						bool was_use_dir = current_light._use_dir;
+						if (ImGui::Checkbox("##Tweak Dir", &current_light._use_dir)) 
+						{
+							// Initialize with default value if enabling for the first time
+							if (current_light._use_dir && !was_use_dir) {
+								current_light.dir = get_default_dir();
+							}
+
 							sync_override_to_toml(selected_hash);
 						} TT("Tweak Dir");
+
 						ImGui::SameLine(0, 6);
-						ImGui::BeginDisabled(!l._use_dir);
-						if (ImGui::DragFloat3("Dir Override", &l.dir.x, 0.025f, 0, 0, "%.2f")) {
-							l.dir.Normalize();
+						ImGui::BeginDisabled(!current_light._use_dir);
+						Vector dir_value = current_light._use_dir ? current_light.dir : get_default_dir();
+						if (ImGui::DragFloat3("Dir Override", &dir_value.x, 0.025f, 0, 0, "%.2f")) 
+						{
+							current_light.dir = dir_value;
+							current_light.dir.Normalize();
+							current_light._use_dir = true;
 							sync_override_to_toml(selected_hash);
 						}
 						ImGui::EndDisabled();
 
-						if (ImGui::Checkbox("##Tweak Color", &l._use_color)) {
+						bool was_use_color = current_light._use_color;
+						if (ImGui::Checkbox("##Tweak Color", &current_light._use_color)) 
+						{
+							// Initialize with default value if enabling for the first time
+							if (current_light._use_color && !was_use_color) {
+								current_light.color = get_default_color();
+							}
+
 							sync_override_to_toml(selected_hash);
 						} TT("Tweak Color");
+
 						ImGui::SameLine(0, 6);
-						ImGui::BeginDisabled(!l._use_color);
-						if (ImGui::ColorEdit3("Color Override", &l.color.x)) {
+						ImGui::BeginDisabled(!current_light._use_color);
+						Vector color_value = current_light._use_color ? current_light.color : get_default_color();
+						if (ImGui::ColorEdit3("Color Override", &color_value.x)) 
+						{
+							current_light.color = color_value;
+							current_light._use_color = true;
 							sync_override_to_toml(selected_hash);
 						}
 						ImGui::EndDisabled();
 
-						if (ImGui::Checkbox("##Tweak Radius", &l._use_radius)) {
+						bool was_use_radius = current_light._use_radius;
+						if (ImGui::Checkbox("##Tweak Radius", &current_light._use_radius)) 
+						{
+							// Initialize with default value if enabling for the first time
+							if (current_light._use_radius && !was_use_radius) {
+								current_light.radius = get_default_radius();
+							}
+
 							sync_override_to_toml(selected_hash);
 						} TT("Tweak Radius");
+
 						ImGui::SameLine(0, 6);
-						ImGui::BeginDisabled(!l._use_radius);
-						if (ImGui::DragFloat("Radius Override", &l.radius, 0.025f, 0.0f, 0.0f, "%.2f")) {
+						ImGui::BeginDisabled(!current_light._use_radius);
+						float radius_value = current_light._use_radius ? current_light.radius : get_default_radius();
+						if (ImGui::DragFloat("Radius Override", &radius_value, 0.025f, 0.0f, 0.0f, "%.2f"))
+						{
+							current_light.radius = radius_value;
+							current_light._use_radius = true;
 							sync_override_to_toml(selected_hash);
 						}
 						ImGui::EndDisabled();
 
-						if (ImGui::Checkbox("##Tweak Intensity", &l._use_intensity)) {
+						bool was_use_intensity = current_light._use_intensity;
+						if (ImGui::Checkbox("##Tweak Intensity", &current_light._use_intensity)) {
+							// Initialize with default value if enabling for the first time
+							if (current_light._use_intensity && !was_use_intensity) {
+								current_light.intensity = get_default_intensity();
+							}
 							sync_override_to_toml(selected_hash);
 						} TT("Tweak Intensity");
+
 						ImGui::SameLine(0, 6);
-						ImGui::BeginDisabled(!l._use_intensity);
-						if (ImGui::DragFloat("Intensity Override", &l.intensity, 0.025f, 0.0f, 0.0f, "%.2f")) {
+						ImGui::BeginDisabled(!current_light._use_intensity);
+						float intensity_value = current_light._use_intensity ? current_light.intensity : get_default_intensity();
+						if (ImGui::DragFloat("Intensity Override", &intensity_value, 0.025f, 0.0f, 0.0f, "%.2f")) 
+						{
+							current_light.intensity = intensity_value;
+							current_light._use_intensity = true;
 							sync_override_to_toml(selected_hash);
 						}
 						ImGui::EndDisabled();
 
-						if (ImGui::Checkbox("##Tweak VolumetricScale", &l._use_volumetric_scale)) {
+						bool was_use_volumetric_scale = current_light._use_volumetric_scale;
+						if (ImGui::Checkbox("##Tweak VolumetricScale", &current_light._use_volumetric_scale)) 
+						{
+							// Initialize with default value if enabling for the first time
+							if (current_light._use_volumetric_scale && !was_use_volumetric_scale) {
+								current_light.volumetric_scale = get_default_volumetric_scale();
+							}
+
 							sync_override_to_toml(selected_hash);
 						} TT("Tweak VolumetricScale");
+
 						ImGui::SameLine(0, 6);
-						ImGui::BeginDisabled(!l._use_volumetric_scale);
-						if (ImGui::DragFloat("VolumetricScale Override", &l.volumetric_scale, 0.025f, 0.0f, 10.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp)) {
+						ImGui::BeginDisabled(!current_light._use_volumetric_scale);
+						float volumetric_value = current_light._use_volumetric_scale ? current_light.volumetric_scale : get_default_volumetric_scale();
+						if (ImGui::DragFloat("VolumetricScale Override", &volumetric_value, 0.025f, 0.0f, 10.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp)) 
+						{
+							current_light.volumetric_scale = volumetric_value;
+							current_light._use_volumetric_scale = true;
 							sync_override_to_toml(selected_hash);
 						}
 						ImGui::EndDisabled();
 
-						if (ImGui::Checkbox("##Tweak Light Type", &l._use_light_type)) {
+						if (ImGui::Checkbox("##Tweak Light Type", &current_light._use_light_type))
+						{
 							sync_override_to_toml(selected_hash);
 						} TT("Tweak Light Type");
+
 						ImGui::SameLine(0, 6);
-						ImGui::BeginDisabled(!l._use_light_type);
-						if (ImGui::Checkbox("Light Type (False: Sphere -- True: Spot)", &l.light_type)) {
+						ImGui::BeginDisabled(!current_light._use_light_type);
+						if (ImGui::Checkbox("Light Type (False: Sphere -- True: Spot)", &current_light.light_type)) 
+						{
 							sync_override_to_toml(selected_hash);
 						}
 						ImGui::EndDisabled();
 
-						if (ImGui::Checkbox("##Tweak OuterConeAngle", &l._use_outer_cone_angle)) {
+						bool was_use_outer_cone_angle = current_light._use_outer_cone_angle;
+						if (ImGui::Checkbox("##Tweak OuterConeAngle", &current_light._use_outer_cone_angle)) 
+						{
+							// Initialize with default value if enabling for the first time
+							if (current_light._use_outer_cone_angle && !was_use_outer_cone_angle) {
+								current_light.outer_cone_angle = get_default_outer_cone();
+							}
+
 							sync_override_to_toml(selected_hash);
 						} TT("Tweak OuterConeAngle");
+
 						ImGui::SameLine(0, 6);
-						ImGui::BeginDisabled(!l._use_outer_cone_angle);
-						float temp_outer_angle = RAD2DEG(l.outer_cone_angle);
-						if (ImGui::DragFloat("OuterConeAngle Override", &temp_outer_angle, 0.025f, 0.0f, 180.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp)) {
-							l.outer_cone_angle = DEG2RAD(temp_outer_angle);
+						ImGui::BeginDisabled(!current_light._use_outer_cone_angle);
+						float outer_cone_value = current_light._use_outer_cone_angle ? current_light.outer_cone_angle : get_default_outer_cone();
+						float temp_outer_angle = RAD2DEG(outer_cone_value);
+						if (ImGui::DragFloat("OuterConeAngle Override", &temp_outer_angle, 0.025f, 0.0f, 180.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp)) 
+						{
+							current_light.outer_cone_angle = DEG2RAD(temp_outer_angle);
+							current_light._use_outer_cone_angle = true;
 							sync_override_to_toml(selected_hash);
 						}
 						ImGui::EndDisabled();
 
-						if (ImGui::Checkbox("##Tweak InnerConeAngle", &l._use_inner_cone_angle)) {
+						bool was_use_inner_cone_angle = current_light._use_inner_cone_angle;
+						if (ImGui::Checkbox("##Tweak InnerConeAngle", &current_light._use_inner_cone_angle)) 
+						{
+							// Initialize with default value if enabling for the first time
+							if (current_light._use_inner_cone_angle && !was_use_inner_cone_angle) {
+								current_light.inner_cone_angle = get_default_inner_cone();
+							}
+
 							sync_override_to_toml(selected_hash);
 						} TT("Tweak InnerConeAngle");
+
 						ImGui::SameLine(0, 6);
-						ImGui::BeginDisabled(!l._use_inner_cone_angle);
-						float temp_inner_angle = RAD2DEG(l.inner_cone_angle);
+						ImGui::BeginDisabled(!current_light._use_inner_cone_angle);
+						float inner_cone_value = current_light._use_inner_cone_angle ? current_light.inner_cone_angle : get_default_inner_cone();
+						float temp_inner_angle = RAD2DEG(inner_cone_value);
+
 						if (ImGui::DragFloat("InnerConeAngle Override", &temp_inner_angle, 0.025f, 0.0f, 180.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp))
 						{
-							l.inner_cone_angle = DEG2RAD(temp_inner_angle);
+							current_light.inner_cone_angle = DEG2RAD(temp_inner_angle);
+							current_light._use_inner_cone_angle = true;
 							if (temp_inner_angle > temp_outer_angle) {
-								l.outer_cone_angle = DEG2RAD(temp_inner_angle);
+								current_light.outer_cone_angle = DEG2RAD(temp_inner_angle);
 							}
+
 							sync_override_to_toml(selected_hash);
 						}
 						ImGui::EndDisabled();
 
-						//SET_CHILD_WIDGET_WIDTH;
-						if (ImGui::InputText("Comment", &l.comment))
+						
+						// Get reference fresh to avoid invalidation from vector reallocation
+						map_settings::light_override_s& current_light_for_comment = get_current_light();
+
+						ImGui::SetNextItemWidth(306);
+						if (ImGui::InputText("Comment", &current_light_for_comment.comment))
 						{
-							// Sync comment to all TOML files that contain this light
-							for (auto& [toml_file, toml_info] : light_overrides_toml_info)
+							// Sync comment to all TOML files that contain this light (only for main light)
+							if (get_current_light_entry().is_main) 
 							{
-								// Sync to categories
-								for (auto& category : toml_info.categories)
+								for (auto& [toml_file, toml_info] : light_overrides_toml_info)
 								{
-									if (category.overrides.contains(selected_hash)) {
-										category.overrides[selected_hash].comment = l.comment;
+									// Sync to categories
+									for (auto& category : toml_info.categories)
+									{
+										if (category.overrides.contains(selected_hash)) {
+											category.overrides[selected_hash].comment = current_light_for_comment.comment;
+										}
 									}
-								}
-								// Sync to flat overrides
-								if (toml_info.flat_overrides.contains(selected_hash)) {
-									toml_info.flat_overrides[selected_hash].comment = l.comment;
+
+									// Sync to flat overrides
+									if (toml_info.flat_overrides.contains(selected_hash)) {
+										toml_info.flat_overrides[selected_hash].comment = current_light_for_comment.comment;
+									}
 								}
 							}
 						}
-					}
+					} // End if (does_override_exist && !pending_erase)
 				}
 				ImGui::EndDisabled();
 				ImGui::PopID();
@@ -3888,7 +4267,7 @@ namespace gta4
 					ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.360f, 0.360f, 0.360f, 0.275f)); pushed_treenode_color++;
 
 					// TOML file TreeNode with export and add category buttons
-					if (ImGui::TreeNodeEx(toml_file.c_str(), ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_FramePadding))
+					if (ImGui::TreeNodeEx(toml_file.c_str(), ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_FramePadding))
 					{
 						const auto og_fpx = ImGui::GetStyle().FramePadding.x;
 						ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(12, og_fpx - 4.0f));
@@ -4477,6 +4856,38 @@ namespace gta4
 		ImGui::GetBackgroundDrawList()->AddCircle(screen_pos, screen_radius, color, 32, 1.0f);
 	}
 
+	// Calculate text scale based on distance from screen center (closer to center = larger scale)
+	float calculate_text_scale_from_center(const ImVec2& screen_pos, float max_distance = 500.0f, float min_scale = 0.8f, float max_scale = 1.5f)
+	{
+		if (const auto vpscene = game::pViewports; vpscene && vpscene->sceneviewport)
+		{
+			if (shared::globals::d3d_device)
+			{
+				D3DVIEWPORT9 vp;
+				shared::globals::d3d_device->GetViewport(&vp);
+
+				// Calculate screen center
+				const float center_x = vp.Width * 0.5f;
+				const float center_y = vp.Height * 0.5f;
+
+				// Calculate distance from center
+				const float dx = screen_pos.x - center_x;
+				const float dy = screen_pos.y - center_y;
+				const float distance = std::sqrt(dx * dx + dy * dy);
+
+				// Normalize distance (0 = center, 1 = max_distance)
+				const float normalized_dist = std::min(distance / max_distance, 1.0f);
+
+				// Interpolate scale (closer to center = larger scale)
+				const float scale = max_scale - (normalized_dist * (max_scale - min_scale));
+
+				return scale;
+			}
+		}
+
+		return 1.0f; // Default scale if viewport not available
+	}
+
 	ImU32 get_color_for_hash(uint32_t hash)
 	{
 		hash ^= hash >> 17;
@@ -4521,73 +4932,194 @@ namespace gta4
 						{
 							auto msov = map_settings::get_map_settings().light_overrides;
 
-							map_settings::light_override_s* lov = nullptr;
-							if (const auto it = msov.find(l.second.m_hash); it != msov.end()) {
-								lov = &it->second;
+							const map_settings::light_override_s* lov = nullptr;
+							uint64_t base_hash = l.second.m_hash;
+							
+							// For attached lights, extract base hash and get the attached override
+							if (l.second.m_is_attached_light)
+							{
+								const uint64_t attached_index_upper = (l.second.m_hash >> 32);
+								base_hash = l.second.m_hash ^ (attached_index_upper << 32);
+								
+								// Get the attached light override data from the base override
+								if (msov.contains(base_hash))
+								{
+									const auto& override_data = msov.at(base_hash);
+									const size_t attached_index = static_cast<size_t>(attached_index_upper - 1);
+									if (attached_index < override_data.attached_lights.size()) {
+										lov = &override_data.attached_lights[attached_index];
+									}
+								}
+							}
+							else
+							{
+								// Normal light - get override if it exists
+								if (const auto it = msov.find(l.second.m_hash); it != msov.end()) {
+									lov = &it->second;
+								}
 							}
 
 							const Vector& light_pos = remix_lights::get_light_position(l.second.m_def, lov);
 							if (w2s(light_pos, viewport_pos))
 							{
-								bool is_light_hash_stable = im->m_dbg_visualize_api_light_unstable_hashes; // false by default
-								bool is_light_in_vis_list = false;
-
-								if (!im->m_dbg_visualize_api_light_unstable_hashes)
+								// Only add to visualized_api_lights list if NOT an attached light
+								if (!l.second.m_is_attached_light)
 								{
-									for (auto& ign : visualized_api_lights)
+									bool is_light_hash_stable = im->m_dbg_visualize_api_light_unstable_hashes; // false by default
+									bool is_light_in_vis_list = false;
+
+									if (!im->m_dbg_visualize_api_light_unstable_hashes)
+									{
+										for (auto& ign : visualized_api_lights)
+										{
+											if (ign.hash == l.second.m_hash)
+											{
+												is_light_in_vis_list = true;
+												ign.ignored = l.second.m_is_ignored; // ignored state might have changed
+												ign.allowed_filler = l.second.m_is_allowed_filler; // ^
+												ign.m_updateframe++;
+												is_light_hash_stable = ign.m_frames_since_addition > 5u;
+												break;
+											}
+										}
+									}
+
+									if (!is_light_in_vis_list)
+									{
+										visualized_api_lights.emplace_back(
+											visualized_api_light_s{
+												.hash = l.second.m_hash,
+												.pos = l.second.m_def.mPosition,
+												.m_def_copy = l.second.m_def,
+												.ignored = l.second.m_is_ignored,
+												.allowed_filler = l.second.m_is_allowed_filler,
+												.is_filler = l.second.m_is_filler,
+												.m_updateframe = 0u,
+												.m_frames_since_addition = 0u
+											}
+										);
+									}
+								}
+
+								// Draw all lights (both normal and attached) in 3D space
+								bool is_light_hash_stable = false;
+								if (l.second.m_is_attached_light) {
+									is_light_hash_stable = true;
+								}
+								else if (im->m_dbg_visualize_api_light_unstable_hashes) {
+									is_light_hash_stable = true;
+								}
+								else
+								{
+									for (const auto& ign : visualized_api_lights)
 									{
 										if (ign.hash == l.second.m_hash)
 										{
-											is_light_in_vis_list = true;
-											ign.ignored = l.second.m_is_ignored; // ignored state might have changed
-											ign.allowed_filler = l.second.m_is_allowed_filler; // ^
-											ign.m_updateframe++;
 											is_light_hash_stable = ign.m_frames_since_addition > 5u;
 											break;
 										}
 									}
 								}
 
-								if (!is_light_in_vis_list)
-								{
-									visualized_api_lights.emplace_back(
-										visualized_api_light_s{
-											.hash = l.second.m_hash,
-											.pos = l.second.m_def.mPosition,
-											.m_def_copy = l.second.m_def,
-											.ignored = l.second.m_is_ignored,
-											.allowed_filler = l.second.m_is_allowed_filler,
-											.is_filler = l.second.m_is_filler,
-											.m_updateframe = 0u,
-											.m_frames_since_addition = 0u
-										}
-									);
-								}
-
 								if (is_light_hash_stable)
 								{
-									const auto radius = remix_lights::get_light_radius(l.second.m_def, lov) * comp_settings::get()->translate_game_light_radius_scalar.get_as<float>() * 3.7f; //20.0f * (1.0f - exp(-(l.second.m_def.mRadius) / 20.0f)) * comp_settings::get()->translate_game_light_radius_scalar.get_as<float>() * (1.0f + im->m_debug_vector4.y);
+									const auto radius = remix_lights::get_light_radius(l.second.m_def, lov) * comp_settings::get()->translate_game_light_radius_scalar.get_as<float>() * 3.7f;
 									const auto& color = remix_lights::get_light_color(l.second.m_def, lov);
 
 									ImGui::GetBackgroundDrawList()->AddCircleFilled(viewport_pos, radius, ImColor(color.x, color.y, color.z));
 
+									// Get TOML filename for the hash (use base_hash for attached lights)
+									const auto& light_overrides_toml_info = map_settings::get_map_settings().light_overrides_toml_info;
+									std::string toml_filename;
+									uint64_t hash_to_check = l.second.m_is_attached_light ? base_hash : l.second.m_hash;
+									
+									std::vector<std::string> sorted_toml_files;
+									for (const auto& [toml_file, _] : light_overrides_toml_info) {
+										sorted_toml_files.push_back(toml_file);
+									}
+									std::sort(sorted_toml_files.begin(), sorted_toml_files.end());
+									
+									for (const auto& toml_file : sorted_toml_files)
+									{
+										const auto& toml_info = light_overrides_toml_info.at(toml_file);
+										
+										bool found = false;
+										for (const auto& category : toml_info.categories)
+										{
+											if (category.overrides.contains(hash_to_check)) {
+												toml_filename = toml_file;
+												found = true;
+												break;
+											}
+										}
+										
+										if (!found && toml_info.flat_overrides.contains(hash_to_check)) {
+											toml_filename = toml_file;
+											found = true;
+										}
+										
+										if (found) {
+											break;
+										}
+									}
+
+									// Calculate text scale based on distance from screen center
+									const float text_scale = calculate_text_scale_from_center(viewport_pos, 200.0f);
+									
+									// Get the current font and use AddText with explicit font size for scaling
+									ImFont* font = ImGui::GetFont();
+									const float base_font_size = font ? font->FontSize : ImGui::GetFontSize();
+									const float scaled_font_size = base_font_size * text_scale;
+
 									if (l.second.m_is_ignored)
 									{
-										ImGui::GetBackgroundDrawList()->AddText(viewport_pos,
-											ImColor(1.0f, 0.0f, 0.0f, 1.0f), shared::utils::va("    [HASH] %llx\n    ~ IGNORED ~", l.second.m_hash));
+										const char* text = shared::utils::va("    [HASH] %llx\n    ~ IGNORED ~", l.second.m_hash);
+										if (font) {
+											ImGui::GetBackgroundDrawList()->AddText(font, scaled_font_size, viewport_pos,
+												ImColor(1.0f, 0.0f, 0.0f, 1.0f), text);
+										} else {
+											ImGui::GetBackgroundDrawList()->AddText(viewport_pos,
+												ImColor(1.0f, 0.0f, 0.0f, 1.0f), text);
+										}
 									}
 									else if (l.second.m_is_allowed_filler)
 									{
-										ImGui::GetBackgroundDrawList()->AddText(viewport_pos,
-											ImColor(0.1f, 0.8f, 0.1f, 1.0f), shared::utils::va("    [HASH] %llx\n~ ALLOWED FILLER ~%s", l.second.m_hash, lov ? "\n    ~ OVERRIDE ~" : ""));
+										std::string toml_str = toml_filename.empty() ? "" : ("\n    ~ " + toml_filename + " ~");
+										const char* text = shared::utils::va("    [HASH] %llx\n~ ALLOWED FILLER ~%s%s", l.second.m_hash, lov ? "\n    ~ OVERRIDE ~" : "", toml_str.c_str());
+										if (font) {
+											ImGui::GetBackgroundDrawList()->AddText(font, scaled_font_size, viewport_pos,
+												ImColor(0.1f, 0.8f, 0.1f, 1.0f), text);
+										} else {
+											ImGui::GetBackgroundDrawList()->AddText(viewport_pos,
+												ImColor(0.1f, 0.8f, 0.1f, 1.0f), text);
+										}
+									}
+									else if (l.second.m_is_attached_light)
+									{
+										// Use comment instead of hash for attached lights
+										std::string display_text = lov && !lov->comment.empty() ? lov->comment : ("Attached light " + std::to_string((l.second.m_hash >> 32)));
+										std::string toml_str = toml_filename.empty() ? "" : ("\n    ~ " + toml_filename + " ~");
+										const char* text = shared::utils::va("    %s\n    ~ ATTACHED to 0x%llx ~%s", display_text.c_str(), static_cast<unsigned long long>(base_hash), toml_str.c_str());
+										if (font) {
+											ImGui::GetBackgroundDrawList()->AddText(font, scaled_font_size, viewport_pos,
+												ImColor(0.7f, 0.7f, 0.9f, 1.0f), text);
+										} else {
+											ImGui::GetBackgroundDrawList()->AddText(viewport_pos,
+												ImColor(0.7f, 0.7f, 0.9f, 1.0f), text);
+										}
 									}
 									else
 									{
-										ImGui::GetBackgroundDrawList()->AddText(viewport_pos,
-											ImGui::GetColorU32(ImGuiCol_Text), shared::utils::va("    [HASH] %llx %s", l.second.m_hash, lov ? "\n    ~ OVERRIDE ~" : ""));
+										std::string toml_str = toml_filename.empty() ? "" : ("\n    ~ " + toml_filename + " ~");
+										const char* text = shared::utils::va("    [HASH] %llx %s%s", l.second.m_hash, lov ? "\n    ~ OVERRIDE ~" : "", toml_str.c_str());
+										if (font) {
+											ImGui::GetBackgroundDrawList()->AddText(font, scaled_font_size, viewport_pos,
+												ImGui::GetColorU32(ImGuiCol_Text), text);
+										} else {
+											ImGui::GetBackgroundDrawList()->AddText(viewport_pos,
+												ImGui::GetColorU32(ImGuiCol_Text), text);
+										}
 									}
-
-									
 								}
 							}
 						}

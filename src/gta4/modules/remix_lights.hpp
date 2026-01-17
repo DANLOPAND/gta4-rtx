@@ -37,6 +37,7 @@ namespace gta4
 			bool m_is_ignored = false;
 			bool m_is_allowed_filler = false;
 			bool m_is_filler = false;
+			bool m_is_attached_light = false;
 		};
 
 		struct remix_distant_light_def
@@ -59,7 +60,7 @@ namespace gta4
 		static float			get_light_volumetric_scale(const game::CLightSource& def, const map_settings::light_override_s* lov= nullptr );
 		static bool				get_light_type(const game::CLightSource& def, const map_settings::light_override_s* lov = nullptr);
 
-		bool spawn_or_update_remix_sphere_light(remix_light_def& light, bool update = false, bool custom = false);
+		bool spawn_or_update_remix_sphere_light(remix_light_def& light, bool update = false, bool custom = false, const map_settings::light_override_s* custom_lov = nullptr);
 
 		void add_light(const game::CLightSource& def, const uint64_t& hash, bool is_filler = false, bool add_but_do_not_draw = false);
 		void destroy_light(remix_light_def& light);

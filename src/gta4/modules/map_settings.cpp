@@ -204,7 +204,7 @@ namespace gta4
 					try 
 					{
 						toml::basic_value<toml::type_config> marker_config = toml::parse(file_path, toml::spec::v(1, 1, 0));
-						shared::common::log("MapSettings", std::format("> '{}' ...", file_path), shared::common::LOG_TYPE::LOG_TYPE_DEFAULT, false);
+						shared::common::log("MapSettings", std::format("> MARKER '{}' ...", file_path), shared::common::LOG_TYPE::LOG_TYPE_DEFAULT, false);
 
 						if (marker_config.contains("MARKER"))
 						{
@@ -231,7 +231,8 @@ namespace gta4
 
 
 			// ####################
-			// parse 'IGNORE_LIGHTS' and 'ALLOW_LIGHTS' from light_tweaks/ folder
+			// parse 'IGNORE_LIGHTS' / 'ALLOW_LIGHTS' / 'LIGHT_OVERRIDES' from light_tweaks/ folder
+
 			shared::common::log("MapSettings", "Parsing light tweaks from 'rtx_comp/light_tweaks/' folder ...", shared::common::LOG_TYPE::LOG_TYPE_DEFAULT, false);
 			{
 				// Process all light tweak files in alphabetical order (earlier files have higher priority)
@@ -241,15 +242,14 @@ namespace gta4
 					try 
 					{
 						toml::basic_value<toml::type_config> light_config = toml::parse(file_path, toml::spec::v(1, 1, 0));
-						shared::common::log("MapSettings", std::format("> '{}' ...", file_path), shared::common::LOG_TYPE::LOG_TYPE_DEFAULT, false);
+						shared::common::log("MapSettings", std::format("> Light Tweaks '{}' ...", file_path), shared::common::LOG_TYPE::LOG_TYPE_DEFAULT, false);
 						
 						// Extract just the filename from the full path
 						std::filesystem::path path_obj(file_path);
 						std::string filename = path_obj.filename().string();
-						
-						// Initialize TOML info for this file
-						lights_toml_info_s& toml_info = m_map_settings.lights_toml_info[filename];
-						
+
+						lights_toml_info_s& toml_info_allow_ignore = m_map_settings.lights_toml_info[filename];
+
 						// Parse IGNORE_LIGHTS (priority: don't overwrite existing)
 						if (light_config.contains("IGNORE_LIGHTS"))
 						{
@@ -260,7 +260,7 @@ namespace gta4
 								for (const auto& hash : new_lights)
 								{
 									// Store in TOML-specific info
-									toml_info.ignored_lights.insert(hash);
+									toml_info_allow_ignore.ignored_lights.insert(hash);
 									
 									// Add to flat set (only if not already present - higher priority files already added)
 									if (!m_map_settings.ignored_lights.contains(hash)) {
@@ -268,9 +268,6 @@ namespace gta4
 									}
 								}
 							}
-						}
-						else {
-							shared::common::log("MapSettings", "> Couldn't find 'IGNORE_LIGHTS' section. Skipping ...", shared::common::LOG_TYPE::LOG_TYPE_WARN, false);
 						}
 
 						// Parse ALLOW_LIGHTS (priority: don't overwrite existing)
@@ -283,7 +280,7 @@ namespace gta4
 								for (const auto& hash : new_lights)
 								{
 									// Store in TOML-specific info
-									toml_info.allow_lights.insert(hash);
+									toml_info_allow_ignore.allow_lights.insert(hash);
 									
 									// Add to flat set (only if not already present - higher priority files already added)
 									if (!m_map_settings.allow_lights.contains(hash)) {
@@ -292,172 +289,283 @@ namespace gta4
 								}
 							}
 						}
-					}
-					catch (const toml::file_io_error& err) {
-						shared::common::log("MapSettings", std::format("Failed to parse light tweak file '{}': {}", file_path, err.what()), shared::common::LOG_TYPE::LOG_TYPE_ERROR, true);
-					}
-					catch (const toml::syntax_error& err) {
-						shared::common::log("MapSettings", std::format("Syntax error in light tweak file '{}': {}", file_path, err.what()), shared::common::LOG_TYPE::LOG_TYPE_ERROR, true);
-					}
-				}
-			} // end 'IGNORE_LIGHTS' and 'ALLOW_LIGHTS'
 
+						light_overrides_toml_info_s& toml_info_overrides = m_map_settings.light_overrides_toml_info[filename];
 
-			// ####################
-			// parse 'LIGHT_OVERRIDES' from light_tweaks/ folder (with category support)
-			{
-				// Helper function to parse a single override entry
-				auto parse_light_override_entry = [](const toml::value& entry) -> std::pair<uint64_t, light_override_s>
-					{
-						std::uint64_t temp_light_hash = 0u;
-						if (entry.contains("hash")) {
-							temp_light_hash = static_cast<std::uint64_t>(to_uint(entry.at("hash"), 0u));
-						}
-						else
-						{
-							TOML_ERROR("[!] [LIGHT_OVERRIDES] #hash", entry, "LightOverride did not define a hash via 'hash' -> skipping");
-							return {0, {}};
-						}
-
-						std::string temp_comment;
-						if (!entry.comments().empty())
-						{
-							temp_comment = entry.comments().at(0);
-							temp_comment.erase(0, 2); // rem '# '
-						}
-
-						Vector temp_pos;
-						bool   temp_use_pos = false;
-						if (entry.contains("pos"))
-						{
-							if (const auto& pos = entry.at("pos").as_array(); pos.size() == 3)
-							{
-								temp_pos = { to_float(pos[0]), to_float(pos[1]), to_float(pos[2]) };
-								temp_use_pos = true;
-							}
-							else { TOML_ERROR("[!] [LIGHT_OVERRIDES] #pos", entry.at("pos"), "expected a 3D vector but got => %d ", entry.at("pos").as_array().size()); }
-						}
-
-						Vector temp_dir;
-						bool   temp_use_dir = false;
-						if (entry.contains("dir"))
-						{
-							if (const auto& dir = entry.at("dir").as_array(); dir.size() == 3)
-							{
-								temp_dir = { to_float(dir[0]), to_float(dir[1]), to_float(dir[2]) };
-								temp_use_dir = true;
-							}
-							else { TOML_ERROR("[!] [LIGHT_OVERRIDES] #dir", entry.at("dir"), "expected a 3D vector but got => %d ", entry.at("dir").as_array().size()); }
-						}
-
-						Vector temp_color;
-						bool   temp_use_color = false;
-						if (entry.contains("color"))
-						{
-							if (const auto& color = entry.at("color").as_array(); color.size() == 3) 
-							{
-								temp_color = { to_float(color[0]), to_float(color[1]), to_float(color[2]) };
-								temp_use_color = true;
-							}
-							else { TOML_ERROR("[!] [LIGHT_OVERRIDES] #color", entry.at("color"), "expected a 3D vector but got => %d ", entry.at("color").as_array().size()); }
-						}
-
-						float temp_radius = 0;
-						bool  temp_use_radius = false;
-						if (entry.contains("radius")) 
-						{
-							temp_radius = to_float(entry.at("radius"), 0.0f);
-							temp_use_radius = true;
-						}
-
-						float temp_intensity = 0;
-						bool  temp_use_intensity = false;
-						if (entry.contains("intensity"))
-						{
-							temp_intensity = to_float(entry.at("intensity"), 0.0f);
-							temp_use_intensity = true;
-						}
-
-						float temp_outer_cone_angle = 0;
-						bool  temp_use_outer_cone_angle = false;
-						if (entry.contains("outer_cone_angle"))
-						{
-							temp_outer_cone_angle = to_float(entry.at("outer_cone_angle"), 0.0f);
-							temp_use_outer_cone_angle = true;
-						}
-
-						float temp_inner_cone_angle = 0;
-						bool  temp_use_inner_cone_angle = false;
-						if (entry.contains("inner_cone_angle"))
-						{
-							temp_inner_cone_angle = to_float(entry.at("inner_cone_angle"), 0.0f);
-							temp_use_inner_cone_angle = true;
-						}
-
-						float temp_volumetric_scale = 0;
-						bool  temp_use_volumetric_scale = false;
-						if (entry.contains("volumetric_scale"))
-						{
-							temp_volumetric_scale = to_float(entry.at("volumetric_scale"), 0.0f);
-							temp_use_volumetric_scale = true;
-						}
-
-						bool temp_light_type = false;
-						bool temp_use_light_type = false;
-						if (entry.contains("light_type")) 
-						{
-							temp_light_type = to_bool(entry.at("light_type"), false);
-							temp_use_light_type = true;
-						}
-
-						light_override_s override_data =
-						{
-							.pos = std::move(temp_pos),
-							.dir = std::move(temp_dir),
-							.color = std::move(temp_color),
-							.radius = temp_radius,
-							.intensity = temp_intensity,
-							.outer_cone_angle = temp_outer_cone_angle,
-							.inner_cone_angle = temp_inner_cone_angle,
-							.volumetric_scale = temp_volumetric_scale,
-							.light_type = temp_light_type,
-							.comment = temp_comment,
-
-							._use_pos = temp_use_pos,
-							._use_dir = temp_use_dir,
-							._use_color = temp_use_color,
-							._use_radius = temp_use_radius,
-							._use_intensity = temp_use_intensity,
-							._use_outer_cone_angle = temp_use_outer_cone_angle,
-							._use_inner_cone_angle = temp_use_inner_cone_angle,
-							._use_volumetric_scale = temp_use_volumetric_scale,
-							._use_light_type = temp_use_light_type,
-						};
-
-						return {temp_light_hash, std::move(override_data)};
-					};
-
-				// Process all light tweak files in alphabetical order (earlier files have higher priority)
-				const auto light_tweak_files = get_sorted_toml_files("rtx_comp\\light_tweaks");
-				for (const auto& file_path : light_tweak_files)
-				{
-					try 
-					{
-						toml::basic_value<toml::type_config> light_config = toml::parse(file_path, toml::spec::v(1, 1, 0));
-						shared::common::log("MapSettings", std::format("> '{}' ...", file_path), shared::common::LOG_TYPE::LOG_TYPE_DEFAULT, false);
-
-						// Extract just the filename from the full path
-						std::filesystem::path path_obj(file_path);
-						std::string filename = path_obj.filename().string();
-						
-						// Initialize TOML info for this file
-						light_overrides_toml_info_s& toml_info = m_map_settings.light_overrides_toml_info[filename];
-						
 						// Parse LIGHT_OVERRIDES (can be in categories or flat)
 						if (light_config.contains("LIGHT_OVERRIDES"))
 						{
+							auto parse_light_override_entry = [](const toml::value& entry) -> std::pair<uint64_t, light_override_s>
+								{
+									std::uint64_t temp_light_hash = 0u;
+									if (entry.contains("hash")) {
+										temp_light_hash = static_cast<std::uint64_t>(to_uint(entry.at("hash"), 0u));
+									}
+									else
+									{
+										TOML_ERROR("[!] [LIGHT_OVERRIDES] #hash", entry, "LightOverride did not define a hash via 'hash' -> skipping");
+										return { 0, {} };
+									}
+
+									std::string temp_comment;
+									if (!entry.comments().empty())
+									{
+										temp_comment = entry.comments().at(0);
+										temp_comment.erase(0, 2); // rem '# '
+									}
+
+									Vector temp_pos;
+									bool   temp_use_pos = false;
+									if (entry.contains("pos"))
+									{
+										if (const auto& pos = entry.at("pos").as_array(); pos.size() == 3)
+										{
+											temp_pos = { to_float(pos[0]), to_float(pos[1]), to_float(pos[2]) };
+											temp_use_pos = true;
+										}
+										else { TOML_ERROR("[!] [LIGHT_OVERRIDES] #pos", entry.at("pos"), "expected a 3D vector but got => %d ", entry.at("pos").as_array().size()); }
+									}
+
+									Vector temp_dir;
+									bool   temp_use_dir = false;
+									if (entry.contains("dir"))
+									{
+										if (const auto& dir = entry.at("dir").as_array(); dir.size() == 3)
+										{
+											temp_dir = { to_float(dir[0]), to_float(dir[1]), to_float(dir[2]) };
+											temp_use_dir = true;
+										}
+										else { TOML_ERROR("[!] [LIGHT_OVERRIDES] #dir", entry.at("dir"), "expected a 3D vector but got => %d ", entry.at("dir").as_array().size()); }
+									}
+
+									Vector temp_color;
+									bool   temp_use_color = false;
+									if (entry.contains("color"))
+									{
+										if (const auto& color = entry.at("color").as_array(); color.size() == 3)
+										{
+											temp_color = { to_float(color[0]), to_float(color[1]), to_float(color[2]) };
+											temp_use_color = true;
+										}
+										else { TOML_ERROR("[!] [LIGHT_OVERRIDES] #color", entry.at("color"), "expected a 3D vector but got => %d ", entry.at("color").as_array().size()); }
+									}
+
+									float temp_radius = 0;
+									bool  temp_use_radius = false;
+									if (entry.contains("radius"))
+									{
+										temp_radius = to_float(entry.at("radius"), 0.0f);
+										temp_use_radius = true;
+									}
+
+									float temp_intensity = 0;
+									bool  temp_use_intensity = false;
+									if (entry.contains("intensity"))
+									{
+										temp_intensity = to_float(entry.at("intensity"), 0.0f);
+										temp_use_intensity = true;
+									}
+
+									float temp_outer_cone_angle = 0;
+									bool  temp_use_outer_cone_angle = false;
+									if (entry.contains("outer_cone_angle"))
+									{
+										temp_outer_cone_angle = to_float(entry.at("outer_cone_angle"), 0.0f);
+										temp_use_outer_cone_angle = true;
+									}
+
+									float temp_inner_cone_angle = 0;
+									bool  temp_use_inner_cone_angle = false;
+									if (entry.contains("inner_cone_angle"))
+									{
+										temp_inner_cone_angle = to_float(entry.at("inner_cone_angle"), 0.0f);
+										temp_use_inner_cone_angle = true;
+									}
+
+									float temp_volumetric_scale = 0;
+									bool  temp_use_volumetric_scale = false;
+									if (entry.contains("volumetric_scale"))
+									{
+										temp_volumetric_scale = to_float(entry.at("volumetric_scale"), 0.0f);
+										temp_use_volumetric_scale = true;
+									}
+
+									bool temp_light_type = false;
+									bool temp_use_light_type = false;
+									if (entry.contains("light_type"))
+									{
+										temp_light_type = to_bool(entry.at("light_type"), false);
+										temp_use_light_type = true;
+									}
+
+									light_override_s override_data =
+									{
+										.pos = std::move(temp_pos),
+										.dir = std::move(temp_dir),
+										.color = std::move(temp_color),
+										.radius = temp_radius,
+										.intensity = temp_intensity,
+										.outer_cone_angle = temp_outer_cone_angle,
+										.inner_cone_angle = temp_inner_cone_angle,
+										.volumetric_scale = temp_volumetric_scale,
+										.light_type = temp_light_type,
+										.comment = temp_comment,
+										.attached_lights = {},
+
+										._use_pos = temp_use_pos,
+										._use_dir = temp_use_dir,
+										._use_color = temp_use_color,
+										._use_radius = temp_use_radius,
+										._use_intensity = temp_use_intensity,
+										._use_outer_cone_angle = temp_use_outer_cone_angle,
+										._use_inner_cone_angle = temp_use_inner_cone_angle,
+										._use_volumetric_scale = temp_use_volumetric_scale,
+										._use_light_type = temp_use_light_type,
+									};
+
+									// Parse attached lights if present
+									if (entry.contains("attached") && entry.at("attached").is_array())
+									{
+										// Helper function to parse a single attached light override entry (without hash requirement)
+										auto parse_attached_light_entry = [](const toml::value& attached_entry) -> light_override_s
+											{
+												std::string temp_comment;
+												if (!attached_entry.comments().empty())
+												{
+													temp_comment = attached_entry.comments().at(0);
+													temp_comment.erase(0, 2); // rem '# '
+												}
+
+												Vector temp_pos;
+												bool   temp_use_pos = false;
+												if (attached_entry.contains("pos"))
+												{
+													if (const auto& pos = attached_entry.at("pos").as_array(); pos.size() == 3)
+													{
+														temp_pos = { to_float(pos[0]), to_float(pos[1]), to_float(pos[2]) };
+														temp_use_pos = true;
+													}
+													else { TOML_ERROR("[!] [LIGHT_OVERRIDES] #pos", attached_entry.at("pos"), "expected a 3D vector but got => %d ", attached_entry.at("pos").as_array().size()); }
+												}
+
+												Vector temp_dir;
+												bool   temp_use_dir = false;
+												if (attached_entry.contains("dir"))
+												{
+													if (const auto& dir = attached_entry.at("dir").as_array(); dir.size() == 3)
+													{
+														temp_dir = { to_float(dir[0]), to_float(dir[1]), to_float(dir[2]) };
+														temp_use_dir = true;
+													}
+													else { TOML_ERROR("[!] [LIGHT_OVERRIDES] #dir", attached_entry.at("dir"), "expected a 3D vector but got => %d ", attached_entry.at("dir").as_array().size()); }
+												}
+
+												Vector temp_color;
+												bool   temp_use_color = false;
+												if (attached_entry.contains("color"))
+												{
+													if (const auto& color = attached_entry.at("color").as_array(); color.size() == 3)
+													{
+														temp_color = { to_float(color[0]), to_float(color[1]), to_float(color[2]) };
+														temp_use_color = true;
+													}
+													else { TOML_ERROR("[!] [LIGHT_OVERRIDES] #color", attached_entry.at("color"), "expected a 3D vector but got => %d ", attached_entry.at("color").as_array().size()); }
+												}
+
+												float temp_radius = 0;
+												bool  temp_use_radius = false;
+												if (attached_entry.contains("radius"))
+												{
+													temp_radius = to_float(attached_entry.at("radius"), 0.0f);
+													temp_use_radius = true;
+												}
+
+												float temp_intensity = 0;
+												bool  temp_use_intensity = false;
+												if (attached_entry.contains("intensity"))
+												{
+													temp_intensity = to_float(attached_entry.at("intensity"), 0.0f);
+													temp_use_intensity = true;
+												}
+
+												float temp_outer_cone_angle = 0;
+												bool  temp_use_outer_cone_angle = false;
+												if (attached_entry.contains("outer_cone_angle"))
+												{
+													temp_outer_cone_angle = to_float(attached_entry.at("outer_cone_angle"), 0.0f);
+													temp_use_outer_cone_angle = true;
+												}
+
+												float temp_inner_cone_angle = 0;
+												bool  temp_use_inner_cone_angle = false;
+												if (attached_entry.contains("inner_cone_angle"))
+												{
+													temp_inner_cone_angle = to_float(attached_entry.at("inner_cone_angle"), 0.0f);
+													temp_use_inner_cone_angle = true;
+												}
+
+												float temp_volumetric_scale = 0;
+												bool  temp_use_volumetric_scale = false;
+												if (attached_entry.contains("volumetric_scale"))
+												{
+													temp_volumetric_scale = to_float(attached_entry.at("volumetric_scale"), 0.0f);
+													temp_use_volumetric_scale = true;
+												}
+
+												bool temp_light_type = false;
+												bool temp_use_light_type = false;
+												if (attached_entry.contains("light_type"))
+												{
+													temp_light_type = to_bool(attached_entry.at("light_type"), false);
+													temp_use_light_type = true;
+												}
+
+												return light_override_s
+												{
+													.pos = std::move(temp_pos),
+													.dir = std::move(temp_dir),
+													.color = std::move(temp_color),
+													.radius = temp_radius,
+													.intensity = temp_intensity,
+													.outer_cone_angle = temp_outer_cone_angle,
+													.inner_cone_angle = temp_inner_cone_angle,
+													.volumetric_scale = temp_volumetric_scale,
+													.light_type = temp_light_type,
+													.comment = temp_comment,
+													.attached_lights = {},
+
+													._use_pos = temp_use_pos,
+													._use_dir = temp_use_dir,
+													._use_color = temp_use_color,
+													._use_radius = temp_use_radius,
+													._use_intensity = temp_use_intensity,
+													._use_outer_cone_angle = temp_use_outer_cone_angle,
+													._use_inner_cone_angle = temp_use_inner_cone_angle,
+													._use_volumetric_scale = temp_use_volumetric_scale,
+													._use_light_type = temp_use_light_type,
+												};
+											};
+
+										for (const auto& attached_entry : entry.at("attached").as_array())
+										{
+											light_override_s attached_light = parse_attached_light_entry(attached_entry);
+
+											// Only add if it has at least one property set
+											if (attached_light._use_pos || attached_light._use_dir || attached_light._use_color ||
+												attached_light._use_radius || attached_light._use_intensity ||
+												attached_light._use_outer_cone_angle || attached_light._use_inner_cone_angle ||
+												attached_light._use_volumetric_scale || attached_light._use_light_type)
+											{
+												override_data.attached_lights.emplace_back(std::move(attached_light));
+											}
+										}
+									}
+
+									return { temp_light_hash, std::move(override_data) };
+								};
+
 							const auto& lov = light_config.at("LIGHT_OVERRIDES");
-							
+
 							// Process each entry individually - supports mixed format (categories and flat entries)
 							if (lov.is_array() && !lov.as_array().empty())
 							{
@@ -473,19 +581,19 @@ namespace gta4
 										// Category format entry
 										std::string category_name;
 										std::string category_comment_text;
-										
+
 										// Get TOML comment (above the category entry)
 										if (!entry.comments().empty())
 										{
 											category_comment_text = entry.comments().at(0);
 											category_comment_text.erase(0, 2); // rem '# '
 										}
-										
+
 										// Get category name from "category" field
 										if (entry.contains("category") && entry.at("category").is_string()) {
 											category_name = entry.at("category").as_string();
 										}
-										
+
 										// If no category name but we have a comment, use comment as name
 										if (category_name.empty() && !category_comment_text.empty()) {
 											category_name = category_comment_text;
@@ -508,7 +616,7 @@ namespace gta4
 										}
 
 										if (!category_info.overrides.empty()) {
-											toml_info.categories.emplace_back(std::move(category_info));
+											toml_info_overrides.categories.emplace_back(std::move(category_info));
 										}
 									}
 									else if (entry.contains("hash"))
@@ -517,14 +625,11 @@ namespace gta4
 										auto [hash, override_data] = parse_light_override_entry(entry);
 
 										if (hash != 0) {
-											toml_info.flat_overrides[hash] = std::move(override_data);
+											toml_info_overrides.flat_overrides[hash] = std::move(override_data);
 										}
 									}
 								}
 							}
-						}
-						else {
-							shared::common::log("MapSettings", "> Couldn't find 'LIGHT_OVERRIDES' section. Skipping ...", shared::common::LOG_TYPE::LOG_TYPE_WARN, false);
 						}
 					}
 					catch (const toml::file_io_error& err) {
@@ -534,13 +639,13 @@ namespace gta4
 						shared::common::log("MapSettings", std::format("Syntax error in light tweak file '{}': {}", file_path, err.what()), shared::common::LOG_TYPE::LOG_TYPE_ERROR, true);
 					}
 				}
-				
+
 				// After parsing all files, rebuild light_overrides from toml_info based on priority
 				// This will also rebuild ignored/allowed lights (excluding those with overrides)
 				rebuild_light_overrides_from_toml_info();
 
-			} // end 'LIGHT_OVERRIDES'
-			
+			} // end 'IGNORE_LIGHTS' and 'ALLOW_LIGHTS'
+
 			// Rebuild ignored/allowed lights after all parsing is complete
 			// (in case light overrides were parsed after ignored/allowed lights)
 			rebuild_lights_from_toml_info();

@@ -54,13 +54,18 @@ namespace gta4
 	 * @param custom		Is this light custom and not created by the game? 
 	 * @return				True if successfull
 	 */
-	bool remix_lights::spawn_or_update_remix_sphere_light(remix_light_def& light, bool update, bool custom)
+	bool remix_lights::spawn_or_update_remix_sphere_light(remix_light_def& light, bool update, bool custom, const map_settings::light_override_s* custom_lov)
 	{
 		const auto gs = comp_settings::get();
 		auto msov = map_settings::get_map_settings().light_overrides;
 
 		map_settings::light_override_s* lov = nullptr;
-		if (const auto it = msov.find(light.m_hash); it != msov.end()) {
+		if (custom_lov)
+		{
+			lov = const_cast<map_settings::light_override_s*>(custom_lov);
+		}
+		else if (const auto it = msov.find(light.m_hash); it != msov.end())
+		{
 			lov = &it->second;
 		}
 
@@ -206,6 +211,140 @@ namespace gta4
 		{
 			rml->m_updateframe++;
 			gl->iterate_all_game_lights();
+			
+			// Spawn attached lights
+			const auto& light_overrides = map_settings::get_map_settings().light_overrides;
+			
+			for (const auto& [base_hash, override_data] : light_overrides)
+			{
+				const auto& attached_list = override_data.attached_lights;
+				if (attached_list.empty()) {
+					continue;
+				}
+
+				// Get the base light definition from active lights
+				if (const auto base_light_it = rml->m_active_lights.find(base_hash); base_light_it != rml->m_active_lights.end())
+				{
+					const auto& base_light_def = base_light_it->second.m_def;
+					
+					for (size_t i = 0; i < attached_list.size(); ++i)
+					{
+						// Create unique hash for attached light: base_hash XOR (index + 1) in upper 32 bits
+						const uint64_t attached_hash = base_hash ^ (static_cast<uint64_t>(i + 1) << 32);
+						
+						// Check if this attached light already exists
+						if (rml->m_active_lights.contains(attached_hash))
+						{
+							// Update existing attached light
+							auto& attached_light = rml->m_active_lights[attached_hash];
+							attached_light.m_def = base_light_def;
+							attached_light.m_is_attached_light = true;
+							
+							// Apply override from attached light data
+							const auto& attached_override = attached_list[i];
+							if (attached_override._use_pos) {
+								attached_light.m_def.mPosition = attached_override.pos;
+							}
+							if (attached_override._use_dir) {
+								attached_light.m_def.mDirection = attached_override.dir;
+							}
+							if (attached_override._use_color) {
+								attached_light.m_def.mColor = Vector4D(attached_override.color.x, attached_override.color.y, attached_override.color.z, 1.0f);
+							}
+							if (attached_override._use_radius) {
+								attached_light.m_def.mRadius = attached_override.radius;
+							}
+							if (attached_override._use_intensity) {
+								attached_light.m_def.mIntensity = attached_override.intensity;
+							}
+							if (attached_override._use_volumetric_scale) {
+								attached_light.m_def.mVolumeScale = attached_override.volumetric_scale;
+							}
+							if (attached_override._use_light_type) {
+								attached_light.m_def.mType = attached_override.light_type ? game::LT_SPOT : game::LT_POINT;
+							}
+							if (attached_override._use_outer_cone_angle) {
+								attached_light.m_def.mOuterConeAngle = attached_override.outer_cone_angle;
+							}
+							if (attached_override._use_inner_cone_angle) {
+								attached_light.m_def.mInnerConeAngle = attached_override.inner_cone_angle;
+							}
+							
+							// Use translation code by passing the attached override
+							rml->spawn_or_update_remix_sphere_light(attached_light, true, false, &attached_override);
+						}
+						else
+						{
+							// Create new attached light
+							auto& attached_light = rml->m_active_lights[attached_hash];
+							attached_light.m_def = base_light_def;
+							attached_light.m_hash = attached_hash;
+							attached_light.m_light_num = rml->m_active_light_spawn_tracker++;
+							attached_light.m_is_attached_light = true;
+							
+							// Apply override from attached light data
+							const auto& attached_override = attached_list[i];
+							if (attached_override._use_pos) {
+								attached_light.m_def.mPosition = attached_override.pos;
+							}
+							if (attached_override._use_dir) {
+								attached_light.m_def.mDirection = attached_override.dir;
+							}
+							if (attached_override._use_color) {
+								attached_light.m_def.mColor = Vector4D(attached_override.color.x, attached_override.color.y, attached_override.color.z, 1.0f);
+							}
+							if (attached_override._use_radius) {
+								attached_light.m_def.mRadius = attached_override.radius;
+							}
+							if (attached_override._use_intensity) {
+								attached_light.m_def.mIntensity = attached_override.intensity;
+							}
+							if (attached_override._use_volumetric_scale) {
+								attached_light.m_def.mVolumeScale = attached_override.volumetric_scale;
+							}
+							if (attached_override._use_light_type) {
+								attached_light.m_def.mType = attached_override.light_type ? game::LT_SPOT : game::LT_POINT;
+							}
+							if (attached_override._use_outer_cone_angle) {
+								attached_light.m_def.mOuterConeAngle = attached_override.outer_cone_angle;
+							}
+							if (attached_override._use_inner_cone_angle) {
+								attached_light.m_def.mInnerConeAngle = attached_override.inner_cone_angle;
+							}
+							
+							// Use translation code by passing the attached override
+							rml->spawn_or_update_remix_sphere_light(attached_light, false, false, &attached_override);
+						}
+					}
+				}
+			}
+			
+			// Clean up attached lights that no longer exist in map_settings
+			for (auto it = rml->m_active_lights.begin(); it != rml->m_active_lights.end();)
+			{
+				// Check if this is an attached light
+				if (it->second.m_is_attached_light)
+				{
+					// Extract base hash from attached hash (reverse the XOR operation)
+					const uint64_t attached_index_upper = (it->first >> 32);
+					const uint64_t base_hash = it->first ^ (attached_index_upper << 32);
+					
+					if (light_overrides.contains(base_hash))
+					{
+						// This is an attached light, check if it still exists
+						const size_t attached_index = static_cast<size_t>(attached_index_upper - 1);
+						const auto& override_data = light_overrides.at(base_hash);
+						if (attached_index >= override_data.attached_lights.size())
+						{
+							// Attached light was removed, destroy it
+							rml->destroy_light(it->second);
+							it = rml->m_active_lights.erase(it);
+							continue;
+						}
+					}
+				}
+				++it;
+			}
 		}
 
 		rml->draw_all_active_lights();
