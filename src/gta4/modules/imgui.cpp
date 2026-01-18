@@ -937,10 +937,10 @@ namespace gta4
 		if (ImGui::TreeNode("Debug Offset Matrix 3"))
 		{
 			ImGui::Spacing(0, TREENODE_SPACING_INSIDE);
-			ImGui::DragFloat4("##Debug Mtx03 Row0", im->m_debug_mtx02.m[0], 0.01f);
-			ImGui::DragFloat4("##Debug Mtx03 Row1", im->m_debug_mtx02.m[1], 0.01f);
-			ImGui::DragFloat4("##Debug Mtx03 Row2", im->m_debug_mtx02.m[2], 0.01f);
-			ImGui::DragFloat4("##Debug Mtx03 Row3", im->m_debug_mtx02.m[3], 0.01f);
+			ImGui::DragFloat4("##Debug Mtx03 Row0", im->m_debug_mtx03.m[0], 0.01f);
+			ImGui::DragFloat4("##Debug Mtx03 Row1", im->m_debug_mtx03.m[1], 0.01f);
+			ImGui::DragFloat4("##Debug Mtx03 Row2", im->m_debug_mtx03.m[2], 0.01f);
+			ImGui::DragFloat4("##Debug Mtx03 Row3", im->m_debug_mtx03.m[3], 0.01f);
 			ImGui::TreePop();
 		}
 
