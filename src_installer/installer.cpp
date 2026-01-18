@@ -785,8 +785,7 @@ int main()
 			{
 				if (res == IDNO) {
 					fullscreen = false;
-				}
-				else {
+				} else {
 					std::cout << "If you are having trouble with launching the game in fullscreen:\n> Go into 'rtx_comp/game_settings.toml'\n> Set 'manual_game_resolution_enabled' to 'true'\n> Set your desired resolution via 'manual_game_resolution'\n\n";
 				}
 			}
@@ -794,6 +793,25 @@ int main()
 			// steam launch args warning
 			MessageBoxA(nullptr, "Make sure to remove ALL launch arguments from Steam properties for GTA IV!\n", "IMPORTANT", MB_OK | MB_ICONWARNING);
 		}
+
+		// backup some files
+
+		if (MoveFileExA(
+			(game_dir + "\\rtx_comp\\comp_settings.toml").c_str(),
+			(game_dir + "\\rtx_comp\\comp_settings.toml.bak").c_str(),
+			MOVEFILE_REPLACE_EXISTING))
+		{
+			std::cout << "Renamed 'comp_settings.toml' to 'comp_settings.toml.bak'\n";
+		}
+		Sleep(25);
+
+		if (MoveFileExA(
+			(game_dir + "\\rtx.conf").c_str(),
+			(game_dir + "\\rtx.conf.bak").c_str(), MOVEFILE_REPLACE_EXISTING))
+		{
+			std::cout << "Renamed 'rtx.conf' to 'rtx.conf.bak'\n";
+		}
+		Sleep(25);
 
 		// extract comp files
 
@@ -1106,7 +1124,11 @@ int main()
 	}
 
 	log_green(true);
-	std::cout << "\nDone! - If you run into issues, please create an issue on the GitHub repository.\n> Please include the external console log when the game starts\n> The log files from 'rtx-remix/logs'\n> A short description and anything else that might help to identify the issue.\n";
+	std::cout << 
+		"\nDone! - If you run into issues, visit: https://github.com/xoxor4d/gta4-rtx/wiki/Troubleshooting---Guides or create an issue on the GitHub repository.\n"
+		"> Please include the external console log (rtx_comp/logfile.txt)\n"
+		"> The log files from 'rtx-remix/logs'\n"
+		"> A short description and anything else that might help to identify the issue.\n";
 	log_default();
 
 	MessageBoxA(nullptr, "Installation complete!\nYou can now launch GTA IV.", "Success", MB_ICONINFORMATION);
