@@ -377,7 +377,7 @@ namespace shared::common::toml_ext
 			return "";
 		}
 
-		std::string toml_str = ", attached = [";
+		std::string toml_str = ", attached = [\n";
 		bool first_attached = true;
 		for (const auto& attached_light : attached_lights)
 		{
@@ -580,8 +580,10 @@ namespace shared::common::toml_ext
 					continue;
 				}
 
+				toml_str += "\n";
+
 				if (!cat.category_comment.empty()) {
-					toml_str += "\n    # " + cat.category_comment + "\n";
+					toml_str += "    # " + cat.category_comment + "\n";
 				}
 
 				toml_str += "    { category = \"" + cat.category_name + "\", overrides = [\n";

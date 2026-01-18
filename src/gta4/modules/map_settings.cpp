@@ -599,6 +599,12 @@ namespace gta4
 											category_name = category_comment_text;
 										}
 
+										if (category_name.empty())
+										{
+											category_name = std::to_string(rand());
+											TOML_ERROR("Overrides", entry.at("overrides"), "Category with no name and no comment as fallback - using random number");
+										}
+
 										light_override_category_info_s category_info;
 										category_info.category_name = category_name;
 										category_info.category_comment = category_comment_text;

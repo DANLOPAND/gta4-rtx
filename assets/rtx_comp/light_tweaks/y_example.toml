@@ -1,0 +1,13 @@
+LIGHT_OVERRIDES = [
+
+    { category = "broker_safehouse", overrides = [
+        # day window left
+        { hash = 0x28B1B6E6, pos = [895.82, -493.93, 20.87], color = [0.88, 0.82, 0.44], radius = 2.98, intensity = 60.00, attached = [
+            # Attached light #0
+            { pos = [895.82, -493.64, 19.50], color = [0.88, 0.82, 0.44], radius = 0.78, intensity = 27.12 },
+
+            # Attached light #1
+            { pos = [895.89, -494.35, 19.52], color = [0.88, 0.82, 0.44], radius = 2.01, intensity = 20.19 }
+        ]},
+    ]},
+]

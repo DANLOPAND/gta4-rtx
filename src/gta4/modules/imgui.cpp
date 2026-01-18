@@ -2511,10 +2511,11 @@ namespace gta4
 	{
 		const auto& im = imgui::get();
 		const auto& gs = comp_settings::get();
+		auto& ms = map_settings::get_map_settings();
 
-		auto& ignored_lights = map_settings::get_map_settings().ignored_lights;
-		auto& allowed_lights = map_settings::get_map_settings().allow_lights;
-		auto& lights_toml_info = map_settings::get_map_settings().lights_toml_info;
+		auto& ignored_lights = ms.ignored_lights;
+		auto& allowed_lights = ms.allow_lights;
+		auto& lights_toml_info = ms.lights_toml_info;
 
 		ImGui::Spacing(0, 4);
 		reload_mapsettings_button_with_popup("Light-Tweaks");
@@ -2525,6 +2526,8 @@ namespace gta4
 		ImGui::Style_BoldOrangeTextPop();
 
 		ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f, 0);
+		ImGui::Checkbox("##in_view_only", &im->m_vis_api_lights_show_only_in_view); TT("Visualize only in view");
+		ImGui::SameLine();
 		ImGui::BeginDisabled(!im->m_dbg_visualize_api_light_hashes);
 		{
 			ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - ImGui::CalcTextSize("  Draw Distance      ").x);
@@ -2559,30 +2562,7 @@ namespace gta4
 				}
 
 				ImGui::Spacing(0.0f, 8.0f);
-
 				ImGui::BeginDisabled(!im->m_dbg_visualize_api_light_hashes);
-
-				// Helper function to find which TOML file contains an ignored hash (returns highest priority)
-				auto find_toml_file_for_ignored_hash = [&lights_toml_info](uint64_t hash) -> std::string
-				{
-					std::vector<std::string> sorted_toml_files;
-					for (const auto& [toml_file, _] : lights_toml_info) {
-						sorted_toml_files.push_back(toml_file);
-					}
-
-					std::sort(sorted_toml_files.begin(), sorted_toml_files.end());
-					
-					for (const auto& toml_file : sorted_toml_files) 
-					{
-						const auto& toml_info = lights_toml_info[toml_file];
-
-						if (toml_info.ignored_lights.contains(hash)) {
-							return toml_file;
-						}
-					}
-
-					return "";
-				};
 
 				static ImGuiTextFilter ignore_filter;
 				if (ImGui::BeginListBox("##ignore_lights", ImVec2(ImGui::GetContentRegionAvail().x, 140)))
@@ -2602,7 +2582,7 @@ namespace gta4
 							std::snprintf(hash_str, sizeof(hash_str), "%llx", static_cast<unsigned long long>(light.hash));
 							
 							// Get TOML filename for this hash
-							std::string toml_filename = find_toml_file_for_ignored_hash(light.hash);
+							std::string toml_filename = ms.find_highest_priority_ignored_hash_in_toml(light.hash);
 							
 							// Check if hash is in any TOML file (not just the flat set, since overrides exclude it)
 							bool hash_in_any_toml = !toml_filename.empty();
@@ -2630,14 +2610,8 @@ namespace gta4
 									{
 										if (!lights_toml_info.empty())
 										{
-											std::vector<std::string> sorted_toml_files;
-											for (const auto& [toml_file, _] : lights_toml_info) {
-												sorted_toml_files.push_back(toml_file);
-											}
-
-											std::sort(sorted_toml_files.begin(), sorted_toml_files.end());
-											
-											if (!sorted_toml_files.empty()) 
+											if (auto sorted_toml_files = ms.get_sorted_keys(lights_toml_info); 
+												!sorted_toml_files.empty())
 											{
 												lights_toml_info[sorted_toml_files[0]].ignored_lights.insert(light.hash);
 												map_settings::rebuild_lights_from_toml_info();
@@ -2647,7 +2621,7 @@ namespace gta4
 									else
 									{
 										// Remove from highest priority TOML file
-										std::string existing_toml = find_toml_file_for_ignored_hash(light.hash);
+										std::string existing_toml = ms.find_highest_priority_ignored_hash_in_toml(light.hash);
 										if (!existing_toml.empty())
 										{
 											lights_toml_info[existing_toml].ignored_lights.erase(light.hash);
@@ -2666,15 +2640,7 @@ namespace gta4
 							// Context menu - pop style colors before opening
 							if (ImGui::BeginPopupContextItem())
 							{
-								// Show TOML files as sub-menus
-								std::vector<std::string> sorted_toml_files;
-								for (const auto& [toml_file, _] : lights_toml_info) {
-									sorted_toml_files.push_back(toml_file);
-								}
-
-								std::sort(sorted_toml_files.begin(), sorted_toml_files.end());
-
-								for (const auto& toml_file : sorted_toml_files)
+								for (const auto& toml_file : ms.get_sorted_keys(ms.lights_toml_info))
 								{
 									auto& toml_info = lights_toml_info[toml_file];
 									const bool hash_in_this_toml = toml_info.ignored_lights.contains(light.hash);
@@ -2714,8 +2680,8 @@ namespace gta4
 
 									if (ImGui::MenuItem("Remove from all TOML files"))
 									{
-										for (auto& [toml_file, toml_info] : lights_toml_info) {
-											toml_info.ignored_lights.erase(light.hash);
+										for (auto& key : lights_toml_info | std::views::values) {
+											key.ignored_lights.erase(light.hash);
 										}
 
 										map_settings::rebuild_lights_from_toml_info();
@@ -2809,28 +2775,6 @@ namespace gta4
 
 					//if (gs->translate_game_lights_ignore_filler_lights.get_as<bool>())
 					{
-						// Helper function to find which TOML file contains an allowed hash (returns highest priority)
-						auto find_toml_file_for_allowed_hash = [&lights_toml_info](uint64_t hash) -> std::string
-						{
-							std::vector<std::string> sorted_toml_files;
-							for (const auto& [toml_file, _] : lights_toml_info) {
-								sorted_toml_files.push_back(toml_file);
-							}
-
-							std::sort(sorted_toml_files.begin(), sorted_toml_files.end());
-							
-							for (const auto& toml_file : sorted_toml_files) 
-							{
-								const auto& toml_info = lights_toml_info[toml_file];
-
-								if (toml_info.allow_lights.contains(hash)) {
-									return toml_file;
-								}
-							}
-
-							return "";
-						};
-
 						static ImGuiTextFilter filter_allow_lights;
 						if (ImGui::BeginListBox("##allow_lights", ImVec2(ImGui::GetContentRegionAvail().x, 140)))
 						{
@@ -2845,7 +2789,7 @@ namespace gta4
 									std::snprintf(hash_str, sizeof(hash_str), "%llx", static_cast<unsigned long long>(light.hash));
 									
 									// Get TOML filename for this hash
-									std::string toml_filename = find_toml_file_for_allowed_hash(light.hash);
+									std::string toml_filename = ms.find_highest_priority_allowed_hash_in_toml(light.hash);
 									
 									// Check if hash is in any TOML file
 									bool hash_in_any_toml = !toml_filename.empty();
@@ -2873,14 +2817,8 @@ namespace gta4
 											{
 												if (!lights_toml_info.empty())
 												{
-													std::vector<std::string> sorted_toml_files;
-													for (const auto& [toml_file, _] : lights_toml_info) {
-														sorted_toml_files.push_back(toml_file);
-													}
-
-													std::sort(sorted_toml_files.begin(), sorted_toml_files.end());
-													
-													if (!sorted_toml_files.empty()) 
+													if (auto sorted_toml_files = ms.get_sorted_keys(ms.lights_toml_info); 
+														!sorted_toml_files.empty())
 													{
 														lights_toml_info[sorted_toml_files[0]].allow_lights.insert(light.hash);
 														map_settings::rebuild_lights_from_toml_info();
@@ -2890,7 +2828,7 @@ namespace gta4
 											else
 											{
 												// Remove from highest priority TOML file
-												std::string existing_toml = find_toml_file_for_allowed_hash(light.hash);
+												std::string existing_toml = ms.find_highest_priority_allowed_hash_in_toml(light.hash);
 												if (!existing_toml.empty())
 												{
 													lights_toml_info[existing_toml].allow_lights.erase(light.hash);
@@ -2909,15 +2847,7 @@ namespace gta4
 									// Context menu - pop style colors before opening
 									if (ImGui::BeginPopupContextItem())
 									{
-										// Show TOML files as sub-menus
-										std::vector<std::string> sorted_toml_files;
-										for (const auto& [toml_file, _] : lights_toml_info) {
-											sorted_toml_files.push_back(toml_file);
-										}
-
-										std::sort(sorted_toml_files.begin(), sorted_toml_files.end());
-
-										for (const auto& toml_file : sorted_toml_files)
+										for (const auto& toml_file : ms.get_sorted_keys(ms.lights_toml_info))
 										{
 											auto& toml_info = lights_toml_info[toml_file];
 											const bool hash_in_this_toml = toml_info.allow_lights.contains(light.hash);
@@ -3020,104 +2950,52 @@ namespace gta4
 				auto& light_overrides_flat = map_settings::get_map_settings().light_overrides;
 				auto& light_overrides_toml_info = map_settings::get_map_settings().light_overrides_toml_info;
 
-				// Helper function to find the highest priority TOML file that contains a hash
-				auto find_highest_priority_toml_for_hash = [&light_overrides_toml_info](uint64_t hash) -> map_settings::light_overrides_toml_info_s*
-				{
-					// Get sorted TOML filenames (by priority - alphabetical order)
-					std::vector<std::string> sorted_toml_files;
-					for (const auto& [toml_file, _] : light_overrides_toml_info) {
-						sorted_toml_files.push_back(toml_file);
-					}
 
-					std::sort(sorted_toml_files.begin(), sorted_toml_files.end());
-					
-					// Find the first (highest priority) TOML file that contains this hash
-					for (const auto& toml_file : sorted_toml_files) 
+				using toml_lookup_result_t = std::pair<std::string, map_settings::light_overrides_toml_info_s*>;
+				auto find_highest_priority_toml_for_hash = [&ms, &light_overrides_toml_info](uint64_t hash) -> toml_lookup_result_t
 					{
-						auto& toml_info = light_overrides_toml_info[toml_file];
-						
-						// Check if it's in a category
-						for (auto& category : toml_info.categories) 
+						for (const auto& toml_file : ms.get_sorted_keys(light_overrides_toml_info))
 						{
-							if (category.overrides.contains(hash)) {
-								return &toml_info;
+							auto& toml_info = light_overrides_toml_info[toml_file];
+							for (auto& category : toml_info.categories)
+							{
+								if (category.overrides.contains(hash)) {
+									return { toml_file, &toml_info };
+								}
+							}
+
+							if (toml_info.flat_overrides.contains(hash)) {
+								return { toml_file, &toml_info };
 							}
 						}
-						
-						// Check flat overrides
-						if (toml_info.flat_overrides.contains(hash)) {
-							return &toml_info;
-						}
-					}
-					
-					return nullptr;
-				};
 
-				// Helper function to get TOML filename for a hash (returns highest priority)
-				auto get_toml_filename_for_hash = [&light_overrides_toml_info](uint64_t hash) -> std::string
-				{
-					// Get sorted TOML filenames (by priority - alphabetical order)
-					std::vector<std::string> sorted_toml_files;
-					for (const auto& [toml_file, _] : light_overrides_toml_info) {
-						sorted_toml_files.push_back(toml_file);
-					}
-
-					std::sort(sorted_toml_files.begin(), sorted_toml_files.end());
-					
-					// Find the first (highest priority) TOML file that contains this hash
-					for (const auto& toml_file : sorted_toml_files) 
-					{
-						const auto& toml_info = light_overrides_toml_info[toml_file];
-						
-						// Check if it's in a category
-						for (const auto& category : toml_info.categories) 
-						{
-							if (category.overrides.contains(hash)) {
-								return toml_file;
-							}
-						}
-						
-						// Check flat overrides
-						if (toml_info.flat_overrides.contains(hash)) {
-							return toml_file;
-						}
-					}
-					
-					return "";
-				};
+						return { "", nullptr };
+					};
 
 				// Helper function to find override data from any TOML file (searches all files, returns first found)
-				auto find_override_data_in_any_toml = [&light_overrides_toml_info](uint64_t hash) -> std::optional<map_settings::light_override_s>
-				{
-					// Get sorted TOML filenames (by priority - alphabetical order)
-					std::vector<std::string> sorted_toml_files;
-					for (const auto& [toml_file, _] : light_overrides_toml_info) {
-						sorted_toml_files.push_back(toml_file);
-					}
-
-					std::sort(sorted_toml_files.begin(), sorted_toml_files.end());
-					
-					// Search all TOML files for this hash (highest priority first)
-					for (const auto& toml_file : sorted_toml_files)
+				auto find_override_data_in_any_toml = [&ms, &light_overrides_toml_info](uint64_t hash) -> std::optional<map_settings::light_override_s>
 					{
-						const auto& toml_info = light_overrides_toml_info[toml_file];
-						
-						// Check if it's in a category
-						for (const auto& category : toml_info.categories)
+						// Search all TOML files for this hash (highest priority first)
+						for (const auto& toml_file : ms.get_sorted_keys(ms.light_overrides_toml_info))
 						{
-							if (category.overrides.contains(hash)) {
-								return category.overrides.at(hash);
+							const auto& toml_info = light_overrides_toml_info[toml_file];
+							
+							// Check if it's in a category
+							for (const auto& category : toml_info.categories)
+							{
+								if (category.overrides.contains(hash)) {
+									return category.overrides.at(hash);
+								}
+							}
+							
+							// Check flat overrides
+							if (toml_info.flat_overrides.contains(hash)) {
+								return toml_info.flat_overrides.at(hash);
 							}
 						}
 						
-						// Check flat overrides
-						if (toml_info.flat_overrides.contains(hash)) {
-							return toml_info.flat_overrides.at(hash);
-						}
-					}
-					
-					return std::nullopt;
-				};
+						return std::nullopt;
+					};
 
 				// Helper function to find which TOML file contains a hash (returns filename, empty if not found)
 				auto find_toml_file_containing_hash = [&light_overrides_toml_info](uint64_t hash) -> std::string
@@ -3227,7 +3105,7 @@ namespace gta4
 							} 
 							// Override exists but not in a category, get TOML filename directly
 							else if (has_override) {
-								toml_filename = get_toml_filename_for_hash(vislight.hash);
+								toml_filename = find_highest_priority_toml_for_hash(vislight.hash).first;
 							}
 
 							// only add lights that are alive for more than 5 frames
@@ -3296,7 +3174,7 @@ namespace gta4
 										if (ImGui::MenuItem("Remove Override"))
 										{
 											// Remove from highest priority TOML file only
-											auto* toml_info_ptr = find_highest_priority_toml_for_hash(vislight.hash);
+											auto* toml_info_ptr = find_highest_priority_toml_for_hash(vislight.hash).second;
 											if (toml_info_ptr)
 											{
 												// Remove from categories
@@ -3665,7 +3543,7 @@ namespace gta4
 						if (ImGui::Button("Remove Override", ImVec2(ImGui::GetContentRegionAvail().x * 0.6f, 0))) 
 						{
 							// Remove from highest priority TOML file only
-							auto* toml_info_ptr = find_highest_priority_toml_for_hash(selected_hash);
+							auto* toml_info_ptr = find_highest_priority_toml_for_hash(selected_hash).second;
 							if (toml_info_ptr)
 							{
 								// Remove from categories
@@ -3712,26 +3590,18 @@ namespace gta4
 						ImGui::Spacing(0, 12);
 
 						// Helper lambda to sync changes from flat map to highest priority TOML file
-						auto sync_override_to_toml = [&light_overrides_flat, &light_overrides_toml_info](uint64_t hash)
+						auto sync_override_to_toml = [&ms, &light_overrides_flat, &light_overrides_toml_info](uint64_t hash)
 							{
 								if (!light_overrides_flat.contains(hash)) {
 									return;
 								}
 							
 								const auto& override_data = light_overrides_flat[hash];
-								
-								// Find highest priority TOML file that contains this hash
-								std::vector<std::string> sorted_toml_files;
-								for (const auto& [toml_file, _] : light_overrides_toml_info) {
-									sorted_toml_files.push_back(toml_file);
-								}
-
-								std::sort(sorted_toml_files.begin(), sorted_toml_files.end());
-								
+								auto sorted_toml_files = ms.get_sorted_keys(ms.light_overrides_toml_info);
 								bool found_anywhere = false;
 								
 								// Update in the first (highest priority) TOML file that contains this hash
-								for (const auto& toml_file : sorted_toml_files) 
+								for (const auto& toml_file : sorted_toml_files)
 								{
 									auto& toml_info = light_overrides_toml_info[toml_file];
 									
@@ -3749,7 +3619,8 @@ namespace gta4
 									}
 									
 									// If not in a category, check flat overrides
-									if (!found_in_category && toml_info.flat_overrides.contains(hash)) {
+									if (!found_in_category && toml_info.flat_overrides.contains(hash))
+									{
 										toml_info.flat_overrides[hash] = override_data;
 										found_anywhere = true;
 									}
@@ -3765,15 +3636,13 @@ namespace gta4
 								if (!found_anywhere && !sorted_toml_files.empty())
 								{
 									// Check if override has any properties or attached lights - if so, save it
-									const bool has_properties = override_data._use_pos || override_data._use_dir || 
-										override_data._use_color || override_data._use_radius || override_data._use_intensity ||
-										override_data._use_outer_cone_angle || override_data._use_inner_cone_angle ||
-										override_data._use_volumetric_scale || override_data._use_light_type;
-									const bool has_attached_lights = !override_data.attached_lights.empty();
-									
-									if (has_properties || has_attached_lights)
-									{
-										// Add to highest priority TOML file's flat_overrides
+									const bool has_properties = 
+										override_data._use_pos				|| override_data._use_dir				|| override_data._use_color || 
+										override_data._use_radius			|| override_data._use_intensity			|| override_data._use_outer_cone_angle || 
+										override_data._use_inner_cone_angle ||	override_data._use_volumetric_scale || override_data._use_light_type;
+
+									// Add to highest priority TOML file's flat_overrides
+									if (has_properties || !override_data.attached_lights.empty()) {
 										light_overrides_toml_info[sorted_toml_files[0]].flat_overrides[hash] = override_data;
 									}
 								}
@@ -3819,14 +3688,14 @@ namespace gta4
 							auto& entry = get_current_light_entry();
 							if (entry.is_main) {
 								return l;
-							} else {
-								return l.attached_lights[entry.attached_index];
-							}
+							} 
+
+							return l.attached_lights[entry.attached_index];
 						};
 						
 						// List of all lights for this hash
 						ImGui::SeparatorText(shared::utils::va("Lights for hash [0x%llx]  -  Select Light from List to Edit", static_cast<unsigned long long>(selected_hash)));
-						
+
 						/*static float dbgfloat01 = 1.0f, dbgfloat02 = 0.0f, dbgfloat03 = 0.0f, dbgfloat04 = 0.0f;
 						ImGui::Begin("DevSettings");
 						ImGui::DragFloat("DevFloat1", &dbgfloat01, 0.005f);
@@ -4247,16 +4116,8 @@ namespace gta4
 				static uint64_t selected_hash_for_categories = 0u;
 				selected_hash_for_categories = selected_hash; // Sync with the list selection
 
-				// Get sorted TOML filenames (by priority - alphabetical order)
-				std::vector<std::string> sorted_toml_files;
-				for (const auto& [toml_file, _] : light_overrides_toml_info) {
-					sorted_toml_files.push_back(toml_file);
-				}
-
-				std::sort(sorted_toml_files.begin(), sorted_toml_files.end());
-
 				// Show TOML files as TreeNodes
-				for (const auto& toml_file : sorted_toml_files)
+				for (const auto& toml_file : ms.get_sorted_keys(ms.light_overrides_toml_info))
 				{
 					auto& toml_info = light_overrides_toml_info[toml_file];
 					
@@ -4908,11 +4769,12 @@ namespace gta4
 
 	void imgui::draw_debug()
 	{
-		static auto im = imgui::get();
+		const auto im = imgui::get();
 		
 		if (m_dbg_visualize_api_light_hashes)
 		{
-			static auto rml = remix_lights::get();
+			const auto rml = remix_lights::get();
+			auto ms = map_settings::get_map_settings();
 
 			const auto vp = game::pViewports;
 			if (vp->sceneviewport)
@@ -4930,7 +4792,7 @@ namespace gta4
 					{
 						if (fabs(cam_org.DistToSqr(l.second.m_def.mPosition) < draw_dist * draw_dist))
 						{
-							auto msov = map_settings::get_map_settings().light_overrides;
+							auto msov = ms.light_overrides;
 
 							const map_settings::light_override_s* lov = nullptr;
 							uint64_t base_hash = l.second.m_hash;
@@ -4960,7 +4822,10 @@ namespace gta4
 							}
 
 							const Vector& light_pos = remix_lights::get_light_position(l.second.m_def, lov);
-							if (w2s(light_pos, viewport_pos))
+							bool in_view = w2s(light_pos, viewport_pos);
+
+							// we usually want to also add lights to the list that are not in view
+							if (!im->m_vis_api_lights_show_only_in_view || in_view)
 							{
 								// Only add to visualized_api_lights list if NOT an attached light
 								if (!l.second.m_is_attached_light)
@@ -4987,7 +4852,8 @@ namespace gta4
 									if (!is_light_in_vis_list)
 									{
 										visualized_api_lights.emplace_back(
-											visualized_api_light_s{
+											visualized_api_light_s
+											{
 												.hash = l.second.m_hash,
 												.pos = l.second.m_def.mPosition,
 												.m_def_copy = l.second.m_def,
@@ -5001,123 +4867,121 @@ namespace gta4
 									}
 								}
 
-								// Draw all lights (both normal and attached) in 3D space
-								bool is_light_hash_stable = false;
-								if (l.second.m_is_attached_light) {
-									is_light_hash_stable = true;
-								}
-								else if (im->m_dbg_visualize_api_light_unstable_hashes) {
-									is_light_hash_stable = true;
-								}
-								else
+								// only draw light debug info when the light is in view
+								if (in_view)
 								{
-									for (const auto& ign : visualized_api_lights)
-									{
-										if (ign.hash == l.second.m_hash)
-										{
-											is_light_hash_stable = ign.m_frames_since_addition > 5u;
-											break;
-										}
-									}
-								}
+									// Draw all lights (both normal and attached) in 3D space
+									bool is_light_hash_stable = false;
 
-								if (is_light_hash_stable)
-								{
-									const auto radius = remix_lights::get_light_radius(l.second.m_def, lov) * comp_settings::get()->translate_game_light_radius_scalar.get_as<float>() * 3.7f;
-									const auto& color = remix_lights::get_light_color(l.second.m_def, lov);
-
-									ImGui::GetBackgroundDrawList()->AddCircleFilled(viewport_pos, radius, ImColor(color.x, color.y, color.z));
-
-									// Get TOML filename for the hash (use base_hash for attached lights)
-									const auto& light_overrides_toml_info = map_settings::get_map_settings().light_overrides_toml_info;
-									std::string toml_filename;
-									uint64_t hash_to_check = l.second.m_is_attached_light ? base_hash : l.second.m_hash;
-									
-									std::vector<std::string> sorted_toml_files;
-									for (const auto& [toml_file, _] : light_overrides_toml_info) {
-										sorted_toml_files.push_back(toml_file);
+									if (l.second.m_is_attached_light) {
+										is_light_hash_stable = true;
 									}
-									std::sort(sorted_toml_files.begin(), sorted_toml_files.end());
-									
-									for (const auto& toml_file : sorted_toml_files)
-									{
-										const auto& toml_info = light_overrides_toml_info.at(toml_file);
-										
-										bool found = false;
-										for (const auto& category : toml_info.categories)
-										{
-											if (category.overrides.contains(hash_to_check)) {
-												toml_filename = toml_file;
-												found = true;
-												break;
-											}
-										}
-										
-										if (!found && toml_info.flat_overrides.contains(hash_to_check)) {
-											toml_filename = toml_file;
-											found = true;
-										}
-										
-										if (found) {
-											break;
-										}
-									}
-
-									// Calculate text scale based on distance from screen center
-									const float text_scale = calculate_text_scale_from_center(viewport_pos, 200.0f);
-									
-									// Get the current font and use AddText with explicit font size for scaling
-									ImFont* font = ImGui::GetFont();
-									const float base_font_size = font ? font->FontSize : ImGui::GetFontSize();
-									const float scaled_font_size = base_font_size * text_scale;
-
-									if (l.second.m_is_ignored)
-									{
-										const char* text = shared::utils::va("    [HASH] %llx\n    ~ IGNORED ~", l.second.m_hash);
-										if (font) {
-											ImGui::GetBackgroundDrawList()->AddText(font, scaled_font_size, viewport_pos,
-												ImColor(1.0f, 0.0f, 0.0f, 1.0f), text);
-										} else {
-											ImGui::GetBackgroundDrawList()->AddText(viewport_pos,
-												ImColor(1.0f, 0.0f, 0.0f, 1.0f), text);
-										}
-									}
-									else if (l.second.m_is_allowed_filler)
-									{
-										std::string toml_str = toml_filename.empty() ? "" : ("\n    ~ " + toml_filename + " ~");
-										const char* text = shared::utils::va("    [HASH] %llx\n~ ALLOWED FILLER ~%s%s", l.second.m_hash, lov ? "\n    ~ OVERRIDE ~" : "", toml_str.c_str());
-										if (font) {
-											ImGui::GetBackgroundDrawList()->AddText(font, scaled_font_size, viewport_pos,
-												ImColor(0.1f, 0.8f, 0.1f, 1.0f), text);
-										} else {
-											ImGui::GetBackgroundDrawList()->AddText(viewport_pos,
-												ImColor(0.1f, 0.8f, 0.1f, 1.0f), text);
-										}
-									}
-									else if (l.second.m_is_attached_light)
-									{
-										// Use comment instead of hash for attached lights
-										std::string display_text = lov && !lov->comment.empty() ? lov->comment : ("Attached light " + std::to_string((l.second.m_hash >> 32)));
-										std::string toml_str = toml_filename.empty() ? "" : ("\n    ~ " + toml_filename + " ~");
-										const char* text = shared::utils::va("    %s\n    ~ ATTACHED to 0x%llx ~%s", display_text.c_str(), static_cast<unsigned long long>(base_hash), toml_str.c_str());
-										if (font) {
-											ImGui::GetBackgroundDrawList()->AddText(font, scaled_font_size, viewport_pos,
-												ImColor(0.7f, 0.7f, 0.9f, 1.0f), text);
-										} else {
-											ImGui::GetBackgroundDrawList()->AddText(viewport_pos,
-												ImColor(0.7f, 0.7f, 0.9f, 1.0f), text);
-										}
+									else if (im->m_dbg_visualize_api_light_unstable_hashes) {
+										is_light_hash_stable = true;
 									}
 									else
 									{
-										std::string toml_str = toml_filename.empty() ? "" : ("\n    ~ " + toml_filename + " ~");
-										const char* text = shared::utils::va("    [HASH] %llx %s%s", l.second.m_hash, lov ? "\n    ~ OVERRIDE ~" : "", toml_str.c_str());
-										if (font) {
-											ImGui::GetBackgroundDrawList()->AddText(font, scaled_font_size, viewport_pos,
-												ImGui::GetColorU32(ImGuiCol_Text), text);
-										} else {
-											ImGui::GetBackgroundDrawList()->AddText(viewport_pos,
-												ImGui::GetColorU32(ImGuiCol_Text), text);
+										for (const auto& ign : visualized_api_lights)
+										{
+											if (ign.hash == l.second.m_hash)
+											{
+												is_light_hash_stable = ign.m_frames_since_addition > 5u;
+												break;
+											}
+										}
+									}
+
+									if (is_light_hash_stable)
+									{
+										const auto radius = remix_lights::get_light_radius(l.second.m_def, lov) * comp_settings::get()->translate_game_light_radius_scalar.get_as<float>() * 3.7f;
+										const auto& color = remix_lights::get_light_color(l.second.m_def, lov);
+										ImGui::GetBackgroundDrawList()->AddCircleFilled(viewport_pos, radius, ImColor(color.x, color.y, color.z));
+
+
+										std::string toml_filename;
+										uint64_t hash_to_check = l.second.m_is_attached_light ? base_hash : l.second.m_hash;
+
+										for (const auto& toml_file : ms.get_sorted_keys(ms.light_overrides_toml_info))
+										{
+											bool found = false;
+											const auto& toml_info = ms.light_overrides_toml_info.at(toml_file);
+
+											for (const auto& category : toml_info.categories)
+											{
+												if (category.overrides.contains(hash_to_check))
+												{
+													toml_filename = toml_file;
+													found = true;
+													break;
+												}
+											}
+
+											if (!found && toml_info.flat_overrides.contains(hash_to_check))
+											{
+												toml_filename = toml_file;
+												found = true;
+											}
+
+											if (found) {
+												break;
+											}
+										}
+
+										// Calculate text scale based on distance from screen center
+										const float text_scale = calculate_text_scale_from_center(viewport_pos, 200.0f);
+
+										// Get the current font and use AddText with explicit font size for scaling
+										ImFont* font = ImGui::GetFont();
+										const float base_font_size = font ? font->FontSize : ImGui::GetFontSize();
+										const float scaled_font_size = base_font_size * text_scale;
+
+										if (l.second.m_is_ignored)
+										{
+											const char* text = shared::utils::va("    [HASH] %llx\n    ~ IGNORED ~", l.second.m_hash);
+											if (font) {
+												ImGui::GetBackgroundDrawList()->AddText(font, scaled_font_size, viewport_pos, ImColor(1.0f, 0.0f, 0.0f, 1.0f), text);
+											}
+											else {
+												ImGui::GetBackgroundDrawList()->AddText(viewport_pos, ImColor(1.0f, 0.0f, 0.0f, 1.0f), text);
+											}
+										}
+										else if (l.second.m_is_allowed_filler)
+										{
+											std::string toml_str = toml_filename.empty() ? "" : ("\n    ~ " + toml_filename + " ~");
+											const char* text = shared::utils::va("    [HASH] %llx\n~ ALLOWED FILLER ~%s%s", l.second.m_hash, lov ? "\n    ~ OVERRIDE ~" : "", toml_str.c_str());
+
+											if (font) {
+												ImGui::GetBackgroundDrawList()->AddText(font, scaled_font_size, viewport_pos, ImColor(0.1f, 0.8f, 0.1f, 1.0f), text);
+											}
+											else {
+												ImGui::GetBackgroundDrawList()->AddText(viewport_pos, ImColor(0.1f, 0.8f, 0.1f, 1.0f), text);
+											}
+										}
+										else if (l.second.m_is_attached_light)
+										{
+											// Use comment instead of hash for attached lights
+											std::string display_text = lov && !lov->comment.empty() ? lov->comment : ("Attached light " + std::to_string((l.second.m_hash >> 32)));
+											std::string toml_str = toml_filename.empty() ? "" : ("\n    ~ " + toml_filename + " ~");
+											const char* text = shared::utils::va("    %s\n    ~ ATTACHED to 0x%llx ~%s", display_text.c_str(), static_cast<unsigned long long>(base_hash), toml_str.c_str());
+
+											if (font) {
+												ImGui::GetBackgroundDrawList()->AddText(font, scaled_font_size, viewport_pos, ImColor(0.7f, 0.7f, 0.9f, 1.0f), text);
+											}
+											else {
+												ImGui::GetBackgroundDrawList()->AddText(viewport_pos, ImColor(0.7f, 0.7f, 0.9f, 1.0f), text);
+											}
+										}
+										else
+										{
+											std::string toml_str = toml_filename.empty() ? "" : ("\n    ~ " + toml_filename + " ~");
+											const char* text = shared::utils::va("    [HASH] %llx %s%s", l.second.m_hash, lov ? "\n    ~ OVERRIDE ~" : "", toml_str.c_str());
+
+											if (font) {
+												ImGui::GetBackgroundDrawList()->AddText(font, scaled_font_size, viewport_pos, ImGui::GetColorU32(ImGuiCol_Text), text);
+											}
+											else {
+												ImGui::GetBackgroundDrawList()->AddText(viewport_pos, ImGui::GetColorU32(ImGuiCol_Text), text);
+											}
 										}
 									}
 								}

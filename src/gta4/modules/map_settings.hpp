@@ -1,5 +1,8 @@
 #pragma once
+
+#include <ranges>
 #include <gta4/game/structs.hpp>
+
 namespace gta4
 {
 	class map_settings final : public shared::common::loader::component_module
@@ -105,6 +108,46 @@ namespace gta4
 		std::unordered_map<std::string, light_overrides_toml_info_s> light_overrides_toml_info; // TOML filename -> TOML info (preserves all data for rebuilding)
 		std::unordered_map<std::string, lights_toml_info_s> lights_toml_info; // TOML filename -> lights info (preserves all data for ignored/allow lights)
 		std::vector<anti_cull_meshes_s> anticull_meshes;
+
+		template <typename Map>
+		std::vector<typename Map::key_type> get_sorted_keys(const Map& map)
+		{
+			std::vector<typename Map::key_type> keys;
+			keys.reserve(map.size());
+
+			for (const auto& key : map | std::views::keys) {
+				keys.push_back(key);
+			}
+
+			std::ranges::sort(keys);
+			return keys;
+		}
+
+		std::string find_highest_priority_ignored_hash_in_toml(uint64_t hash)
+		{
+			for (const auto& toml_file : get_sorted_keys(lights_toml_info))
+			{
+				const auto& toml_info = lights_toml_info[toml_file];
+				if (toml_info.ignored_lights.contains(hash)) {
+					return toml_file;
+				}
+			}
+
+			return "";
+		};
+
+		std::string find_highest_priority_allowed_hash_in_toml(uint64_t hash)
+		{
+			for (const auto& toml_file : get_sorted_keys(lights_toml_info))
+			{
+				const auto& toml_info = lights_toml_info[toml_file];
+				if (toml_info.allow_lights.contains(hash)) {
+					return toml_file;
+				}
+			}
+
+			return "";
+		};
 	};
 
 		static map_settings_s& get_map_settings() { return m_map_settings; }

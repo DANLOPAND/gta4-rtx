@@ -1,0 +1,45 @@
+# ##########################################################################################################################################
+# >> Spawn unique markers meshes
+#
+# :: Can be used as anchor mesh (same one can be spawned multiple times)
+#    > They can be spawned and adjusted in-game via the imgui menu
+#
+# ~~ Parameters
+#   {          
+#       #                                   comment         
+#       marker_num =                        num of marker                                                           [Int 0-Inf]
+#       position = []                       position of the marker mesh                                             [3D Vector]
+#       rotation = []                       rotation of the marker mesh                                             [3D Vector]
+#       scale = []                          scale of the marker mesh                                                [3D Vector]
+#       cull_distance =                     disable drawing of marker mesh after this distance from the player      [Float]
+#       spawn_on = {
+#           weather = "TYPE"                only spawn marker when THIS weather is active                           [STRING] - [EXTRASUNNY, SUNNY, SUNNY_WINDY, CLOUDY, RAIN, DRIZZLE, FOGGY, LIGHTNING]
+#           weather_transition_value =      transition value the weather needs to be at for the marker to show      [Float 0-1] 
+#           between_hours = [from, to]      only spawn marker between certain hours (from-to)                       [2D Int]
+#       }
+#   }, 
+#   { ... },
+
+MARKER = [
+
+    # first safehouse test
+    { marker_num = 170, position = [895.40, -495.05, 18.91], rotation = [0.00, 0.00, 0.00], scale = [1.00, 1.00, 1.00], cull_distance = 15.00 },
+
+    # seabed plane
+    { marker_num = 1000, position = [552.59, 530.76, 16.72], rotation = [0.00, 0.00, 0.00], scale = [50.00, 50.00, 1.00] },
+
+    # tlad safehouse
+    { marker_num = 570, position = [-1721.77, 347.40, 26.00], rotation = [0.00, 0.00, 0.00], scale = [1.00, 1.00, 1.00], cull_distance = 50.00 },
+
+    # downtown skyscrapers shadowcasters 01
+    { marker_num = 300, position = [-57.10, 594.42, 74.78], rotation = [0.00, 0.00, 0.00], scale = [1.00, 1.00, 1.00], cull_distance = 600.00 },
+
+    # downtown skyscrapers shadowcasters 02
+    { marker_num = 301, position = [-215.06, 381.53, 87.49], rotation = [0.00, 0.00, 0.00], scale = [1.00, 1.00, 1.00], cull_distance = 600.00 },
+
+    # downtown skyscrapers shadowcasters 03
+    { marker_num = 302, position = [-281.44, -0.08, 104.94], rotation = [0.00, 0.00, 0.00], scale = [1.00, 1.00, 1.00], cull_distance = 600.00 },
+
+    # downtown skyscrapers shadowcasters 04
+    { marker_num = 303, position = [-50.80, -561.45, 64.70], rotation = [0.00, 0.00, 0.00], scale = [1.00, 1.00, 1.00], cull_distance = 800.00 },
+]

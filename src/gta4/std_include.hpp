@@ -28,6 +28,7 @@ constexpr auto COMP_MOD_VERSION_PATCH = 7;
 #include <iostream>
 #include <xmmintrin.h>
 #include <intrin.h>
+#include <ranges>
 
 #pragma comment(lib, "psapi.lib")
 

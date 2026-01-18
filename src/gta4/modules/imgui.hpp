@@ -225,6 +225,7 @@ namespace gta4
 		};
 
 		std::vector<visualized_api_light_s> visualized_api_lights;
+		bool m_vis_api_lights_show_only_in_view = false;
 
 		// --
 
