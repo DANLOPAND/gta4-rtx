@@ -1160,6 +1160,27 @@ namespace gta4
 				100.0f
 			};
 
+			variable timecycle_skyhorizonheight_cam_height_threshold = {
+				"timecycle_skyhorizonheight_cam_height_threshold",
+				("Camera height threshold (in meters) where the influence curve changes behavior.\n"
+				"Below this height, the impact is minimal. Above this height, the impact increases more significantly."),
+				100.0f
+			};
+
+			variable timecycle_skyhorizonheight_cam_height_influence_low = {
+				"timecycle_skyhorizonheight_cam_height_influence_low",
+				("Scalar for camera height influence on atmosphere height for heights up to the threshold.\n"
+				"Controls how much atmosphere height increases per meter of camera height before the threshold (minimal impact)."),
+				0.2f
+			};
+
+			variable timecycle_skyhorizonheight_cam_height_influence_high = {
+				"timecycle_skyhorizonheight_cam_height_influence_high",
+				("Scalar for camera height influence on atmosphere height for heights above the threshold.\n"
+				"Controls how much atmosphere height increases per meter of camera height above the threshold (stronger impact)."),
+				1.0f
+			};
+
 			// -----
 			variable timecycle_skylight_enabled = {
 				"timecycle_skylight_enabled",

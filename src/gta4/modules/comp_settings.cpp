@@ -282,6 +282,9 @@ namespace gta4
 				ASSIGN(timecycle_skyhorizonheight_scalar);
 				ASSIGN(timecycle_skyhorizonheight_low_transmittance_offset);
 				ASSIGN(timecycle_skyhorizonheight_high_transmittance_offset);
+				ASSIGN(timecycle_skyhorizonheight_cam_height_threshold);
+				ASSIGN(timecycle_skyhorizonheight_cam_height_influence_low);
+				ASSIGN(timecycle_skyhorizonheight_cam_height_influence_high);
 				ASSIGN(timecycle_skylight_enabled);
 				ASSIGN(timecycle_skylight_scalar);
 				ASSIGN(timecycle_colorcorrection_enabled);

@@ -1486,6 +1486,11 @@ namespace gta4
 				compsettings_float_widget("SkyHorizonHeight Low - Transmittance Offset", gs->timecycle_skyhorizonheight_low_transmittance_offset, 0.0f, 0.0f, 0.01f);
 				compsettings_float_widget("SkyHorizonHeight High - Transmittance Offset", gs->timecycle_skyhorizonheight_high_transmittance_offset, 0.0f, 0.0f, 0.01f);
 
+				ImGui::Spacing(0, 4);
+				compsettings_float_widget("Camera Height Threshold", gs->timecycle_skyhorizonheight_cam_height_threshold, 0.0f, 0.0f, 1.0f);
+				compsettings_float_widget("Camera Height Influence (Low)", gs->timecycle_skyhorizonheight_cam_height_influence_low, 0.0f, 0.0f, 0.01f);
+				compsettings_float_widget("Camera Height Influence (High)", gs->timecycle_skyhorizonheight_cam_height_influence_high, 0.0f, 0.0f, 0.01f);
+
 				ImGui::TextDisabled("Timecycle mSkyHorizonHeight: [ %.2f ]",
 					im->m_timecyc_curr_mSkyHorizonHeight);
 

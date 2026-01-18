@@ -210,7 +210,44 @@ namespace gta4
 			static auto rtxVolumetricsAtmosphereHeightMeters = vars->get_option("rtx.volumetrics.atmosphereHeightMeters");
 			if (gs->timecycle_skyhorizonheight_enabled.get_as<bool>() && rtxVolumetricsAtmosphereHeightMeters)
 			{
+				// Base atmosphere height from timecycle
 				atmos_height = timecycle->mSkyHorizonHeight * 100.0f * gs->timecycle_skyhorizonheight_scalar.get_as<float>();
+
+				// Add camera height influence with smooth non-linear curve
+				const auto vp = game::pViewports;
+				if (vp && vp->sceneviewport)
+				{
+					const float cam_height = vp->sceneviewport->cameraInv.m[3][2];
+					const float threshold = gs->timecycle_skyhorizonheight_cam_height_threshold.get_as<float>();
+					const float influence_low = gs->timecycle_skyhorizonheight_cam_height_influence_low.get_as<float>();
+					const float influence_high = gs->timecycle_skyhorizonheight_cam_height_influence_high.get_as<float>();
+
+					float cam_height_contribution = 0.0f;
+
+					if (cam_height > 0.0f && threshold > 0.0f)
+					{
+						if (cam_height <= threshold)
+						{
+							// Below/at threshold: linear scaling (minimal impact per meter)
+							cam_height_contribution = influence_low * cam_height;
+						}
+						else
+						{
+							// Above threshold: contribution from below threshold + linear scaled excess height
+							// The curve is smooth at threshold: both formulas give the same value at threshold
+							const float excess_height = cam_height - threshold;
+							
+							// Contribution up to threshold + linear scaling of excess height
+							const float base_contribution = influence_low * threshold;
+							const float excess_contribution = influence_high * excess_height;
+							
+							cam_height_contribution = base_contribution + excess_contribution;
+						}
+
+						atmos_height += cam_height_contribution;
+					}
+				}
+
 				val.value = atmos_height;
 				vars->set_option(rtxVolumetricsAtmosphereHeightMeters, val);
 				ASSIGN_IMGUI_VIS_FLOAT(mSkyHorizonHeight);
