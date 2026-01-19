@@ -895,11 +895,11 @@ namespace gta4
 		if (ImGui::TreeNode("Temp Debug Values"))
 		{
 			ImGui::Spacing(0, TREENODE_SPACING_INSIDE);
-			ImGui::DragFloat3("Debug Vector", &im->m_debug_vector.x, 0.01f);
-			ImGui::DragFloat3("Debug Vector 2", &im->m_debug_vector2.x, 0.1f);
-			ImGui::DragFloat3("Debug Vector 3", &im->m_debug_vector3.x, 0.1f);
-			ImGui::DragFloat3("Debug Vector 4", &im->m_debug_vector4.x, 0.1f);
-			ImGui::DragFloat3("Debug Vector 5", &im->m_debug_vector5.x, 0.1f);
+			ImGui::DragFloat3("Debug Vector", &im->m_debug_vector.x, 0.01f, 0, 0, "%.6f");
+			ImGui::DragFloat3("Debug Vector 2", &im->m_debug_vector2.x, 0.1f, 0, 0, "%.6f");
+			ImGui::DragFloat3("Debug Vector 3", &im->m_debug_vector3.x, 0.1f, 0, 0, "%.6f");
+			ImGui::DragFloat3("Debug Vector 4", &im->m_debug_vector4.x, 0.1f, 0, 0, "%.6f");
+			ImGui::DragFloat3("Debug Vector 5", &im->m_debug_vector5.x, 0.1f, 0, 0, "%.6f");
 
 			ImGui::Checkbox("Debug Bool 1", &im->m_dbg_debug_bool01);
 			ImGui::Checkbox("Debug Bool 2", &im->m_dbg_debug_bool02);
@@ -5320,6 +5320,8 @@ namespace gta4
 					if (shared::globals::imgui_allow_input_bypass_timeout) {
 						shared::globals::imgui_allow_input_bypass_timeout--;
 					}
+
+					shared::globals::imgui_wants_text_input = ImGui::GetIO().WantTextInput;
 
 					if (shared::globals::imgui_menu_open) 
 					{
