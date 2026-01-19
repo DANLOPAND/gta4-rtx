@@ -2259,26 +2259,93 @@ namespace gta4
 				ctx.restore_vs(dev);
 				render_with_ff = false;
 
+				/*if (im->m_dbg_debug_bool03) {
+					render_with_ff = true;
+				}*/
+
+				auto proj = game::pViewports->sceneviewport->proj;
+
+				auto linear_map = [](double x, double x0, double y0, double x1, double y1) -> double
+					{
+						return (x - x0) * (y1 - y0) / (x1 - x0) + y0;
+					};
+
+				float a = (float)linear_map(game::pViewports->sceneviewport->fov, 45.0, 0.0, 83.2544861 /*+ (double)im->m_debug_vector.x*/, 100.0 + -30.0f /*+ (double)im->m_debug_vector.z*/);
+				//float b = (float)linear_map(game::pViewports->sceneviewport->fov, 45.0, 0.0, 83.2544861 + (double)im->m_debug_vector.y, -270.0 + (double)im->m_debug_vector2.x);
+				float c = 0.0f;
+				float d = 0.0f;
+
+				/*if (im->m_dbg_debug_bool01) {
+					b = 0;
+				}
+
+				if (im->m_dbg_debug_bool02) {
+					c = a * im->m_debug_vector3.x;
+				}*/
+
+				//if (im->m_dbg_debug_bool03) {
+					d = (float)((double)a * -0.000100) /*im->m_debug_vector3.y*/;
+				//}
+
 				D3DMATRIX matrix = {};
-				matrix.m[0][0] = 300.0f + im->m_dbg_phone_projection_matrix_offset.m[0][0];
+				matrix.m[0][0] = 300.0f + im->m_dbg_phone_projection_matrix_offset.m[0][0] + 5.0f + -a;
+				matrix.m[0][1] = 12.0f + im->m_dbg_phone_projection_matrix_offset.m[0][1];
+				matrix.m[0][2] += im->m_dbg_phone_projection_matrix_offset.m[0][2];
+				matrix.m[0][3] = -40.0f + 30.0f + im->m_dbg_phone_projection_matrix_offset.m[0][3];
+
+				matrix.m[1][0] = -13.0f + im->m_dbg_phone_projection_matrix_offset.m[1][0];
+				matrix.m[1][1] = 300.0f + im->m_dbg_phone_projection_matrix_offset.m[1][1] + 8.0f + -a;
+				matrix.m[1][2] += im->m_dbg_phone_projection_matrix_offset.m[1][2];
+				matrix.m[1][3] = -4.0f + im->m_dbg_phone_projection_matrix_offset.m[1][3];
+
+				matrix.m[2][0] = 100.0f + im->m_dbg_phone_projection_matrix_offset.m[2][0] + 30.0f - 5.0f;
+				matrix.m[2][1] = -5.0f + im->m_dbg_phone_projection_matrix_offset.m[2][1] - 20.0f;
+
+				//matrix.m[2][2] = b + (viewport->wp->farclip / (viewport->wp->farclip - viewport->wp->nearclip)) + im->m_dbg_phone_projection_matrix_offset.m[2][2] + -a;
+				//if (im->m_dbg_debug_bool04) {
+					matrix.m[2][2] = (viewport->wp->farclip / (viewport->wp->farclip - viewport->wp->nearclip)) + im->m_dbg_phone_projection_matrix_offset.m[2][2];
+				//}
+
+				matrix.m[2][3] = -250.0f + im->m_dbg_phone_projection_matrix_offset.m[2][3];
+
+				matrix.m[3][0] += im->m_dbg_phone_projection_matrix_offset.m[3][0];
+				matrix.m[3][1] += im->m_dbg_phone_projection_matrix_offset.m[3][1];
+				matrix.m[3][2] = c + ((-viewport->wp->nearclip * viewport->wp->farclip) / (viewport->wp->farclip - viewport->wp->nearclip)) + im->m_dbg_phone_projection_matrix_offset.m[3][2];
+				matrix.m[3][3] = d + 0.01f + im->m_dbg_phone_projection_matrix_offset.m[3][3];
+
+				/*float a = linear_map(game::pViewports->sceneviewport->fov, 45.0f + -25.0f, 0.0f, 83.2544861f + 28.7f + im->m_debug_vector.x, 100.0f + 25.0f + im->m_debug_vector.z);
+				float b = linear_map(game::pViewports->sceneviewport->fov, 45.0f + -25.0f, 0.0f, 83.2544861f + 28.7f + im->m_debug_vector.y, -270.0f + 112.0f + im->m_debug_vector2.x);
+
+				if (im->m_dbg_debug_bool01) {
+					b = 0;
+				}
+
+				if (im->m_dbg_debug_bool02) 
+				{
+					a *= im->m_debug_vector2.z;
+					b *= im->m_debug_vector2.z;
+				}
+
+				D3DMATRIX matrix = {};
+				matrix.m[0][0] = 300.0f + im->m_dbg_phone_projection_matrix_offset.m[0][0] + 5.0f + -a;
 				matrix.m[0][1] = 12.0f + im->m_dbg_phone_projection_matrix_offset.m[0][1];
 				matrix.m[0][2] += im->m_dbg_phone_projection_matrix_offset.m[0][2];
 				matrix.m[0][3] = -40.0f + im->m_dbg_phone_projection_matrix_offset.m[0][3];
 
 				matrix.m[1][0] = -13.0f + im->m_dbg_phone_projection_matrix_offset.m[1][0];
-				matrix.m[1][1] = 300.0f + im->m_dbg_phone_projection_matrix_offset.m[1][1];
+				matrix.m[1][1] = 300.0f + im->m_dbg_phone_projection_matrix_offset.m[1][1] + -a;
 				matrix.m[1][2] += im->m_dbg_phone_projection_matrix_offset.m[1][2];
 				matrix.m[1][3] = -4.0f + im->m_dbg_phone_projection_matrix_offset.m[1][3];
 
-				matrix.m[2][0] = 100.0f + im->m_dbg_phone_projection_matrix_offset.m[2][0];
-				matrix.m[2][1] = -5.0f + im->m_dbg_phone_projection_matrix_offset.m[2][1];
-				matrix.m[2][2] = (viewport->wp->farclip / (viewport->wp->farclip - viewport->wp->nearclip)) + im->m_dbg_phone_projection_matrix_offset.m[2][2];
+				matrix.m[2][0] = 100.0f + im->m_dbg_phone_projection_matrix_offset.m[2][0] - 5.0f;
+				matrix.m[2][1] = -5.0f + im->m_dbg_phone_projection_matrix_offset.m[2][1] -20.0f;
+				matrix.m[2][2] = b + (viewport->wp->farclip / (viewport->wp->farclip - viewport->wp->nearclip)) + im->m_dbg_phone_projection_matrix_offset.m[2][2] + -a;
 				matrix.m[2][3] = -250.0f + im->m_dbg_phone_projection_matrix_offset.m[2][3];
 
 				matrix.m[3][0] += im->m_dbg_phone_projection_matrix_offset.m[3][0];
 				matrix.m[3][1] += im->m_dbg_phone_projection_matrix_offset.m[3][1];
 				matrix.m[3][2] = ((-viewport->wp->nearclip * viewport->wp->farclip) / (viewport->wp->farclip - viewport->wp->nearclip)) + im->m_dbg_phone_projection_matrix_offset.m[3][2];
-				matrix.m[3][3] = 0.01f + im->m_dbg_phone_projection_matrix_offset.m[3][3];
+				matrix.m[3][3] = 0.01f + im->m_dbg_phone_projection_matrix_offset.m[3][3] + 0.07f;*/
 
 				dev->SetTransform(D3DTS_PROJECTION, &matrix);
 
@@ -2287,6 +2354,58 @@ namespace gta4
 					set_remix_texture_categories(dev, InstanceCategories::WorldUI | InstanceCategories::IgnoreAlphaChannel);
 					set_remix_emissive_intensity(dev, gs->phone_emissive_scalar.get_as<float>(), false);
 				}
+
+				/*if (viewport && viewport->wp)
+				{
+					if (im->m_dbg_debug_bool01)
+					{
+						D3DMATRIX v = viewport->wp->view;
+						v.m[0][0] += im->m_debug_mtx03.m[0][0];
+						v.m[0][1] += im->m_debug_mtx03.m[0][1];
+						v.m[0][2] += im->m_debug_mtx03.m[0][2];
+						v.m[0][3] += im->m_debug_mtx03.m[0][3];
+						v.m[1][0] += im->m_debug_mtx03.m[1][0];
+						v.m[1][1] += im->m_debug_mtx03.m[1][1];
+						v.m[1][2] += im->m_debug_mtx03.m[1][2];
+						v.m[1][3] += im->m_debug_mtx03.m[1][3];
+						v.m[2][0] += im->m_debug_mtx03.m[2][0];
+						v.m[2][1] += im->m_debug_mtx03.m[2][1];
+						v.m[2][2] += im->m_debug_mtx03.m[2][2];
+						v.m[2][3] += im->m_debug_mtx03.m[2][3];
+						v.m[3][0] += im->m_debug_mtx03.m[3][0];
+						v.m[3][1] += im->m_debug_mtx03.m[3][1];
+						v.m[3][2] += im->m_debug_mtx03.m[3][2];
+						v.m[3][3] += im->m_debug_mtx03.m[3][3];
+						dev->SetTransform(D3DTS_VIEW, &v);
+					}
+
+					D3DMATRIX w = *game::pCurrentWorldTransform;
+
+					if (im->m_dbg_debug_bool02)
+					{
+						w.m[3][0] = 0.0f;
+						w.m[3][1] = 0.0f;
+						w.m[3][2] = 0.0f;
+					}
+
+					w.m[0][0] += im->m_debug_mtx02.m[0][0];
+					w.m[0][1] += im->m_debug_mtx02.m[0][1];
+					w.m[0][2] += im->m_debug_mtx02.m[0][2];
+					w.m[0][3] += im->m_debug_mtx02.m[0][3];
+					w.m[1][0] += im->m_debug_mtx02.m[1][0];
+					w.m[1][1] += im->m_debug_mtx02.m[1][1];
+					w.m[1][2] += im->m_debug_mtx02.m[1][2];
+					w.m[1][3] += im->m_debug_mtx02.m[1][3];
+					w.m[2][0] += im->m_debug_mtx02.m[2][0];
+					w.m[2][1] += im->m_debug_mtx02.m[2][1];
+					w.m[2][2] += im->m_debug_mtx02.m[2][2];
+					w.m[2][3] += im->m_debug_mtx02.m[2][3];
+					w.m[3][0] += im->m_debug_mtx02.m[3][0];
+					w.m[3][1] += im->m_debug_mtx02.m[3][1];
+					w.m[3][2] += im->m_debug_mtx02.m[3][2];
+					w.m[3][3] += im->m_debug_mtx02.m[3][3];
+					dev->SetTransform(D3DTS_WORLD, &w);
+				}*/
 			}
 
 			if (g_is_rendering_vehicle) 

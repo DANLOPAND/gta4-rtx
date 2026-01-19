@@ -556,7 +556,15 @@ namespace gta4::game
 		D3DXMATRIX viewInv; //0x0150 
 		D3DXMATRIX view; //0x0190 
 		D3DXMATRIX proj; //0x01D0 
-		char pad_0x0210[0x5F4]; //0x0210
+		char pad_0x0210[0xB0]; //0x0210
+		int width; //0x02C0 
+		int height; //0x02C4 
+		float fov; //0x02C8 
+		float aspect; //0x02CC 
+		float mnear; //0x02D0 
+		float mfar; //0x02D4 
+		float unk1; //0x02D8 
+		float unk2; //0x02DC 
 	};
 
 	class g_viewports2_sub
