@@ -216,6 +216,9 @@ namespace gta4::game
 
 	uint32_t retn_addr__veh_invalid_model_crash_fix = 0u;
 
+	uint32_t retn_addr__draw_phonescreen_bg_fix = 0u;
+	uint32_t fn_addr__draw_prim_wrapper = 0u; // for phone screen
+
 	// --------------
 
 #define PATTERN_OFFSET_SIMPLE(var, pattern, byte_offset, static_addr) \
@@ -736,6 +739,15 @@ namespace gta4::game
 
 		// accessing wrong mesh? 
 		PATTERN_OFFSET_SIMPLE(retn_addr__veh_invalid_model_crash_fix, "3C ? 0F 85 ? ? ? ? E8 ? ? ? ? F3 0F 59 05", 0, 0x9795CA);
+
+		// retn_addr__draw_phonescreen_bg_fix
+		if (const auto offset = shared::utils::mem::find_pattern("A1 ? ? ? ? 69 C0 ? ? ? ? 83 C4 ? F6 84 30 ? ? ? ? ? 0F 84 ? ? ? ? 80 7C 24 ? ? 0F 84", 0, "retn_addr__draw_phonescreen_bg_fix", use_pattern, 0x94A643); offset) 
+		{
+			retn_addr__draw_phonescreen_bg_fix = offset; found_pattern_count++;
+
+			// func used to draw the screen
+			fn_addr__draw_prim_wrapper = shared::utils::mem::resolve_relative_call_address(retn_addr__draw_phonescreen_bg_fix - 5u);
+		} total_pattern_count++;
 
 		// end GAME_ASM_OFFSETS
 #pragma endregion

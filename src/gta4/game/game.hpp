@@ -234,6 +234,9 @@ namespace gta4::game
 
 	extern uint32_t retn_addr__veh_invalid_model_crash_fix;
 
+	extern uint32_t retn_addr__draw_phonescreen_bg_fix;
+	extern uint32_t fn_addr__draw_prim_wrapper;
+
 	// ---
 
 	extern void init_game_addresses();

@@ -3404,6 +3404,81 @@ namespace gta4
 		}
 	}
 
+#if 0
+	void on_phonescreendrawlist_hk()
+	{
+		// GetDrawListPtr
+		auto DrawListPtr = shared::utils::hook::call<DWORD(__cdecl)(int, int)>(0x8DC3A0)(0x18, 0);
+		if (DrawListPtr)
+		{
+			//v6 = AddCmdClearRT(DrawListPtr, 0, 0, 1, v4, 1, 0);// hooked . 1337 marker
+			auto v6 = shared::utils::hook::call<DWORD*(__fastcall)(int pthis, int unused, char flags, int col, char a4, float z, char a6, int stencil)>
+				(0x8DAA70)(DrawListPtr, 0, 0, 0, 0, 0.0f, 0, 0);
+
+			//AddRenderCmdToList(v6);
+			shared::utils::hook::call<void(__cdecl)(DWORD*)>(0x499E30)(v6);
+		}
+		else
+		{
+			//AddRenderCmdToList(0);
+			shared::utils::hook::call<void(__cdecl)(DWORD*)>(0x499E30)(nullptr);
+		}
+	}
+	
+	__declspec (naked) void on_phonescreendrawlist()
+	{
+		static uint32_t og_func_addr = 0x948320;
+		static uint32_t retn_addr = 0x94ADC4;
+		__asm
+		{
+			call	og_func_addr;
+
+			pushad;
+			call	on_phonescreendrawlist_hk;
+			popad;
+
+			jmp		retn_addr;
+		}
+	}
+#endif
+
+	DWORD phone_bg_alphablendstate = 0u;
+	void on_phonescreen_bg_pre_hk()
+	{
+		const auto dev = shared::globals::d3d_device;
+		dev->GetRenderState(D3DRS_ALPHABLENDENABLE, &phone_bg_alphablendstate);
+		dev->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
+	}
+
+	void on_phonescreen_bg_post_hk()
+	{
+		const auto dev = shared::globals::d3d_device;
+		dev->SetRenderState(D3DRS_ALPHABLENDENABLE, phone_bg_alphablendstate);
+		phone_bg_alphablendstate = 0u;
+	}
+
+	// fix phone screen smear
+	__declspec (naked) void on_phonescreen_bg_draw()
+	{
+		__asm
+		{
+			pushad;
+			call	on_phonescreen_bg_pre_hk;
+			popad;
+
+			call	game::fn_addr__draw_prim_wrapper; // 0x8D41D0
+
+			pushad;
+			call	on_phonescreen_bg_post_hk;
+			popad;
+
+			// render same stuff a second time - would look incorrect without doing that
+			call	game::fn_addr__draw_prim_wrapper; // 0x8D41D0
+
+			jmp		game::retn_addr__draw_phonescreen_bg_fix; // 0x94A643
+		}
+	}
+
 	// ---
 
 	renderer::renderer()
@@ -3495,8 +3570,8 @@ namespace gta4
 			shared::utils::hook(game::hk_addr__dyn_obj_clear_hash03, on_draw_dyn_objects__clear_global_stub, HOOK_JUMP).install()->quick(); // 0x8DE437
 		}
 
-		// hook static water rendering func to fix UVs
-		// AD8960
+		//shared::utils::hook(0x94ADBF, on_phonescreendrawlist, HOOK_JUMP).install()->quick();
+		shared::utils::hook(game::retn_addr__draw_phonescreen_bg_fix - 5u, on_phonescreen_bg_draw, HOOK_JUMP).install()->quick(); // fix phone screen smear issue
 
 		// -----
 		m_initialized = true;
