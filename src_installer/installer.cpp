@@ -6,6 +6,7 @@
 #include <shlobj.h>
 #include <winhttp.h>
 #include <string>
+#include <vector>
 #include <filesystem>
 #include <iostream>
 #include <fstream>
@@ -142,6 +143,69 @@ std::string trim_whitespace(const std::string& str)
 
 	size_t last = str.find_last_not_of(" \t\n\r");
 	return str.substr(first, (last - first + 1));
+}
+
+// Parse version string like "1.1.8" into a vector of integers
+std::vector<int> parse_version(const std::string& version_str)
+{
+	std::vector<int> parts;
+	std::string current;
+	
+	for (char c : version_str) 
+	{
+		if (c == '.') 
+		{
+			if (!current.empty()) 
+			{
+				try {
+					parts.push_back(std::stoi(current));
+				} catch (...) {
+					parts.push_back(0);
+				}
+				current.clear();
+			}
+		} 
+		else if (isdigit(c)) {
+			current += c;
+		}
+	}
+	
+	if (!current.empty()) 
+	{
+		try {
+			parts.push_back(std::stoi(current));
+		} catch (...) {
+			parts.push_back(0);
+		}
+	}
+	
+	return parts;
+}
+
+// Compare two version vectors, returns true if v1 > v2
+bool version_greater_than(const std::vector<int>& v1, const std::vector<int>& v2)
+{
+	size_t max_len = max(v1.size(), v2.size());
+	
+	for (size_t i = 0; i < max_len; i++) 
+	{
+		int a = (i < v1.size()) ? v1[i] : 0;
+		int b = (i < v2.size()) ? v2[i] : 0;
+		
+		if (a > b) return true;
+		if (a < b) return false;
+	}
+	
+	return false; // equal
+}
+
+// Get short SHA (first 7 characters) from full SHA
+std::string get_short_sha(const std::string& full_sha)
+{
+	if (full_sha.length() >= 7) {
+		return full_sha.substr(0, 7);
+	}
+	return full_sha;
 }
 
 // Get the latest commit SHA from a GitHub repository
@@ -611,6 +675,7 @@ int main()
 	
 	// Find zip file first (needed for version comparison)
 	static const wchar_t* zip_prefix = L"GTAIV-Remix-CompatibilityMod";
+	static const std::string zip_prefix_str = "GTAIV-Remix-CompatibilityMod";
 	std::filesystem::path found_zip;
 
 	auto installer_path = []()
@@ -619,6 +684,9 @@ int main()
 			GetModuleFileNameW(nullptr, buf, MAX_PATH);
 			return std::filesystem::path(buf).parent_path();
 		};
+
+	// Collect all matching zip files with their versions
+	std::vector<std::pair<std::filesystem::path, std::vector<int>>> zip_candidates;
 
 	for (const auto& entry : std::filesystem::directory_iterator(installer_path()))
 	{
@@ -629,9 +697,40 @@ int main()
 		const auto& p = entry.path();
 		if (p.extension() == L".zip" && p.stem().wstring().starts_with(zip_prefix))
 		{
-			found_zip = p;
-			break;  // take the first match
+			// Extract version from filename: GTAIV-Remix-CompatibilityMod-X.Y.Z.zip
+			std::string stem = p.stem().string();
+			std::string version_str;
+			
+			if (stem.length() > zip_prefix_str.length()) 
+			{
+				// Skip the prefix and any leading dash
+				version_str = stem.substr(zip_prefix_str.length());
+				if (!version_str.empty() && version_str[0] == '-') {
+					version_str = version_str.substr(1);
+				}
+			}
+			
+			std::vector<int> version = parse_version(version_str);
+			zip_candidates.push_back({p, version});
 		}
+	}
+
+	// Find the zip with the highest version
+	if (!zip_candidates.empty())
+	{
+		found_zip = zip_candidates[0].first;
+		std::vector<int> best_version = zip_candidates[0].second;
+		
+		for (size_t i = 1; i < zip_candidates.size(); i++) 
+		{
+			if (version_greater_than(zip_candidates[i].second, best_version)) 
+			{
+				found_zip = zip_candidates[i].first;
+				best_version = zip_candidates[i].second;
+			}
+		}
+		
+		std::cout << "> Found compatibility mod: " << found_zip.filename().string() << "\n";
 	}
 
 	bool skip_rtx_comp_install = false;
@@ -928,18 +1027,15 @@ int main()
 		const std::filesystem::path mods_dir = std::filesystem::path(game_dir) / "rtx-remix" / "mods";
 		const std::filesystem::path commit_file = mods_dir / "gta4rtx_commit.txt";
 		const std::string commit_file_str = commit_file.string();
-		const std::filesystem::path base_zip_path = get_installer_dir() / "master.zip";
 		
 		// Ensure mods directory exists
 		std::filesystem::create_directories(mods_dir);
 
-		// Helper function to download and extract base mod
-		auto download_and_extract_base_mod = [&]() -> bool
+		// Helper function to download and extract base mod with SHA-based naming
+		auto download_and_extract_base_mod = [&](const std::string& sha) -> bool
 		{
-			// Always download a new zip (remove existing one if present)
-			if (std::filesystem::exists(base_zip_path)) {
-				std::filesystem::remove(base_zip_path);
-			}
+			const std::string short_sha = get_short_sha(sha);
+			const std::filesystem::path base_zip_path = get_installer_dir() / ("gta4-rtx-base-mod-" + short_sha + ".zip");
 
 			// Download the zip
 			std::cout << "\nDownloading base mod zip to:\n> " << base_zip_path.string() << "\n\n";
@@ -1022,36 +1118,34 @@ int main()
 				return 0;
 			}
 
+			// Fetch SHA first so we can name the zip file
+			std::cout << "Fetching latest commit SHA from GitHub...\n";
+			const auto latest_sha = get_latest_github_commit_sha(base_mod_repo_owner, base_mod_repo_name, base_mod_branch);
+			
+			if (latest_sha.empty()) 
+			{
+				log_error("Failed to fetch commit SHA from GitHub. Network error or API failure.");
+				MessageBoxA(nullptr, "Failed to fetch commit information from GitHub.\nPlease check your internet connection.", "Error", MB_ICONERROR);
+				return 0;
+			}
+
 			// Download and extract
-			if (!download_and_extract_base_mod()) {
+			if (!download_and_extract_base_mod(latest_sha)) {
 				return 0;
 			}
 
 			std::cout << "> Done!\n\n";
 
-			// After successful extraction, get the commit SHA and save it
-			std::cout << "Fetching latest commit SHA from GitHub...\n";
-			const auto latest_sha = get_latest_github_commit_sha(base_mod_repo_owner, base_mod_repo_name, base_mod_branch);
-			
-			if (!latest_sha.empty()) 
+			// Save the commit SHA
+			if (write_file_to_disk(commit_file_str, latest_sha)) 
 			{
-				if (write_file_to_disk(commit_file_str, latest_sha)) 
-				{
-					std::cout << "Saved commit SHA: " << latest_sha << "\n";
-					std::cout << "Commit file saved to: " << commit_file_str << "\n";
-				} 
-				else 
-				{
-					log_yellow(true);
-					std::cout << "[WARN] Failed to save commit file to: " << commit_file_str << "\n";
-					log_default();
-				}
+				std::cout << "Saved commit SHA: " << latest_sha << "\n";
+				std::cout << "Commit file saved to: " << commit_file_str << "\n";
 			} 
 			else 
 			{
 				log_yellow(true);
-				std::cout << "[WARN] Failed to fetch commit SHA from GitHub. Network error or API failure.\n";
-				std::cout << "The mod was extracted successfully, but the commit file could not be created.\n";
+				std::cout << "[WARN] Failed to save commit file to: " << commit_file_str << "\n";
 				log_default();
 			}
 		} 
@@ -1081,7 +1175,7 @@ int main()
 					if (user_choice == IDYES) 
 					{
 						// Download and extract the update
-						if (download_and_extract_base_mod())
+						if (download_and_extract_base_mod(latest_sha))
 						{
 							// Only update commit file after successful download and extraction
 							if (write_file_to_disk(commit_file_str, latest_sha)) {
@@ -1109,6 +1203,217 @@ int main()
 			{
 				log_yellow(true);
 				std::cout << "[WARN] Could not check commit SHA (network error or file issue).\n\n";
+				log_default();
+			}
+		}
+	}
+
+	// --------------
+	// AutoPBR Remix Mod (Optional)
+
+	{
+		static const char* autopbr_mod_repo_owner = "xoxor4d";
+		static const char* autopbr_mod_repo_name = "gta4-rtx-autopbr-mod";
+		static const char* autopbr_mod_branch = "master";
+		static const char* autopbr_mod_repo_url = "https://github.com/xoxor4d/gta4-rtx-autopbr-mod";
+		static const char* autopbr_mod_zip_url = "https://github.com/xoxor4d/gta4-rtx-autopbr-mod/archive/refs/heads/master.zip";
+		static const char* autopbr_mod_zip_inner_mods_github = "gta4-rtx-autopbr-mod-master/mods";
+		static const char* autopbr_mod_zip_inner_mods_flat = "mods";
+		
+		auto get_installer_dir = []()
+		{
+			wchar_t buf[MAX_PATH] = { 0 };
+			GetModuleFileNameW(nullptr, buf, MAX_PATH);
+			return std::filesystem::path(buf).parent_path();
+		};
+		
+		const std::filesystem::path mods_dir = std::filesystem::path(game_dir) / "rtx-remix" / "mods";
+		const std::filesystem::path commit_file = mods_dir / "gta4rtx_autopbr_commit.txt";
+		const std::string commit_file_str = commit_file.string();
+		
+		// Ensure mods directory exists
+		std::filesystem::create_directories(mods_dir);
+
+		// Helper function to download and extract autopbr mod with SHA-based naming
+		auto download_and_extract_autopbr_mod = [&](const std::string& sha) -> bool
+		{
+			const std::string short_sha = get_short_sha(sha);
+			const std::filesystem::path autopbr_zip_path = get_installer_dir() / ("gta4-rtx-autopbr-mod-" + short_sha + ".zip");
+
+			// Download the zip
+			std::cout << "\nDownloading AutoPBR mod zip to:\n> " << autopbr_zip_path.string() << "\n\n";
+
+			// Convert char* to wstring
+			std::string zip_url_str(autopbr_mod_zip_url);
+			std::wstring zip_url_w(zip_url_str.begin(), zip_url_str.end());
+
+			if (!download_file_to_path(zip_url_w, autopbr_zip_path))
+			{
+				log_error(
+					"Download failed.\n"
+					"Manually download:\n" + std::string(autopbr_mod_zip_url) + "\n\n"
+					"Extract contents to:\n" + mods_dir.string());
+				
+				MessageBoxA(nullptr,
+							"Failed to download AutoPBR remix-mod.\n\n"
+							"Please try again or proceed manually.\n"
+							"Check the console for more details.",
+							"Error",
+							MB_ICONERROR);
+
+				return false;
+			}
+			
+			// Extract the mods folder
+			log_yellow(true);
+			std::cout << "\nExtracting AutoPBR mod into rtx-remix/mods ...\n";
+			log_default();
+			bool ok_extract = extract_zip(autopbr_zip_path, mods_dir.string(), autopbr_mod_zip_inner_mods_github);
+
+			if (!ok_extract) { // Fallback for archives that have 'mods/...' at the root
+				ok_extract = extract_zip(autopbr_zip_path, mods_dir.string(), autopbr_mod_zip_inner_mods_flat);
+			}
+			
+			if (!ok_extract) 
+			{
+				log_error(
+					"Failed to extract AutoPBR remix-mod.\n"
+					"You can extract it manually from:\n" + autopbr_zip_path.string() + "\n\n"
+					"Extract contents to:\n" + mods_dir.string());
+
+				MessageBoxA(nullptr,
+							"[!] Failed to extract AutoPBR remix-mod.\n\nCheck the console for more details.\n",
+							"Error",
+							MB_ICONERROR);
+
+				return false;
+			}
+
+			return true;
+		};
+
+		// Check if commit file exists
+		const bool commit_file_exists = std::filesystem::exists(commit_file) && std::filesystem::is_regular_file(commit_file);
+		if (!commit_file_exists) 
+		{
+			log_blue(true);
+			std::cout << "\n\nOptional: Download and extract the AutoPBR remix-mod?\n";
+			log_default();
+
+			// Print full info (including links) to console so the user can copy them
+			std::cout
+				<< "This contains automatically converted PBR materials for textures.\n"
+				<< "Download size: ~1.5 GB\n\n"
+				<< "Direct zip link:\n> " << autopbr_mod_zip_url << "\n\n"
+				<< "Repo:\n> " << autopbr_mod_repo_url << "\n\n"
+				<< "This will place the downloaded zip next to the installer, then extract the 'mods' folder into:\n> "
+				<< mods_dir.string() << "\n";
+
+			const int user_choice = MessageBoxA(nullptr, 
+				"Optional: Download and extract the AutoPBR remix-mod?\n\n"
+				"This contains automatically converted PBR materials for textures.\n\n"
+				"Download size: ~1.5 GB", 
+				"AutoPBR Remix-Mod", MB_YESNO | MB_ICONQUESTION);
+			
+			if (user_choice == IDYES) 
+			{
+				// Fetch SHA first so we can name the zip file
+				std::cout << "Fetching latest commit SHA from GitHub...\n";
+				const auto latest_sha = get_latest_github_commit_sha(autopbr_mod_repo_owner, autopbr_mod_repo_name, autopbr_mod_branch);
+				
+				if (latest_sha.empty()) 
+				{
+					log_yellow(true);
+					std::cout << "[WARN] Failed to fetch commit SHA from GitHub. Network error or API failure.\n";
+					std::cout << "Skipping AutoPBR mod installation.\n\n";
+					log_default();
+				}
+				else
+				{
+					// Download and extract
+					if (download_and_extract_autopbr_mod(latest_sha))
+					{
+						std::cout << "> Done!\n\n";
+
+						// Save the commit SHA
+						if (write_file_to_disk(commit_file_str, latest_sha)) 
+						{
+							std::cout << "Saved commit SHA: " << latest_sha << "\n";
+							std::cout << "Commit file saved to: " << commit_file_str << "\n";
+						} 
+						else 
+						{
+							log_yellow(true);
+							std::cout << "[WARN] Failed to save commit file to: " << commit_file_str << "\n";
+							log_default();
+						}
+					}
+				}
+			}
+			else
+			{
+				std::cout << "Skipping AutoPBR mod installation.\n\n";
+			}
+		} 
+		else // commit_file_exists
+		{
+			// File exists, compare with GitHub
+			std::cout << "\nChecking latest gta4-rtx-autopbr-mod commit SHA...\n";
+			int comparison = compare_commit_sha(commit_file_str, autopbr_mod_repo_owner, autopbr_mod_repo_name, autopbr_mod_branch);
+			
+			if (comparison == 0) {
+				std::cout << "Installed AutoPBR mod matches GitHub (up to date).\n";
+			} 
+			else if (comparison == 1) 
+			{
+				std::string local_sha = trim_whitespace(read_file_from_disk(commit_file_str));
+				std::string latest_sha = get_latest_github_commit_sha(autopbr_mod_repo_owner, autopbr_mod_repo_name, autopbr_mod_branch);
+				
+				if (!latest_sha.empty()) 
+				{
+					std::cout
+						<< "\nA newer version of the gta4-rtx-autopbr-mod is available on GitHub.\n"
+						<< "Current commit: " + (local_sha.empty() ? "Unknown" : local_sha) + "\n"
+						<< "Latest commit: " + latest_sha + "\n"
+						<< "Repo: " + std::string(autopbr_mod_repo_url) + "\n\n";
+
+					const int user_choice = MessageBoxA(nullptr, 
+						"A newer version of the AutoPBR mod is available on GitHub.\n\n"
+						"Download size: ~1.8 GB\n\n"
+						"Would you like to update?", 
+						"AutoPBR Mod Update Available", MB_YESNO | MB_ICONQUESTION);
+
+					if (user_choice == IDYES) 
+					{
+						// Download and extract the update
+						if (download_and_extract_autopbr_mod(latest_sha))
+						{
+							// Only update commit file after successful download and extraction
+							if (write_file_to_disk(commit_file_str, latest_sha)) {
+								std::cout << "Updated commit SHA to: " << latest_sha << "\n\n";
+							} else 
+							{
+								log_yellow(true);
+								std::cout << "[WARN] Failed to update commit file.\n\n";
+								log_default();
+							}
+						}
+					} 
+					else {
+						std::cout << "Skipping AutoPBR mod update.\n\n";
+					}
+				} 
+				else 
+				{
+					log_yellow(true);
+					std::cout << "[WARN] Could not fetch latest commit SHA for comparison.\n\n";
+					log_default();
+				}
+			} 
+			else if (comparison == -2) 
+			{
+				log_yellow(true);
+				std::cout << "[WARN] Could not check AutoPBR commit SHA (network error or file issue).\n\n";
 				log_default();
 			}
 		}
