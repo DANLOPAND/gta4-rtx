@@ -1,7 +1,6 @@
 #include "std_include.hpp"
 #include "renderer.hpp"
 
-#include "d3d9ex.hpp"
 #include "comp_settings.hpp"
 #include "imgui.hpp"
 #include "natives.hpp"
@@ -645,6 +644,7 @@ namespace gta4
 				std::uint32_t dataPoolIndex = info->vs_constant_stack[i].constant_pool_index;
 				game::const_stack_s* vs_const = &info->vs_constant_stack[i];
 				std::uint8_t float_count = constant_data_struct->constant_float_count_array[dataPoolIndex];
+				auto entry_hash = constant_data_struct->mEntriesHashes[dataPoolIndex];
 
 				if (float_count)
 				{
@@ -730,7 +730,8 @@ namespace gta4
 						}*/
 
 						if ((register_num == 69u || register_num == 70u) 
-							&& pidx == -1 
+							&& pidx == -1
+							&& entry_hash == 0x490C2A6B /*gSuperAlpha*/
 							&& (g_is_rendering_fx_instance || g_is_rendering_fx)) // constantly need to check
 						{
 							if (im->m_stats._gta_rmptfx_litsprite_shader_name_checks.track_check() && ctx.info.shader_name.ends_with("gta_rmptfx_litsprite.fxc"))
@@ -748,7 +749,9 @@ namespace gta4
 								game_device->SetVertexShaderConstantF(register_num, constant_data_struct->constants[dataPoolIndex].float_arr, float_count * game::pShaderConstFloatCountMap[type]);
 							}
 						}
-						else if ((register_num == 208u || register_num == 209u) && (pidx == GTA_EMISSIVE || pidx == GTA_EMISSIVE_ALPHA))
+						else if (  (register_num == 208u || register_num == 209u) 
+								&& (pidx == GTA_EMISSIVE || pidx == GTA_EMISSIVE_ALPHA)
+								&& (entry_hash == 0xD79BFC1E /*globalAnimUV0*/ || entry_hash == 0xBA54C190 /*globalAnimUV1*/))
 						{
 							if (register_num == 208u) {
 								ctx.info.has_global_anim_uv1 = true;
@@ -796,6 +799,21 @@ namespace gta4
 		}
 	}
 
+	void SetupTextureAndSampler_call(uint32_t texture_slot, game::grcTextureReference* arg2, int sampler_state_count, int arg4)
+	{
+		__asm
+		{
+			pushad;
+			push	arg4;
+			push	sampler_state_count;
+			mov		edx, arg2;
+			mov		ecx, texture_slot;
+			call	game::func_addr__SetupTextureAndSampler;
+			add     esp, 8;
+			popad;
+		}
+	}
+
 	// every mesh goes through here (besides in-game ui and particles)
 	void SetupPixelShaderAndConstants(game::ps_info_s* info, game::ps_data_s* data, game::shader_info_sub_s* constant_data_struct, game::shader_data_sub_s* sampler_data)
 	{
@@ -817,6 +835,33 @@ namespace gta4
 		if (g_is_rendering_fx_instance || g_is_rendering_fx) {
 			ctx.modifiers.is_fx = true;
 		}
+
+		// example usage
+		//int spec_channel_index = -1;
+		//float bumpiness = 1.0f;
+		//
+		//for (auto i = 0u; i < constant_data_struct->mCount; i++)
+		//{
+		//	const auto& h = constant_data_struct->mEntriesHashes[i];
+		//	if (h == 0xFF11711D /*specMapIntMask*/)
+		//	{
+		//		Vector4D specmapindex = constant_data_struct->constants[i].float_arr;
+		//		if (specmapindex.x) {
+		//			spec_channel_index = 0u;
+		//		}
+		//		else if (specmapindex.y) {
+		//			spec_channel_index = 1u;
+		//		}
+		//		else if (specmapindex.z) {
+		//			spec_channel_index = 2u;
+		//		}
+		//	}
+		//
+		//	else if (h == 0xF6712B81 /*bumpiness*/) {
+		//		bumpiness = *constant_data_struct->constants[i].float_arr;
+		//	}
+		//}
+
 
 		if (info->num_ps_constants > 0)
 		{
@@ -878,6 +923,7 @@ namespace gta4
 				std::uint32_t dataPoolIndex = info->ps_constant_stack[i].constant_pool_index;
 				game::const_stack_s* psconst = &info->ps_constant_stack[i];
 				std::uint8_t float_count = constant_data_struct->constant_float_count_array[dataPoolIndex];
+				auto entry_hash = constant_data_struct->mEntriesHashes[dataPoolIndex];
 
 				if (float_count)
 				{
@@ -897,8 +943,7 @@ namespace gta4
 							}
 						}
 
-						//if (g_is_sky_rendering || is_gta_im_shader)
-							game_device->SetPixelShaderConstantB(register_num, constant_data_struct->constants[dataPoolIndex].bool_ptr, 1u);
+						game_device->SetPixelShaderConstantB(register_num, constant_data_struct->constants[dataPoolIndex].bool_ptr, 1u);
 					}
 					else
 					{
@@ -999,7 +1044,7 @@ namespace gta4
 
 						else
 						{
-							if (register_num == 66u && is_emissive_shader)
+							if (register_num == 66u && is_emissive_shader && entry_hash == 0x5EEBED48 /*emissiveMultiplier*/)
 							{
 								ctx.info.shaderconst_uses_emissive_multiplier = true;
 
@@ -1125,7 +1170,7 @@ namespace gta4
 									break;
 								}
 							}
-							else if (register_num == 51u && (pidx == GTA_EMISSIVENIGHT || pidx == GTA_EMISSIVENIGHT_ALPHA))
+							else if (register_num == 51u && (pidx == GTA_EMISSIVENIGHT || pidx == GTA_EMISSIVENIGHT_ALPHA) && entry_hash == 0xB0232CBA /*colorize*/)
 							{
 								if (!im->m_dbg_emissive_disable_const51_tfactor_ems_multi)
 								{
@@ -1165,15 +1210,14 @@ namespace gta4
 							}
 						}
 
-						//if (g_is_sky_rendering || is_gta_im_shader)
-							game_device->SetPixelShaderConstantF(register_num, constant_data_struct->constants[dataPoolIndex].float_arr, float_count * game::pShaderConstFloatCountMap[type]);
+						game_device->SetPixelShaderConstantF(register_num, constant_data_struct->constants[dataPoolIndex].float_arr, float_count * game::pShaderConstFloatCountMap[type]);
 					}
 				}
 				else
 				{
 					//SetupTextureAndSampler(data->register_pool[psconst->register_pool_index].register_num, constant_data_struct->constants[dataPoolIndex].constant_ptr, (*sampler_data)[2 * dataPoolIndex].unk02 >> 1, *&(*sampler_data)[2 * dataPoolIndex + 1].unk01);
 
-					auto arg1 = (unsigned int)data->register_pool[psconst->register_pool_index].register_num;
+					auto texture_slot = (unsigned int)data->register_pool[psconst->register_pool_index].register_num;
 					auto arg2 = constant_data_struct->constants[dataPoolIndex].texture_ref;
 					auto arg3 = sampler_data->sampler_constant_data[dataPoolIndex].unk3_lo >> 1;
 					auto arg4 = sampler_data->sampler_constant_data[dataPoolIndex].unk9;
@@ -1183,28 +1227,28 @@ namespace gta4
 					bool is_dirt_s2 = false;
 
 					if (pidx == GTA_VEHICLE_PAINT1 || pidx == GTA_VEHICLE_PAINT2) { 
-						is_dirt = arg3 == 6 && arg1 == 1;
+						is_dirt = arg3 == 6 && texture_slot == 1;
 					}
 
 #if 0 //DEBUG
 					if (pidx == GTA_VEHICLE_PAINT1 || pidx == GTA_VEHICLE_PAINT2 || pidx == GTA_VEHICLE_PAINT3)
 					{
-						if (arg3 == 6 && arg1 == 0) 
+						if (arg3 == 6 && texture_slot == 0) 
 						{
 							int y = 0;
 						}
 
-						if (arg3 == 6 && arg1 == 1)
+						if (arg3 == 6 && texture_slot == 1)
 						{
 							int y = 0;
 						}
 
-						if (arg3 == 6 && arg1 == 2)
+						if (arg3 == 6 && texture_slot == 2)
 						{
 							int y = 0;
 						}
 
-						if (arg3 == 6 && arg1 == 3)
+						if (arg3 == 6 && texture_slot == 3)
 						{
 							int y = 0;
 						}
@@ -1213,35 +1257,41 @@ namespace gta4
 
 					if (pidx == GTA_VEHICLE_PAINT3) 
 					{
-						is_livery = arg3 == 6 && arg1 == 1;
-						is_dirt_s2 = arg3 == 6 && arg1 == 2;
+						is_livery = arg3 == 6 && texture_slot == 1;
+						is_dirt_s2 = arg3 == 6 && texture_slot == 2;
 					}
 
 					if (gs->load_colormaps_only.get_as<bool>() && !g_is_sky_rendering)
 					{
 						// everything that is not 0 is not a colormap (I hope)
-						if (arg1 && !is_livery && !is_dirt && !is_dirt_s2)
+						if (texture_slot && !is_livery && !is_dirt && !is_dirt_s2)
 						{
 							++i;
 							continue;
 						}
 					}
 
-					__asm
+					// this was causing issues with ebx all of a sudden?
+					/*__asm
 					{
 						pushad;
 						push	arg4;
 						push	arg3;
 						mov		edx, arg2;
-						mov		ecx, arg1;
+						mov		ecx, texture_slot;
 						call	game::func_addr__SetupTextureAndSampler;
 						add     esp, 8;
 						popad;
-					}
+					}*/
+
+					// calling this in a debug build resulted in esp fuckery .. (fine on release)
+					//game::SetupTextureAndSampler(texture_slot, arg2, arg3, arg4);
+
+					SetupTextureAndSampler_call(texture_slot, arg2, arg3, arg4);
 
 					if (is_livery && gs->vehicle_livery_enabled.get_as<bool>())
 					{
-						if (arg3 == 6 && arg1 == 1)
+						if (arg3 == 6 && texture_slot == 1)
 						{
 							IDirect3DBaseTexture9* tex1ptr = nullptr;
 							if (game_device->GetTexture(1, &tex1ptr); tex1ptr)
@@ -1255,7 +1305,7 @@ namespace gta4
 
 					if (gs->vehicle_dirt_enabled.get_as<bool>())
 					{
-						if (is_dirt && arg3 == 6 && arg1 == 1)
+						if (is_dirt && arg3 == 6 && texture_slot == 1)
 						{
 							IDirect3DBaseTexture9* tex1ptr = nullptr;
 							if (game_device->GetTexture(1, &tex1ptr); tex1ptr)
@@ -1266,7 +1316,7 @@ namespace gta4
 							}
 						}
 
-						if (is_dirt_s2 && arg3 == 6 && arg1 == 2)
+						if (is_dirt_s2 && arg3 == 6 && texture_slot == 2)
 						{
 							IDirect3DBaseTexture9* tex2ptr = nullptr;
 							if (game_device->GetTexture(2, &tex2ptr); tex2ptr)

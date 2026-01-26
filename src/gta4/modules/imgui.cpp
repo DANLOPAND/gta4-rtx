@@ -906,6 +906,7 @@ namespace gta4
 			ImGui::Checkbox("Debug Bool 3", &im->m_dbg_debug_bool03);
 			ImGui::Checkbox("Debug Bool 4", &im->m_dbg_debug_bool04);
 			ImGui::Checkbox("Debug Bool 5", &im->m_dbg_debug_bool05);
+
 			ImGui::DragInt("Debug Int 1", &im->m_dbg_int_01, 0.01f);
 			ImGui::DragInt("Debug Int 2", &im->m_dbg_int_02, 0.01f);
 			ImGui::TreePop();
@@ -974,10 +975,12 @@ namespace gta4
 		}
 
 #if DEBUG
+		ImGui::Spacing(0.0f, 4.0f);
 		if (ImGui::Button("Timecycle Vars - Debug Single Frame", ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
 			im->m_dbg_debug_single_frame_timecycle_remix_vars = true;
 		}
 
+		ImGui::Spacing(0.0f, 4.0f);
 		if (ImGui::Button("Emissive Intensity - Debug Single Frame", ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
 			im->m_dbg_debug_single_frame_emissive_intensity_vars = true;
 		}
