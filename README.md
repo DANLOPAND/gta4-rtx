@@ -38,8 +38,8 @@ __[Compiling](#compiling)__
 <div align="center" markdown="1"> 
 
 First and foremost, __this is not a remaster__. It is a mod that allows the game to be modded with NVIDIA's 
-[RTX Remix](https://github.com/NVIDIAGameWorks/rtx-remix)  
-[It only comes with a few enhanced assets](https://github.com/xoxor4d/gta4-rtx-base-mod). You'll need actual remix mods made by the community for proper PBR materials.
+[RTX Remix](https://github.com/NVIDIAGameWorks/rtx-remix).  
+[It comes with a few enhanced assets](https://github.com/xoxor4d/gta4-rtx-base-mod) and [GTAIV-AutoPBR](https://github.com/xoxor4d/gta4-rtx-autopbr-mod).  
 
 <br>
 
@@ -51,7 +51,7 @@ which means that the performance you'll see in certain places is not entirely du
 
 <br>
 
-The mod comes with a custom [Remix Runtime](https://github.com/xoxor4d/dxvk-remix/tree/game/gta4_rebase7) required for a few game specific features   
+The mod comes with a custom [Remix Runtime](https://github.com/xoxor4d/dxvk-remix/tree/game/gta4_rebase8) required for a few game specific features   
 and with [Ultimate ASI Loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases/tag/v9.0.0) to load the Compatibility Mod itself. 
 
 </div>
