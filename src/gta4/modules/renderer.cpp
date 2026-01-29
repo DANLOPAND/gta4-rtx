@@ -2338,7 +2338,16 @@ namespace gta4
 				//}
 
 				D3DMATRIX matrix = {};
-				matrix.m[0][0] = 300.0f + im->m_dbg_phone_projection_matrix_offset.m[0][0] + 5.0f + -a;
+
+				float aspect_offs_x = 1.777f - game::pViewports->sceneviewport->aspect;
+				aspect_offs_x = std::clamp(aspect_offs_x, 0.0f, 0.777f);
+				aspect_offs_x *= ((108.0f /*+ im->m_debug_vector.x*/) * -1.0f);
+
+				float aspect_offs_w = game::pViewports->sceneviewport->aspect - 1.777f;
+				aspect_offs_w = std::clamp(aspect_offs_w, 0.0f, 1.25f);
+				aspect_offs_w *= ((100.0f /*+ im->m_debug_vector.x*/) * -1.0f);
+
+				matrix.m[0][0] = 300.0f + im->m_dbg_phone_projection_matrix_offset.m[0][0] + 5.0f + -a + aspect_offs_w;
 				matrix.m[0][1] = 12.0f + im->m_dbg_phone_projection_matrix_offset.m[0][1];
 				matrix.m[0][2] += im->m_dbg_phone_projection_matrix_offset.m[0][2];
 				matrix.m[0][3] = -40.0f + 30.0f + im->m_dbg_phone_projection_matrix_offset.m[0][3];
@@ -2348,7 +2357,7 @@ namespace gta4
 				matrix.m[1][2] += im->m_dbg_phone_projection_matrix_offset.m[1][2];
 				matrix.m[1][3] = -4.0f + im->m_dbg_phone_projection_matrix_offset.m[1][3];
 
-				matrix.m[2][0] = 100.0f + im->m_dbg_phone_projection_matrix_offset.m[2][0] + 30.0f - 5.0f;
+				matrix.m[2][0] = 100.0f + im->m_dbg_phone_projection_matrix_offset.m[2][0] + 30.0f - 5.0f + aspect_offs_x;
 				matrix.m[2][1] = -5.0f + im->m_dbg_phone_projection_matrix_offset.m[2][1] - 20.0f;
 
 				//matrix.m[2][2] = b + (viewport->wp->farclip / (viewport->wp->farclip - viewport->wp->nearclip)) + im->m_dbg_phone_projection_matrix_offset.m[2][2] + -a;
@@ -2356,7 +2365,7 @@ namespace gta4
 					matrix.m[2][2] = (viewport->wp->farclip / (viewport->wp->farclip - viewport->wp->nearclip)) + im->m_dbg_phone_projection_matrix_offset.m[2][2];
 				//}
 
-				matrix.m[2][3] = -250.0f + im->m_dbg_phone_projection_matrix_offset.m[2][3];
+				matrix.m[2][3] = -250.0f + im->m_dbg_phone_projection_matrix_offset.m[2][3] + 40.0f;
 
 				matrix.m[3][0] += im->m_dbg_phone_projection_matrix_offset.m[3][0];
 				matrix.m[3][1] += im->m_dbg_phone_projection_matrix_offset.m[3][1];
