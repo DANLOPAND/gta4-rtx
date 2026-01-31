@@ -22,6 +22,7 @@ namespace gta4
 
 	bool g_rendered_first_primitive = false;
 	bool g_applied_hud_hack = false; // was hud "injection" applied this frame
+	bool g_applied_phone_hack = false;
 
 	std::uint32_t g_model_hash = 0u;
 	std::uint32_t g_model_reference = 0u;
@@ -3624,16 +3625,33 @@ namespace gta4
 	void on_phonescreen_bg_pre_hk()
 	{
 		const auto dev = shared::globals::d3d_device;
-		dev->GetRenderState(D3DRS_ALPHABLENDENABLE, &phone_bg_alphablendstate);
-		dev->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
+		const auto im = imgui::get();
+
+		if (!im->m_dbg_disable_phone_fixup)
+		{
+			if (!g_applied_phone_hack)
+			{
+				dev->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
+				g_applied_phone_hack = true;
+			}
+		}
+
+		/*if (!imgui::get()->m_dbg_debug_bool02)
+		{
+			dev->GetRenderState(D3DRS_ALPHABLENDENABLE, &phone_bg_alphablendstate);
+			dev->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
+		}*/
 	}
 
-	void on_phonescreen_bg_post_hk()
+	/*void on_phonescreen_bg_post_hk()
 	{
 		const auto dev = shared::globals::d3d_device;
-		dev->SetRenderState(D3DRS_ALPHABLENDENABLE, phone_bg_alphablendstate);
-		phone_bg_alphablendstate = 0u;
-	}
+		if (!imgui::get()->m_dbg_debug_bool02)
+		{
+			dev->SetRenderState(D3DRS_ALPHABLENDENABLE, phone_bg_alphablendstate);
+			phone_bg_alphablendstate = 0u;
+		}
+	}*/
 
 	// fix phone screen smear
 	__declspec (naked) void on_phonescreen_bg_draw()
@@ -3646,17 +3664,46 @@ namespace gta4
 
 			call	game::fn_addr__draw_prim_wrapper; // 0x8D41D0
 
-			pushad;
-			call	on_phonescreen_bg_post_hk;
-			popad;
+			//pushad;
+			//call	on_phonescreen_bg_post_hk;
+			//popad;
 
 			// render same stuff a second time - would look incorrect without doing that
-			call	game::fn_addr__draw_prim_wrapper; // 0x8D41D0
+			//call	game::fn_addr__draw_prim_wrapper; // 0x8D41D0
 
 			jmp		game::retn_addr__draw_phonescreen_bg_fix; // 0x94A643
 		}
 	}
 
+	// --
+
+	void on_phonescreen_start_hk()
+	{
+		const auto dev = shared::globals::d3d_device;
+
+		if (imgui::get()->m_dbg_debug_bool03) 
+		{
+			if (!g_applied_phone_hack)
+			{
+				dev->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(1, 0, 0), 1.0f, 0);
+				g_applied_phone_hack = true;
+			}
+		}
+	}
+
+	// issue a clear before starting to draw the phone screen
+	__declspec (naked) void on_phonescreen_bg_draw_early()
+	{
+		__asm
+		{
+			pushad;
+			call	on_phonescreen_start_hk;
+			popad;
+
+			lea     eax, [esp + 0x194]; // og
+			jmp		game::retn_addr__draw_phonescreen_bg_fix2; // 0x94A1B7
+		}
+	}
 	// ---
 
 	renderer::renderer()
@@ -3748,8 +3795,12 @@ namespace gta4
 			shared::utils::hook(game::hk_addr__dyn_obj_clear_hash03, on_draw_dyn_objects__clear_global_stub, HOOK_JUMP).install()->quick(); // 0x8DE437
 		}
 
-		//shared::utils::hook(0x94ADBF, on_phonescreendrawlist, HOOK_JUMP).install()->quick();
-		shared::utils::hook(game::retn_addr__draw_phonescreen_bg_fix - 5u, on_phonescreen_bg_draw, HOOK_JUMP).install()->quick(); // fix phone screen smear issue
+		// fix phone screen smear issue
+		shared::utils::hook(game::retn_addr__draw_phonescreen_bg_fix - 5u, on_phonescreen_bg_draw, HOOK_JUMP).install()->quick(); 
+		
+		//shared::utils::hook::nop(game::retn_addr__draw_phonescreen_bg_fix2 - 7u, 7); // fix phone screen smear issue by issuing a clear before the first draw
+		//shared::utils::hook(game::retn_addr__draw_phonescreen_bg_fix2 - 7u, on_phonescreen_bg_draw_early, HOOK_JUMP).install()->quick();
+
 
 		// -----
 		m_initialized = true;

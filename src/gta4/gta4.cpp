@@ -34,6 +34,7 @@ namespace gta4
 
 		renderer::get()->m_triggered_remix_injection = false; 
 		g_applied_hud_hack = false;
+		g_applied_phone_hack = false;
 
 		if (!tex_addons::initialized) {
 			tex_addons::init_texture_addons();

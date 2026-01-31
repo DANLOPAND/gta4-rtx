@@ -15,6 +15,7 @@ namespace gta4
 
 	extern bool g_rendered_first_primitive;
 	extern bool g_applied_hud_hack;
+	extern bool g_applied_phone_hack;
 
 	extern std::uint32_t g_model_hash;
 	extern std::uint32_t g_model_reference;

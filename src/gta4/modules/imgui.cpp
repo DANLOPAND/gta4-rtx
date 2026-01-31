@@ -577,6 +577,10 @@ namespace gta4
 			ImGui::Checkbox("Disable HUD Hack", &im->m_dbg_disable_hud_fixup); TT("Disables hack that helps remix detect the first HUD elem");
 			ImGui::Checkbox("Disable HUD Hack #2", &im->m_dbg_disable_hud_fixup2); TT("Disables 2nd hack that helps remix detect the first HUD elem (on drawing radar background)");
 
+			ImGui::Checkbox("Disable Phone Hack", &im->m_dbg_disable_phone_fixup); TT("Disables phone hack that clears the RT before drawing the first elem on the phone screen. Fixes smearing.");
+
+			
+
 			ImGui::Checkbox("Disable IgnoreBackedLighting Enforcement", &im->m_dbg_disable_ignore_baked_lighting_enforcement);
 			TT("CompMod forces the IgnoreBakedLighting category for almost every mesh. This disables that")
 

@@ -218,7 +218,8 @@ namespace gta4::game
 	uint32_t retn_addr__veh_invalid_model_crash_fix = 0u;
 
 	uint32_t retn_addr__draw_phonescreen_bg_fix = 0u;
-	uint32_t fn_addr__draw_prim_wrapper = 0u; // for phone screen
+	uint32_t fn_addr__draw_prim_wrapper = 0u; // for phone screen#
+	uint32_t retn_addr__draw_phonescreen_bg_fix2 = 0u;
 
 	// --------------
 
@@ -750,6 +751,8 @@ namespace gta4::game
 			// func used to draw the screen
 			fn_addr__draw_prim_wrapper = shared::utils::mem::resolve_relative_call_address(retn_addr__draw_phonescreen_bg_fix - 5u);
 		} total_pattern_count++;
+
+		//PATTERN_OFFSET_SIMPLE(retn_addr__draw_phonescreen_bg_fix2, "50 E8 ? ? ? ? 83 C4 ? E8 ? ? ? ? E9 ? ? ? ? F3 0F 10 44 24", 0, 0x94A1B7);
 
 		// end GAME_ASM_OFFSETS
 #pragma endregion

@@ -105,6 +105,7 @@ namespace gta4
 		bool m_dbg_extended_anticull_always_true = false;
 		bool m_dbg_disable_hud_fixup = false;
 		bool m_dbg_disable_hud_fixup2 = false;
+		bool m_dbg_disable_phone_fixup = false;
 		bool m_dbg_disable_global_uv_anims = false;
 		bool m_dbg_disable_omm_override_on_alpha_uv_anims = false;
 		bool m_dbg_disable_water_worldpos_logic = false;
