@@ -752,7 +752,7 @@ namespace gta4::game
 			fn_addr__draw_prim_wrapper = shared::utils::mem::resolve_relative_call_address(retn_addr__draw_phonescreen_bg_fix - 5u);
 		} total_pattern_count++;
 
-		//PATTERN_OFFSET_SIMPLE(retn_addr__draw_phonescreen_bg_fix2, "50 E8 ? ? ? ? 83 C4 ? E8 ? ? ? ? E9 ? ? ? ? F3 0F 10 44 24", 0, 0x94A1B7);
+		PATTERN_OFFSET_SIMPLE(retn_addr__draw_phonescreen_bg_fix2, "83 C4 ? E8 ? ? ? ? E9 ? ? ? ? F3 0F 10 44 24", 0, 0x94A1BD);
 
 		// end GAME_ASM_OFFSETS
 #pragma endregion

@@ -272,12 +272,44 @@ namespace gta4
 
 		//renderer::get()->m_modified_draw_prim = false;
 
+		// delay reset of phone_last_frame to end of next frame
+		if (!g_was_rendering_phone_last_frame_delay_reset_helper) {
+			g_was_rendering_phone_last_frame_delay_reset_helper = true;
+		} 
+		else
+		{
+			g_was_rendering_phone_last_frame = false;
+			g_was_rendering_phone_last_frame_delay_reset_helper = false;
+		}
+
 		return m_pIDirect3DDevice9->EndScene();
 	}
 
 	HRESULT d3d9ex::D3D9Device::Clear(DWORD Count, CONST D3DRECT* pRects, DWORD Flags, D3DCOLOR Color, float Z, DWORD Stencil)
 	{
 		g_is_rendering_phone = shared::utils::float_equal(Z, 0.1337f);
+
+		if (g_is_rendering_phone) 
+		{
+			g_was_rendering_phone_last_frame = true;
+			g_was_rendering_phone_last_frame_delay_reset_helper = false; // reset helper if phone was drawn this frame
+		}
+
+		/*if (imgui::is_initialized())
+		{
+			const auto im = imgui::get();
+			if (im->m_dbg_debug_shader_float_constants)
+			{
+				{
+					float a = ((Color >> 24) & 0xFF) / 255.0f;
+					float r = ((Color >> 16) & 0xFF) / 255.0f;
+					float g = ((Color >> 8) & 0xFF) / 255.0f;
+					float b = ((Color >> 0) & 0xFF) / 255.0f;
+					shared::common::log("CLEAR", std::format("r:{} g:{} b:{} a:{} --- z: {}",
+						r, g, b, a, Z), shared::common::LOG_TYPE::LOG_TYPE_STATUS, true);
+				}
+			}
+		}*/
 
 		return m_pIDirect3DDevice9->Clear(Count, pRects, Flags, Color, Z, Stencil);
 	}

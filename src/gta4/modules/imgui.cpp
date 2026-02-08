@@ -910,20 +910,35 @@ namespace gta4
 			ImGui::Checkbox("Debug Bool 3", &im->m_dbg_debug_bool03);
 			ImGui::Checkbox("Debug Bool 4", &im->m_dbg_debug_bool04);
 			ImGui::Checkbox("Debug Bool 5", &im->m_dbg_debug_bool05);
+			ImGui::Checkbox("Debug Bool 6", &im->m_dbg_debug_bool06);
+			ImGui::Checkbox("Debug Bool 7", &im->m_dbg_debug_bool07);
+			ImGui::Checkbox("Debug Bool 8", &im->m_dbg_debug_bool08);
+			ImGui::Checkbox("Debug Bool 9", &im->m_dbg_debug_bool09);
 
 			ImGui::DragInt("Debug Int 1", &im->m_dbg_int_01, 0.01f);
 			ImGui::DragInt("Debug Int 2", &im->m_dbg_int_02, 0.01f);
+			ImGui::DragInt("Debug Int 3", &im->m_dbg_int_03, 0.01f);
+			ImGui::DragInt("Debug Int 4", &im->m_dbg_int_04, 0.01f);
+			ImGui::DragInt("Debug Int 5", &im->m_dbg_int_05, 0.01f);
+			
 			ImGui::TreePop();
 		}
 
 		ImGui::Spacing(0, TREENODE_SPACING);
-		if (ImGui::TreeNode("Phone Projection Offset Matrix"))
+		if (ImGui::TreeNode("Phone Debug"))
 		{
 			ImGui::Spacing(0, TREENODE_SPACING_INSIDE);
 			ImGui::DragFloat4("##Phone Proj Offset Row0", im->m_dbg_phone_projection_matrix_offset.m[0], 0.01f);
 			ImGui::DragFloat4("##Phone Proj Offset Row1", im->m_dbg_phone_projection_matrix_offset.m[1], 0.01f);
 			ImGui::DragFloat4("##Phone Proj Offset Row2", im->m_dbg_phone_projection_matrix_offset.m[2], 0.01f);
 			ImGui::DragFloat4("##Phone Proj Offset Row3", im->m_dbg_phone_projection_matrix_offset.m[3], 0.01f);
+
+			ImGui::Spacing(0, 8.0f);
+			ImGui::Separator();
+
+			ImGui::ColorEdit3("Phone Clear Color", &im->m_dbg_phone_clear_hack_color.x, ImGuiColorEditFlags_InputRGB);
+			TT("Color used for the clear hack used on phones");
+
 			ImGui::TreePop();
 		}
 
@@ -988,6 +1003,8 @@ namespace gta4
 		if (ImGui::Button("Emissive Intensity - Debug Single Frame", ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
 			im->m_dbg_debug_single_frame_emissive_intensity_vars = true;
 		}
+
+		//ImGui::Checkbox("Log Shader Float Constants", &im->m_dbg_debug_shader_float_constants);
 #endif
 
 		ImGui::Spacing(0.0f, 4.0f);

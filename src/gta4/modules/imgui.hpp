@@ -48,6 +48,7 @@ namespace gta4
 		Vector m_debug_vector4 = { 0.0f, 0.0f, 0.0f };
 		Vector m_debug_vector5 = { 0.0f, 0.0f, 0.0f };
 
+		Vector m_dbg_phone_clear_hack_color = { 0.22f, 0.27f, 0.27f };
 		D3DXMATRIX m_dbg_phone_projection_matrix_offset;
 		D3DXMATRIX m_debug_mtx02;
 		D3DXMATRIX m_debug_mtx03;
@@ -57,8 +58,16 @@ namespace gta4
 		bool m_dbg_debug_bool03 = false;
 		bool m_dbg_debug_bool04 = false;
 		bool m_dbg_debug_bool05 = false;
+		bool m_dbg_debug_bool06 = false;
+		bool m_dbg_debug_bool07 = false;
+		bool m_dbg_debug_bool08 = false;
+		bool m_dbg_debug_bool09 = false;
+
 		int m_dbg_int_01 = -1;
 		int m_dbg_int_02 = -1;
+		int m_dbg_int_03 = -1;
+		int m_dbg_int_04 = -1;
+		int m_dbg_int_05 = -1;
 
 		bool m_dbg_only_render_static = false;
 		bool m_dbg_do_not_render_static = false;
@@ -117,6 +126,8 @@ namespace gta4
 		bool m_dbg_debug_single_frame_timecycle_remix_vars = false;
 
 		bool m_dbg_debug_single_frame_emissive_intensity_vars = false;
+
+		bool m_dbg_debug_shader_float_constants = false;
 
 		bool m_dbg_global_wetness_override = false;
 		float m_dbg_global_wetness = 0.0f;

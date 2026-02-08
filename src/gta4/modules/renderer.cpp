@@ -18,7 +18,9 @@ namespace gta4
 	int g_is_rendering_fx = 0;
 	int  g_is_rendering_static = 0;
 	int  g_is_rendering_vehicle = 0;
-	bool g_is_rendering_phone = false;
+	bool g_is_rendering_phone = false; // phone on screen (not true when rendering screen to RT)
+	bool g_was_rendering_phone_last_frame = false;
+	bool g_was_rendering_phone_last_frame_delay_reset_helper = false;
 
 	bool g_rendered_first_primitive = false;
 	bool g_applied_hud_hack = false; // was hud "injection" applied this frame
@@ -1210,6 +1212,19 @@ namespace gta4
 								renderer::set_remix_temp_float02(shared::globals::d3d_device, gs->decal_dirt_shader_contrast.get_as<float>());
 							}
 						}
+
+						/*if (im->m_dbg_debug_shader_float_constants)
+						{
+							if (ctx.info.shader_name.contains("gta_emissive.fxc"))
+							{
+								if (float_count * game::pShaderConstFloatCountMap[type] == 1) // ignore matrices
+								{
+									auto& c = constant_data_struct->constants[dataPoolIndex].float_arr;
+									shared::common::log("SHADERCONST", std::format("[{}]: x:{} y:{} z:{} w:{} --- hash: {:#x}"
+										, register_num, c[0], c[1], c[2], c[3], entry_hash), shared::common::LOG_TYPE::LOG_TYPE_STATUS, true);
+								}
+							}
+						}*/
 
 						game_device->SetPixelShaderConstantF(register_num, constant_data_struct->constants[dataPoolIndex].float_arr, float_count * game::pShaderConstFloatCountMap[type]);
 					}
@@ -3583,77 +3598,30 @@ namespace gta4
 		}
 	}
 
-#if 0
-	void on_phonescreendrawlist_hk()
-	{
-		// GetDrawListPtr
-		auto DrawListPtr = shared::utils::hook::call<DWORD(__cdecl)(int, int)>(0x8DC3A0)(0x18, 0);
-		if (DrawListPtr)
-		{
-			//v6 = AddCmdClearRT(DrawListPtr, 0, 0, 1, v4, 1, 0);// hooked . 1337 marker
-			auto v6 = shared::utils::hook::call<DWORD*(__fastcall)(int pthis, int unused, char flags, int col, char a4, float z, char a6, int stencil)>
-				(0x8DAA70)(DrawListPtr, 0, 0, 0, 0, 0.0f, 0, 0);
+	// --
 
-			//AddRenderCmdToList(v6);
-			shared::utils::hook::call<void(__cdecl)(DWORD*)>(0x499E30)(v6);
-		}
-		else
-		{
-			//AddRenderCmdToList(0);
-			shared::utils::hook::call<void(__cdecl)(DWORD*)>(0x499E30)(nullptr);
-		}
-	}
-	
-	__declspec (naked) void on_phonescreendrawlist()
-	{
-		static uint32_t og_func_addr = 0x948320;
-		static uint32_t retn_addr = 0x94ADC4;
-		__asm
-		{
-			call	og_func_addr;
-
-			pushad;
-			call	on_phonescreendrawlist_hk;
-			popad;
-
-			jmp		retn_addr;
-		}
-	}
-#endif
-
-	DWORD phone_bg_alphablendstate = 0u;
 	void on_phonescreen_bg_pre_hk()
 	{
-		const auto dev = shared::globals::d3d_device;
-		const auto im = imgui::get();
-
-		if (!im->m_dbg_disable_phone_fixup)
+		if (g_was_rendering_phone_last_frame)
 		{
-			if (!g_applied_phone_hack)
+			const auto im = imgui::get();
+			if (!im->m_dbg_disable_phone_fixup)
 			{
-				dev->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
-				g_applied_phone_hack = true;
+				if (!g_applied_phone_hack)
+				{
+					const auto dev = shared::globals::d3d_device;
+					dev->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(
+							(int)(im->m_dbg_phone_clear_hack_color.x * 255.0f), 
+							(int)(im->m_dbg_phone_clear_hack_color.y * 255.0f), 
+							(int)(im->m_dbg_phone_clear_hack_color.z * 255.0f)), 1.0f, 0);
+
+					g_applied_phone_hack = true;
+				}
 			}
 		}
-
-		/*if (!imgui::get()->m_dbg_debug_bool02)
-		{
-			dev->GetRenderState(D3DRS_ALPHABLENDENABLE, &phone_bg_alphablendstate);
-			dev->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
-		}*/
 	}
 
-	/*void on_phonescreen_bg_post_hk()
-	{
-		const auto dev = shared::globals::d3d_device;
-		if (!imgui::get()->m_dbg_debug_bool02)
-		{
-			dev->SetRenderState(D3DRS_ALPHABLENDENABLE, phone_bg_alphablendstate);
-			phone_bg_alphablendstate = 0u;
-		}
-	}*/
-
-	// fix phone screen smear
+	// fix phone screen smear when not in a submenu (bg drawn first)
 	__declspec (naked) void on_phonescreen_bg_draw()
 	{
 		__asm
@@ -3662,49 +3630,29 @@ namespace gta4
 			call	on_phonescreen_bg_pre_hk;
 			popad;
 
+			// calling this twice fixes the missing background ..
 			call	game::fn_addr__draw_prim_wrapper; // 0x8D41D0
-
-			//pushad;
-			//call	on_phonescreen_bg_post_hk;
-			//popad;
-
-			// render same stuff a second time - would look incorrect without doing that
-			//call	game::fn_addr__draw_prim_wrapper; // 0x8D41D0
-
+			call	game::fn_addr__draw_prim_wrapper; // 0x8D41D0
 			jmp		game::retn_addr__draw_phonescreen_bg_fix; // 0x94A643
 		}
 	}
 
-	// --
-
-	void on_phonescreen_start_hk()
-	{
-		const auto dev = shared::globals::d3d_device;
-
-		if (imgui::get()->m_dbg_debug_bool03) 
-		{
-			if (!g_applied_phone_hack)
-			{
-				dev->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(1, 0, 0), 1.0f, 0);
-				g_applied_phone_hack = true;
-			}
-		}
-	}
-
-	// issue a clear before starting to draw the phone screen
-	__declspec (naked) void on_phonescreen_bg_draw_early()
+	// fix phone screen smear when in a submenu (keypad bg drawn first)
+	// we need this second stub - otherwise we'd clear the keypad bg with the above stub
+	__declspec (naked) void on_phonescreen_bg_draw2()
 	{
 		__asm
 		{
 			pushad;
-			call	on_phonescreen_start_hk;
+			call	on_phonescreen_bg_pre_hk;
 			popad;
 
-			lea     eax, [esp + 0x194]; // og
-			jmp		game::retn_addr__draw_phonescreen_bg_fix2; // 0x94A1B7
+			call	game::fn_addr__draw_prim_wrapper; // 0x8D41D0
+			jmp		game::retn_addr__draw_phonescreen_bg_fix2; // 0x94A1BD
 		}
 	}
-	// ---
+
+	// --
 
 	renderer::renderer()
 	{
@@ -3796,10 +3744,8 @@ namespace gta4
 		}
 
 		// fix phone screen smear issue
-		shared::utils::hook(game::retn_addr__draw_phonescreen_bg_fix - 5u, on_phonescreen_bg_draw, HOOK_JUMP).install()->quick(); 
-		
-		//shared::utils::hook::nop(game::retn_addr__draw_phonescreen_bg_fix2 - 7u, 7); // fix phone screen smear issue by issuing a clear before the first draw
-		//shared::utils::hook(game::retn_addr__draw_phonescreen_bg_fix2 - 7u, on_phonescreen_bg_draw_early, HOOK_JUMP).install()->quick();
+		shared::utils::hook(game::retn_addr__draw_phonescreen_bg_fix - 5u, on_phonescreen_bg_draw, HOOK_JUMP).install()->quick(); // bg drawn first when not in a submenu
+		shared::utils::hook(game::retn_addr__draw_phonescreen_bg_fix2 - 5u, on_phonescreen_bg_draw2, HOOK_JUMP).install()->quick(); // keypad bg drawn first when in a submenu
 
 
 		// -----
