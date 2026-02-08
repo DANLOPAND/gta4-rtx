@@ -3602,6 +3602,9 @@ namespace gta4
 
 	void on_phonescreen_bg_pre_hk()
 	{
+		const auto dev = shared::globals::d3d_device;
+		renderer::set_remix_texture_categories(dev, InstanceCategories::IgnoreOpacityMicromap);
+
 		if (g_was_rendering_phone_last_frame)
 		{
 			const auto im = imgui::get();
@@ -3609,7 +3612,6 @@ namespace gta4
 			{
 				if (!g_applied_phone_hack)
 				{
-					const auto dev = shared::globals::d3d_device;
 					dev->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(
 							(int)(im->m_dbg_phone_clear_hack_color.x * 255.0f), 
 							(int)(im->m_dbg_phone_clear_hack_color.y * 255.0f), 
