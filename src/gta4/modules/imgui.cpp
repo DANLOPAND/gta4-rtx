@@ -1937,7 +1937,7 @@ namespace gta4
 				const auto n = natives::get();
 
 				natives::Ped ped;
-				n->GetPlayerChar(n->GetPlayerId(), &ped);
+				n->GetPlayerChar(n->ConvertIntToPlayerindex(n->GetPlayerId()), &ped);
 
 				n->DisplayRadar(im->m_screenshot_mode);
 
@@ -1975,7 +1975,7 @@ namespace gta4
 				const auto n = natives::get();
 
 				natives::Ped ped;
-				n->GetPlayerChar(n->GetPlayerId(), &ped);
+				n->GetPlayerChar(n->ConvertIntToPlayerindex(n->GetPlayerId()), &ped);
 
 				if (!n->IsCharSittingInAnyCar(ped))
 				{
@@ -2427,7 +2427,7 @@ namespace gta4
 				const auto n = natives::get();
 				natives::Ped ped;
 
-				n->GetPlayerChar(n->GetPlayerId(), &ped);
+				n->GetPlayerChar(n->ConvertIntToPlayerindex(n->GetPlayerId()), &ped);
 				n->SetCharCoordinatesNoOffset(ped, selection->origin.x, selection->origin.y, selection->origin.z);
 			}
 

@@ -13,7 +13,7 @@ namespace gta4
 			const auto n = natives::get();
 
 			natives::Ped ped;
-			n->GetPlayerChar(n->GetPlayerId(), &ped);
+			n->GetPlayerChar(n->ConvertIntToPlayerindex(n->GetPlayerId()), &ped);
 
 			if (n->IsCharSittingInAnyCar(ped))
 			{
