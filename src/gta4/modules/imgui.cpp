@@ -1884,6 +1884,8 @@ namespace gta4
 		ImGui::Spacing(0, 4);
 
 		compsettings_float_widget("MoonLight Intensity Scalar", gs->translate_moonlight_intensity_scalar, 0.0f, 1.0f, 0.005f);
+		compsettings_float_widget("SunLight Bad Weather Influence", gs->translate_sunlight_intensity_bad_weather_influence, 0.0f, 1.0f, 0.005f);
+		
 
 		ImGui::Spacing(0, inbetween_spacing);
 		ImGui::SeparatorText(" Timecycle ");
@@ -1898,8 +1900,10 @@ namespace gta4
 				ImGui::EndDisabled();
 			}
 			ImGui::EndDisabled();
+
+			ImGui::Spacing(0, 4);
+			compsettings_float_widget("SkyLight Bad Weather Offset", gs->timecycle_skylight_max_offset_bad_weather, 0.0f, 2.0f, 0.005f);
 		}
-		
 
 		ImGui::Spacing(0, 4);
 	}

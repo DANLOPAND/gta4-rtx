@@ -122,14 +122,14 @@ namespace gta4
 					}
 					else if (hour >= 20)
 					{
-						// fade from: 20:00-22:00
-						const float fade_progress = static_cast<float>(minute) / 120.0f; // 0.0 at 20:00, 1.0 at 22:00
+						// fade from: 20:00-21:00
+						const float fade_progress = static_cast<float>(minute) / 60.0f; // 0.0 at 20:00, 1.0 at 21:00
 						weather_factor = 1.0f - fade_progress;
 					}
-					else if (hour >= 6)
+					else if (hour == 6)
 					{
 						// fade from: 06:00-07:00
-						const float fade_progress = static_cast<float>(minute) / 120.0f; // 0.0 at 06:00, 1.0 at 07:00
+						const float fade_progress = static_cast<float>(minute) / 60.0f; // 0.0 at 06:00, 1.0 at 07:00
 						weather_factor = fade_progress * weather_factor;
 					}
 				}
@@ -148,10 +148,26 @@ namespace gta4
 				val.value = timecycle->mBloomIntensity * gs->timecycle_bloomintensity_scalar.get_as<float>();
 
 				// allow min clamping at night with no cutscene playing
-				if (gs->timecycle_bloom_night_min_clamp_enabled._bool() && !is_playing_cutscene && 
-					(*game::m_game_clock_hours <= 6 || *game::m_game_clock_hours >= 19)) 
+				if (gs->timecycle_bloom_night_min_clamp_enabled._bool() && !is_playing_cutscene && game::m_game_clock_hours && game::m_game_clock_minutes &&
+					(*game::m_game_clock_hours < 6 || *game::m_game_clock_hours >= 19)) 
 				{
-					val.value = std::max(gs->timecycle_bloom_night_min_clamp_value._float(), val.value);
+					const int& hour = *game::m_game_clock_hours;
+					const int& minute = *game::m_game_clock_minutes;
+					float fade_scale = 1.0f;
+
+					if (hour >= 20 || hour < 5) {
+						fade_scale = 1.0f;
+					}
+					else if (hour >= 19) {
+						fade_scale = static_cast<float>(minute) / 60.0f; // 0.0 at 18:00, 1.0 at 19:00
+					}
+					else if (hour == 5)
+					{
+						const float fade_progress = static_cast<float>(minute) / 60.0f; // 0.0 at 05:00, 1.0 at 06:00
+						fade_scale = 1.0f - fade_progress;
+					}
+					
+					val.value = std::max(gs->timecycle_bloom_night_min_clamp_value._float() * fade_scale, val.value);
 				}
 	
 				vars->set_option(rtxBloomBurnIntensity, val);
