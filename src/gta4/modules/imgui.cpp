@@ -1303,6 +1303,7 @@ namespace gta4
 		ImGui::Spacing(0, 4);
 
 		compsettings_float_widget("SunLight Intensity Scalar", gs->translate_sunlight_intensity_scalar, 0.0f, 0.0f, 0.005f);
+		compsettings_float_widget("SunLight Bad Weather Influence", gs->translate_sunlight_intensity_bad_weather_influence, 0.0f, 1.0f, 0.005f);
 		compsettings_float_widget("SunLight Angular Diameter Degrees", gs->translate_sunlight_angular_diameter_degrees, 0.0f, 45.0f, 0.005f);
 		compsettings_float_widget("SunLight Volumetric Base", gs->translate_sunlight_volumetric_radiance_base, 0.0f, 10.0f, 0.005f);
 		compsettings_float_widget("MoonLight Intensity Scalar", gs->translate_moonlight_intensity_scalar, 0.0f, 1.0f, 0.005f);
@@ -1539,6 +1540,7 @@ namespace gta4
 			ImGui::BeginDisabled(!gs->timecycle_skylight_enabled.get_as<bool>());
 			{
 				compsettings_float_widget("SkyLight Scalar", gs->timecycle_skylight_scalar, 0.0f, 0.0f, 0.005f);
+				compsettings_float_widget("SkyLight Bad Weather Offset", gs->timecycle_skylight_max_offset_bad_weather, 0.0f, 2.0f, 0.005f);
 
 				ImGui::TextDisabled("Timecycle mSkyLightMultiplier: [ %.2f ]",
 					im->m_timecyc_curr_mSkyLightMultiplier);

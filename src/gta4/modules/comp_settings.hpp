@@ -492,7 +492,7 @@ namespace gta4
 			{
 				"translate_game_light_focus_expo",
 				("Fixed focus expo of translated game spot lights"),
-				0.0f
+				1.0f
 			};
 
 			variable translate_game_light_spotlight_volumetric_radiance_scale =
@@ -521,6 +521,14 @@ namespace gta4
 				"translate_sunlight_intensity_scalar",
 				("Scale intensity of translated game sunlight"),
 				1.0f
+			};
+
+			variable translate_sunlight_intensity_bad_weather_influence =
+			{
+				"translate_sunlight_intensity_bad_weather_influence",
+				("Reduce intensity of translated game sunlight when weather is bad.\n"
+				 "0: No influence, 1: No sunlight on (full) bad weather"),
+				0.65f
 			};
 
 			variable translate_sunlight_angular_diameter_degrees =
@@ -1206,6 +1214,12 @@ namespace gta4
 				"timecycle_skylight_scalar",
 				("Controls how much the skylight timecycle variable influences 'rtx.skyBrightness'"),
 				0.02f
+			};
+
+			variable timecycle_skylight_max_offset_bad_weather = {
+				"timecycle_skylight_max_offset_bad_weather",
+				("How much offset gets applied to skylight on (full) bad weather. Influences 'rtx.skyBrightness'"),
+				0.5f
 			};
 
 			// -----

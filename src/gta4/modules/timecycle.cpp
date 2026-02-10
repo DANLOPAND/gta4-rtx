@@ -26,6 +26,32 @@ namespace gta4
 		im->m_timecyc_curr_##tc_name##_final.z = val.vector[2]; \
 		im->m_timecyc_curr_##tc_name##_final.w = val.vector[3];
 
+	// returns a factor between 0 and 1 based on prev and next weather
+	// 0 = good weather, 1 = bad weather
+	// can be used like: val.value += (max_offset * weather_factor);
+	float timecycle::get_bad_weather_factor()
+	{
+		auto is_bad_weather = [](game::eWeatherType wt) -> bool
+			{
+				return	wt == game::eWeatherType::WEATHER_RAIN ||
+						wt == game::eWeatherType::WEATHER_LIGHTNING ||
+						wt == game::eWeatherType::WEATHER_CLOUDY;
+			};
+
+		const float transition = *game::weather_change_value; // 0.0f = fully previous, 1.0f = fully new
+		float weather_factor = 0.0f;
+
+		if (is_bad_weather(*game::weather_type_prev)) {
+			weather_factor += (1.0f - transition);
+		}
+
+		if (is_bad_weather(*game::weather_type_new)) {
+			weather_factor += transition;
+		}
+
+		return std::clamp(weather_factor, 0.0f, 1.0f);
+	}
+
 	void timecycle::translate_and_apply_timecycle_settings()
 	{
 		auto unpack_uint32 = [](const uint32_t& in, float* out)
@@ -83,6 +109,33 @@ namespace gta4
 			if (gs->timecycle_skylight_enabled.get_as<bool>() && rtxSkybrightness)
 			{
 				val.value = timecycle->mSkyLightMultiplier * gs->timecycle_skylight_scalar.get_as<float>();
+
+				// bad weather
+				auto weather_factor = get_bad_weather_factor();
+				if (game::m_game_clock_hours && game::m_game_clock_minutes)
+				{
+					const int& hour = *game::m_game_clock_hours;
+					const int& minute = *game::m_game_clock_minutes;
+					
+					if (hour >= 21 || hour < 6) {
+						weather_factor = 0.0f; // no skylight increase at night
+					}
+					else if (hour >= 20)
+					{
+						// fade from: 20:00-22:00
+						const float fade_progress = static_cast<float>(minute) / 120.0f; // 0.0 at 20:00, 1.0 at 22:00
+						weather_factor = 1.0f - fade_progress;
+					}
+					else if (hour >= 6)
+					{
+						// fade from: 06:00-07:00
+						const float fade_progress = static_cast<float>(minute) / 120.0f; // 0.0 at 06:00, 1.0 at 07:00
+						weather_factor = fade_progress * weather_factor;
+					}
+				}
+
+				val.value += (gs->timecycle_skylight_max_offset_bad_weather._float() * weather_factor);
+
 				vars->set_option(rtxSkybrightness, val);
 				ASSIGN_IMGUI_VIS_FLOAT(mSkyLightMultiplier);
 			}

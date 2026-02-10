@@ -177,6 +177,7 @@ namespace gta4
 				ASSIGN(translate_game_light_angle_offset);
 
 				ASSIGN(translate_sunlight_intensity_scalar);
+				ASSIGN(translate_sunlight_intensity_bad_weather_influence);
 				ASSIGN(translate_sunlight_angular_diameter_degrees);
 				ASSIGN(translate_sunlight_volumetric_radiance_base);
 				ASSIGN(translate_sunlight_timecycle_fogdensity_volumetric_influence_enabled);
@@ -289,6 +290,7 @@ namespace gta4
 				ASSIGN(timecycle_skyhorizonheight_cam_height_influence_high);
 				ASSIGN(timecycle_skylight_enabled);
 				ASSIGN(timecycle_skylight_scalar);
+				ASSIGN(timecycle_skylight_max_offset_bad_weather);
 				ASSIGN(timecycle_colorcorrection_enabled);
 				ASSIGN(timecycle_colorcorrection_influence);
 				ASSIGN(timecycle_colortemp_enabled);

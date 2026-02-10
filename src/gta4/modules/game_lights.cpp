@@ -4,6 +4,7 @@
 #include "comp_settings.hpp"
 #include "imgui.hpp"
 #include "remix_lights.hpp"
+#include "timecycle.hpp"
 #include "shared/common/remix_api.hpp"
 
 namespace gta4
@@ -172,7 +173,13 @@ namespace gta4
 			l.m_info.sType = REMIXAPI_STRUCT_TYPE_LIGHT_INFO;
 			l.m_info.pNext = &l.m_ext;
 			l.m_info.hash = shared::utils::string_hash64("apilight_distant");
-			l.m_info.radiance = (def.mIntensity * Vector(def.mColor) * gs->translate_sunlight_intensity_scalar._float() * intensity_multiplier).ToRemixFloat3D();
+
+			Vector rad = (def.mIntensity * Vector(def.mColor) * gs->translate_sunlight_intensity_scalar._float() * intensity_multiplier);
+
+			const auto weather_factor = 1.0f - timecycle::get_bad_weather_factor() * std::clamp(gs->translate_sunlight_intensity_bad_weather_influence._float(), 0.0f, 1.0f);
+			rad *= weather_factor;
+
+			l.m_info.radiance = rad.ToRemixFloat3D();
 
 			if (api.m_bridge.CreateLight(&l.m_info, &l.m_handle) == REMIXAPI_ERROR_CODE_SUCCESS && l.m_handle) {
 				api.m_bridge.DrawLightInstance(l.m_handle);

@@ -18,6 +18,7 @@ namespace gta4
 			return false;
 		}
 
+		static float	get_bad_weather_factor();
 		static void		translate_and_apply_timecycle_settings();
 
 	private:
