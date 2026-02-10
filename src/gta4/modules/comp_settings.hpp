@@ -471,14 +471,28 @@ namespace gta4
 			{
 				"translate_game_light_intensity_scalar",
 				("Scale intensity of translated game lights"),
-				200.0f
+				500.0f
 			};
 
 			variable translate_game_light_softness_offset =
 			{
 				"translate_game_light_softness_offset",
 				("Offset softness of translated game lights"),
-				0.20f
+				0.00f
+			};
+
+			variable translate_game_light_softness_scalar =
+			{
+				"translate_game_light_softness_scalar",
+				("Scalar applied to softness of translated game spot lights"),
+				1.00f
+			};
+
+			variable translate_game_light_focus_expo =
+			{
+				"translate_game_light_focus_expo",
+				("Fixed focus expo of translated game spot lights"),
+				0.0f
 			};
 
 			variable translate_game_light_spotlight_volumetric_radiance_scale =
@@ -545,7 +559,7 @@ namespace gta4
 				("Scale intensity of moonlight. Moonlight is active from 22:00 to 05:00.\n"
 				"Transitions smoothly from sun intensity to moon intensity between 21:00-22:00 and 05:00-06:00.\n"
 				"Clamped from 0.0 to 1.0."),
-				0.23f
+				0.1f
 			};
 
 			// --

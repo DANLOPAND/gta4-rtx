@@ -170,6 +170,8 @@ namespace gta4
 				ASSIGN(translate_game_light_radius_scalar);
 				ASSIGN(translate_game_light_intensity_scalar);
 				ASSIGN(translate_game_light_softness_offset);
+				ASSIGN(translate_game_light_softness_scalar);
+				ASSIGN(translate_game_light_focus_expo);
 				ASSIGN(translate_game_light_spotlight_volumetric_radiance_scale);
 				ASSIGN(translate_game_light_spherelight_volumetric_radiance_scale);
 				ASSIGN(translate_game_light_angle_offset);

@@ -1,4 +1,4 @@
-﻿#include "std_include.hpp"
+#include "std_include.hpp"
 #include "remix_lights.hpp"
 
 #include "comp_settings.hpp"
@@ -93,8 +93,8 @@ namespace gta4
 		const float coneSoftness = std::cos(get_light_inner_cone_angle(def, lov) * 0.5f) - std::cos(get_light_outer_cone_angle(def, lov) * 0.5f);
 
 		light.m_ext.shaping_value.coneAngleDegrees = outerConeDegrees + gs->translate_game_light_angle_offset.get_as<float>();
-		light.m_ext.shaping_value.coneSoftness = coneSoftness + gs->translate_game_light_softness_offset.get_as<float>();
-		light.m_ext.shaping_value.focusExponent = 0.0f;
+			light.m_ext.shaping_value.coneSoftness = coneSoftness * gs->translate_game_light_softness_scalar.get_as<float>() + gs->translate_game_light_softness_offset.get_as<float>();
+			light.m_ext.shaping_value.focusExponent = gs->translate_game_light_focus_expo.get_as<float>();
 
 		light.m_ext.volumetricRadianceScale = 
 			   get_light_volumetric_scale(def, lov)
