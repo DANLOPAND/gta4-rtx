@@ -807,23 +807,23 @@ int main()
 			else
 			{
 				// Versions differ, ask user if they want to update
-				std::string message = "A newer version of the RTXRemix FusionFix fork is available.\n\n";
+				/*std::string message = "A newer version of the RTXRemix FusionFix fork is available.\n\n";
 				message += "Current version: " + (existing_version.empty() ? "Unknown" : existing_version) + "\n";
 				message += "New version: " + (zip_version.empty() ? "Unknown" : zip_version) + "\n\n";
 				message += "Do you want to update?";
 
 				const auto res = MessageBoxA(nullptr, message.c_str(), "FusionFix Update", MB_YESNO | MB_ICONQUESTION);
-				opt_install_fusion_fix_fork = (res == IDYES);
-
-				if (opt_install_fusion_fix_fork) {
+				opt_install_fusion_fix_fork = (res == IDYES);*/
+				opt_install_fusion_fix_fork = true; 
+				//if (opt_install_fusion_fix_fork) {
 					std::cout << "> Updating RTXRemix FusionFix fork from " << existing_version << " to " << zip_version << ".\n\n";
-				}
-				else
+				//}
+				/*else
 				{
 					log_yellow(true);
 					std::cout << "> Skipping RTXRemix FusionFix fork update.\n\n";
 					log_default();
-				}
+				}*/
 			}
 		}
 		else if (has_original_fusion_fix)
@@ -863,7 +863,7 @@ int main()
 					log_default();
 				}
 
-				opt_install_fusion_fix_fork = true;
+				opt_ins{tall_fusion_fix_fork = true;
 			}
 
 			if (!has_remix_comp_mod || !has_fusion_fix)
