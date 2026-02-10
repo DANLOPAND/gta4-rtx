@@ -1,8 +1,9 @@
-#include "std_include.hpp"
+﻿#include "std_include.hpp"
 #include "remix_lights.hpp"
 
 #include "comp_settings.hpp"
 #include "game_lights.hpp"
+#include "imgui.hpp"
 #include "map_settings.hpp"
 #include "shared/common/remix_api.hpp"
 
@@ -30,12 +31,12 @@ namespace gta4
 
 	float remix_lights::get_light_outer_cone_angle(const game::CLightSource& def, const map_settings::light_override_s* lov) {
 		return lov &&  lov->_use_outer_cone_angle ? lov->outer_cone_angle
-			 : lov && !lov->_use_outer_cone_angle && lov->light_type && def.mType != game::LT_SPOT ? lov->outer_cone_angle : def.mInnerConeAngle; // yes
+			 : lov && !lov->_use_outer_cone_angle && lov->light_type && def.mType != game::LT_SPOT ? lov->outer_cone_angle : def.mOuterConeAngle;
 	}
 
 	float remix_lights::get_light_inner_cone_angle(const game::CLightSource& def, const map_settings::light_override_s* lov) {
 		return lov &&  lov->_use_inner_cone_angle ? lov->inner_cone_angle
-			 : lov && !lov->_use_inner_cone_angle && lov->light_type && def.mType != game::LT_SPOT ? lov->inner_cone_angle : def.mOuterConeAngle; // yes
+			 : lov && !lov->_use_inner_cone_angle && lov->light_type && def.mType != game::LT_SPOT ? lov->inner_cone_angle : def.mInnerConeAngle;
 	}
 
 	float remix_lights::get_light_volumetric_scale(const game::CLightSource& def, const map_settings::light_override_s* lov) {
@@ -86,15 +87,42 @@ namespace gta4
 		light.m_ext.radius = custom ? def.mRadius : get_light_radius(def, lov) * gs->translate_game_light_radius_scalar.get_as<float>() * 0.01f;
 		light.m_ext.shaping_hasvalue = is_spotlight;
 		light.m_ext.shaping_value = {};
-		light.m_ext.shaping_value.direction = get_light_dir(def, lov).ToRemixFloat3D();
 
-		// "outer" param → actual inner cone (smaller)
-		const float outerConeDegrees = RAD2DEG(get_light_outer_cone_angle(def, lov)); // "inner" param → outer cone (larger)
-		const float coneSoftness = std::cos(get_light_inner_cone_angle(def, lov) * 0.5f) - std::cos(get_light_outer_cone_angle(def, lov) * 0.5f);
+		if (is_spotlight)
+		{
+			light.m_ext.shaping_value.direction = get_light_dir(def, lov).ToRemixFloat3D();
 
-		light.m_ext.shaping_value.coneAngleDegrees = outerConeDegrees + gs->translate_game_light_angle_offset.get_as<float>();
+			// "outer" param → actual inner cone (smaller)
+			//float outerConeDegrees = RAD2DEG(get_light_outer_cone_angle(def, lov));
+
+			//const float cosOuter = std::cos(get_light_outer_cone_angle(def, lov) * 0.5f);
+			//const float cosInner = std::cos(get_light_inner_cone_angle(def, lov) * 0.5f);
+			const float cosInner = get_light_inner_cone_angle(def, lov);
+			const float cosOuter = get_light_outer_cone_angle(def, lov);
+			const float coneSoftness = cosInner - cosOuter;
+
+			/*if (imgui::get()->m_dbg_debug_bool04) {
+				coneSoftness /= cosInner;
+			}*/
+
+			const float outerConeDegrees = RAD2DEG(acosf(cosOuter));
+
+			/*if (imgui::get()->m_dbg_debug_bool01) {
+				outerConeDegrees = RAD2DEG(acosf(cosOuter));
+			}
+
+			if (imgui::get()->m_dbg_debug_bool02) {
+				outerConeDegrees = RAD2DEG(acosf(cosInner));
+			}
+
+			if (imgui::get()->m_dbg_debug_bool03) {
+				outerConeDegrees *= 2.0f;
+			}*/
+
+			light.m_ext.shaping_value.coneAngleDegrees = outerConeDegrees + gs->translate_game_light_angle_offset.get_as<float>();
 			light.m_ext.shaping_value.coneSoftness = coneSoftness * gs->translate_game_light_softness_scalar.get_as<float>() + gs->translate_game_light_softness_offset.get_as<float>();
 			light.m_ext.shaping_value.focusExponent = gs->translate_game_light_focus_expo.get_as<float>();
+		}
 
 		light.m_ext.volumetricRadianceScale = 
 			   get_light_volumetric_scale(def, lov)

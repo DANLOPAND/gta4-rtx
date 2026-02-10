@@ -1291,9 +1291,12 @@ namespace gta4
 		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Light Intensity Scalar", gs->translate_game_light_intensity_scalar, 0.0f, 0.0f, 0.005f));
 
 		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Light Softness Offset", gs->translate_game_light_softness_offset, -1.0f, 1.0f, 0.005f));
-		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("SpotLight Volumetric Scale", gs->translate_game_light_spotlight_volumetric_radiance_scale, 0.0f, 10.0f, 0.005f));
+		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Light Softness Scalar", gs->translate_game_light_softness_scalar, 0.0f, 1.0f, 0.005f));
+
 		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("SphereLight Volumetric Scale", gs->translate_game_light_spherelight_volumetric_radiance_scale, 0.0f, 10.0f, 0.005f));
-		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("Light Angle Offset", gs->translate_game_light_angle_offset, -180.0f, 180.0f, 0.1f));
+		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("SpotLight Volumetric Scale", gs->translate_game_light_spotlight_volumetric_radiance_scale, 0.0f, 10.0f, 0.005f));
+		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("SpotLight Angle Offset", gs->translate_game_light_angle_offset, -180.0f, 180.0f, 0.1f));
+		CLEAR_CACHE_CHECK(clear, compsettings_float_widget("SpotLight Focus Expo", gs->translate_game_light_focus_expo, 0.0f, 10.0f, 0.01f));
 
 		ImGui::Spacing(0, inbetween_spacing);
 		ImGui::SeparatorText(" Distant ");
@@ -3885,17 +3888,17 @@ namespace gta4
 						auto get_default_outer_cone = [&]() -> float
 						{
 							if (selected_vis_light && selected_vis_light->m_def_copy.mType == game::LT_SPOT) {
-								return selected_vis_light->m_def_copy.mInnerConeAngle;
+								return selected_vis_light->m_def_copy.mOuterConeAngle;
 							}
-							return 1.5f;
+							return cosf(45.0f);
 						};
 
 						auto get_default_inner_cone = [&]() -> float 
 						{
 							if (selected_vis_light && selected_vis_light->m_def_copy.mType == game::LT_SPOT) {
-								return selected_vis_light->m_def_copy.mOuterConeAngle;
+								return selected_vis_light->m_def_copy.mInnerConeAngle;
 							}
-							return 0.78f;
+							return cosf(30.0f);
 						};
 
 						bool was_use_pos = current_light._use_pos;
@@ -4056,10 +4059,10 @@ namespace gta4
 						ImGui::SameLine(0, 6);
 						ImGui::BeginDisabled(!current_light._use_outer_cone_angle);
 						float outer_cone_value = current_light._use_outer_cone_angle ? current_light.outer_cone_angle : get_default_outer_cone();
-						float temp_outer_angle = RAD2DEG(outer_cone_value);
+						float temp_outer_angle = RAD2DEG(acosf(outer_cone_value));
 						if (ImGui::DragFloat("OuterConeAngle Override", &temp_outer_angle, 0.025f, 0.0f, 180.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp)) 
 						{
-							current_light.outer_cone_angle = DEG2RAD(temp_outer_angle);
+							current_light.outer_cone_angle = cosf(DEG2RAD(temp_outer_angle));
 							current_light._use_outer_cone_angle = true;
 							sync_override_to_toml(selected_hash);
 						}
@@ -4079,14 +4082,14 @@ namespace gta4
 						ImGui::SameLine(0, 6);
 						ImGui::BeginDisabled(!current_light._use_inner_cone_angle);
 						float inner_cone_value = current_light._use_inner_cone_angle ? current_light.inner_cone_angle : get_default_inner_cone();
-						float temp_inner_angle = RAD2DEG(inner_cone_value);
+						float temp_inner_angle = RAD2DEG(acosf(inner_cone_value));
 
 						if (ImGui::DragFloat("InnerConeAngle Override", &temp_inner_angle, 0.025f, 0.0f, 180.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp))
 						{
-							current_light.inner_cone_angle = DEG2RAD(temp_inner_angle);
+							current_light.inner_cone_angle = cosf(DEG2RAD(temp_inner_angle));
 							current_light._use_inner_cone_angle = true;
 							if (temp_inner_angle > temp_outer_angle) {
-								current_light.outer_cone_angle = DEG2RAD(temp_inner_angle);
+								current_light.inner_cone_angle = current_light.outer_cone_angle;
 							}
 
 							sync_override_to_toml(selected_hash);
