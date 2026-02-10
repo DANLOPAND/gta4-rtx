@@ -1239,7 +1239,7 @@ namespace gta4
 			variable timecycle_colortemp_enabled = {
 				"timecycle_colortemp_enabled",
 				("Enables influence of color temperature on 'rtx.tonemap.colorBalance'. NOT based on timecycle setting."),
-				true
+				false
 			};
 
 			variable timecycle_colortemp_value = {
@@ -1264,7 +1264,7 @@ namespace gta4
 			variable timecycle_desaturation_influence = {
 				"timecycle_desaturation_influence",
 				("Controls how much the desaturation timecycle variable influences 'rtx.tonemap.saturation'"),
-				0.55f
+				0.3f
 			};
 
 			variable timecycle_fardesaturation_influence = {
