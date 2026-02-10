@@ -144,4 +144,14 @@ LIGHT_OVERRIDES = [
         # day
         { hash = 0x9B7BE564, pos = [878.23, -482.71, 17.21] },
     ]},
+
+    { category = "skyscraper", overrides = [
+        # upward spot light below roof (tbogt)
+        { hash = 0xC1AD2C8A, pos = [-86.18, -380.73, 125.03] },
+        
+        # upward spot light below roof (no dlc)
+        { hash = 0xB858957D, pos = [-86.18, -380.73, 125.03] },
+    ]},
+
+
 ]
