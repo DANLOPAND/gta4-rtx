@@ -863,7 +863,7 @@ int main()
 					log_default();
 				}
 
-				opt_ins{tall_fusion_fix_fork = true;
+				opt_install_fusion_fix_fork = true;
 			}
 
 			if (!has_remix_comp_mod || !has_fusion_fix)
