@@ -156,6 +156,7 @@ and with [Ultimate ASI Loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader
 - [Entity](https://www.youtube.com/@paprykszadolowski8796)
 - [Gabdeg](https://www.youtube.com/@gabdeg793)
 - [Hemry](https://www.youtube.com/@Hemry81)
+- [Danlopand / Thundery_Dan](https://github.com/DANLOPAND)
 - All 🍓 Testers
 
 <div align="center" markdown="1"> 
