@@ -235,7 +235,7 @@ namespace gta4
 		// check if paused
 		rml->m_is_paused = *game::CMenuManager__m_MenuActive;
 
-		if (!rml->m_is_paused)
+		//if (!rml->m_is_paused)
 		{
 			rml->m_updateframe++;
 			gl->iterate_all_game_lights();
