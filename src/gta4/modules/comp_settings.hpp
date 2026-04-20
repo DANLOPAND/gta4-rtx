@@ -592,14 +592,14 @@ namespace gta4
 			{
 				"translate_vehicle_rearlight_intensity_scalar",
 				("Scale intensity of vehicle rearlights."),
-				0.2f
+				0.6f
 			};
 
 			variable translate_vehicle_rearlight_radius_scalar =
 			{
 				"translate_vehicle_rearlight_radius_scalar",
 				("Scale radius of vehicle headlights."),
-				4.0f
+				1.0f
 			};
 
 			variable translate_vehicle_rearlight_inner_cone_angle_offset =
@@ -613,7 +613,7 @@ namespace gta4
 			{
 				"translate_vehicle_rearlight_outer_cone_angle_offset",
 				("Additional offset applied to the outer cone of the spotlight (can be negative)"),
-				-45.0f
+				5.0f
 			};
 
 			variable translate_vehicle_rearlight_direction_offset =
