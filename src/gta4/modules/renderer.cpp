@@ -423,7 +423,10 @@ namespace gta4
 		}
 
 		ctx.save_tss(dev, D3DTSS_TEXCOORDINDEX);
-		dev->SetTextureStageState(0, D3DTSS_TEXCOORDINDEX, 1);
+		// PAINT3 tri_render (dirt_s2 in slot 2) should use base mesh UVs (UV0), not livery UVs (UV1)
+		// PAINT1/2 dual_render (dirt in slot 1) uses UV1 (original behavior)
+		DWORD uv_index = (ctx.info.preset_index == GTA_VEHICLE_PAINT3 && ctx.modifiers.tri_render) ? 0 : 1;
+		dev->SetTextureStageState(0, D3DTSS_TEXCOORDINDEX, uv_index);
 
 		if (ctx.modifiers.is_vehicle_wet)
 		{
@@ -877,7 +880,7 @@ namespace gta4
 
 			const auto& pidx = ctx.info.preset_index;
 
-			bool is_vehicle_paint = pidx == GTA_VEHICLE_PAINT1 || pidx == GTA_VEHICLE_PAINT2 || pidx == GTA_VEHICLE_PAINT3;
+			bool is_vehicle_paint = pidx == GTA_VEHICLE_PAINT1 || pidx == GTA_VEHICLE_PAINT2 || pidx == GTA_VEHICLE_PAINT3 || pidx == GTA_VEHICLE_MESH;
 
 			// shader_name.contains("gta_vehicle_")
 			if (   pidx == GTA_VEHICLE_BADGES || pidx == GTA_VEHICLE_INTERIOR || pidx == GTA_VEHICLE_INTERIOR2 || pidx == GTA_VEHICLE_LIGHTS
@@ -1242,9 +1245,9 @@ namespace gta4
 					bool is_dirt = false;
 					bool is_dirt_s2 = false;
 
-					if (pidx == GTA_VEHICLE_PAINT1 || pidx == GTA_VEHICLE_PAINT2) { 
+					if (pidx == GTA_VEHICLE_PAINT1 || pidx == GTA_VEHICLE_PAINT2) {
 						is_dirt = arg3 == 6 && texture_slot == 1;
-					}
+					} 
 
 #if 0 //DEBUG
 					if (pidx == GTA_VEHICLE_PAINT1 || pidx == GTA_VEHICLE_PAINT2 || pidx == GTA_VEHICLE_PAINT3)
@@ -1275,6 +1278,10 @@ namespace gta4
 					{
 						is_livery = arg3 == 6 && texture_slot == 1;
 						is_dirt_s2 = arg3 == 6 && texture_slot == 2;
+					}
+
+					if (pidx == GTA_VEHICLE_MESH) {
+						is_dirt = (arg3 == 6 && (texture_slot == 1 || texture_slot == 2));
 					}
 
 					if (gs->load_colormaps_only.get_as<bool>() && !g_is_sky_rendering)
