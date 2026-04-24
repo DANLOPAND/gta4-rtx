@@ -756,7 +756,7 @@ namespace gta4
 							}
 						}
 						else if (  (register_num == 208u || register_num == 209u) 
-								&& (pidx == GTA_EMISSIVE || pidx == GTA_EMISSIVE_ALPHA)
+								&& (pidx == GTA_EMISSIVE || pidx == GTA_EMISSIVE_ALPHA || pidx == GTA_EMISSIVESTRONG || pidx == GTA_EMISSIVESTRONG_ALPHA)
 								&& (entry_hash == 0xD79BFC1E /*globalAnimUV0*/ || entry_hash == 0xBA54C190 /*globalAnimUV1*/))
 						{
 							if (register_num == 208u) {
@@ -2201,7 +2201,7 @@ namespace gta4
 				}
 			}
 
-			else if (pidx == GTA_HAIR_SORTED_ALPHA_EXPENSIVE)
+			else if (pidx == GTA_HAIR_SORTED_ALPHA_EXPENSIVE || pidx == GTA_HAIR_SORTED_ALPHA)
 			{
 				if (im->m_dbg_tag_exp_hair_as_index != -1) {
 					set_remix_texture_categories(dev, (InstanceCategories)(1 << im->m_dbg_tag_exp_hair_as_index));
