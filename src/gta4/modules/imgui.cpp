@@ -2569,13 +2569,12 @@ namespace gta4
 		ImGui::BeginDisabled(!im->m_dbg_visualize_api_light_hashes);
 		{
 			ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - ImGui::CalcTextSize("  Draw Distance      ").x);
-			ImGui::DragFloat("  Draw Distance      ", &im->m_dbg_visualize_api_light_hashes_distance, 0.005f, 0.0f, 100.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp);
+			ImGui::DragFloat("  Draw Distance      ", &im->m_dbg_visualize_api_light_hashes_distance, 0.005f, 0.0f, 3000.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp);
 			ImGui::EndDisabled();
 		}
 
 		ImGui::Checkbox("Ignore Filler Lights (Game Setting)", gs->translate_game_lights_ignore_filler_lights.get_as<bool*>());
 			TT(gs->translate_game_lights_ignore_filler_lights.get_tooltip_string().c_str());
-
 		ImGui::Spacing(0, SEPARATOR_SPACING);
 
 		{
