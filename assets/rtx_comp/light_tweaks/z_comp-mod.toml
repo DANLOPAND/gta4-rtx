@@ -15,7 +15,7 @@
 IGNORE_LIGHTS = [
     0x32734E7F, 0x79B4AF95, 0xDA6E0F5A, 0x403E165F, 0x8207760C, 0x74D3E6F, 0xB9B7A3F3, 0x352AEAAC, 0xDF6EE45C, 
     0x2CCE00DE, 0xABD45A47, 0x8EC40D31, 0x32AE2E4D, 0x9EC26F3E, 0x445F053B, 0x9ECD1EF7, 0x84CD9FFE, 0xDE7EFC36, 0xFF9457D5, 
-    0x25EE6A9E, 0x4C61B845, 0x2239458F, 0x165B6B4A, 0x2C5246BB, 0xFCB0AF0B, 0xF5B8427B, 0xF9451EE6, 0x25C0DCD4, 0x834D4D35
+    0x25EE6A9E, 0x4C61B845, 0x2239458F, 0x165B6B4A, 0x2C5246BB, 0xFCB0AF0B, 0xF5B8427B, 0xF9451EE6
 ]
 
 
@@ -145,6 +145,14 @@ LIGHT_OVERRIDES = [
         { hash = 0x9B7BE564, pos = [878.23, -482.71, 17.21] },
     ]},
 
+    { category = "skyscraper", overrides = [
+        # upward spot light below roof (tbogt)
+        { hash = 0xC1AD2C8A, pos = [-86.18, -380.73, 125.03] },
+        
+        # upward spot light below roof (no dlc)
+        { hash = 0xB858957D, pos = [-86.18, -380.73, 125.03] },
+    ]},
+
     { category = "streets_algonquin", overrides = [
         { hash = 0x4F5E8E73, pos = [-222.54, 124.56, 75.30] },
 
@@ -191,7 +199,6 @@ LIGHT_OVERRIDES = [
             # Attached light #0
             { pos = [-189.93, 154.38, 17.21], dir = [0.97, 0.25, -0.01], radius = 10.00, intensity = 20.00, outer_cone_angle = -1.00, light_type = true }
         ] },
-        { hash = 0xB858957D, pos = [-86.18, -380.73, 124.60] },
         { hash = 0x28D7F3BC, pos = [-419.01, 687.10, 15.35], intensity = 25.00 },
         { hash = 0x8E708360, pos = [-85.55, -402.00, 25.13] },
         { hash = 0x1EC551D3, pos = [-255.42, 410.82, 31.64], radius = 40.00 },
