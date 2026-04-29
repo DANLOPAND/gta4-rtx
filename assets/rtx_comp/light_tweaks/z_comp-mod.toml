@@ -15,7 +15,7 @@
 IGNORE_LIGHTS = [
     0x32734E7F, 0x79B4AF95, 0xDA6E0F5A, 0x403E165F, 0x8207760C, 0x74D3E6F, 0xB9B7A3F3, 0x352AEAAC, 0xDF6EE45C, 
     0x2CCE00DE, 0xABD45A47, 0x8EC40D31, 0x32AE2E4D, 0x9EC26F3E, 0x445F053B, 0x9ECD1EF7, 0x84CD9FFE, 0xDE7EFC36, 0xFF9457D5, 
-    0x25EE6A9E, 0x4C61B845, 0x2239458F, 0x165B6B4A, 0x2C5246BB, 0xFCB0AF0B, 0xF5B8427B, 0xF9451EE6
+    0x25EE6A9E, 0x4C61B845, 0x2239458F, 0x165B6B4A, 0x2C5246BB, 0xFCB0AF0B, 0xF5B8427B, 0xF9451EE6, 0x25C0DCD4, 0x834D4D35
 ]
 
 
@@ -145,13 +145,240 @@ LIGHT_OVERRIDES = [
         { hash = 0x9B7BE564, pos = [878.23, -482.71, 17.21] },
     ]},
 
-    { category = "skyscraper", overrides = [
-        # upward spot light below roof (tbogt)
-        { hash = 0xC1AD2C8A, pos = [-86.18, -380.73, 125.03] },
-        
-        # upward spot light below roof (no dlc)
-        { hash = 0xB858957D, pos = [-86.18, -380.73, 125.03] },
+    { category = "streets_algonquin", overrides = [
+        { hash = 0x4F5E8E73, pos = [-222.54, 124.56, 75.30] },
+
+        # grand n hotel 1
+        { hash = 0x7981A024, pos = [-32.07, 946.08, 16.96], attached = [
+
+            # Attached light #0
+            { pos = [-32.07, 946.24, 16.96] }
+        ] },
+        { hash = 0xB254B9BE, pos = [-419.01, 687.10, 15.35], intensity = 25.00 },
+        { hash = 0x328E7FA6, pos = [-10.05, 1138.74, 53.30] },
+        { hash = 0x61E78CC3, pos = [-10.05, 1138.84, 53.30] },
+        { hash = 0xB5169902, pos = [-20.07, 1125.65, 53.30] },
+        { hash = 0xC050A760, pos = [-75.19, -414.88, 25.13] },
+        { hash = 0xB12259D3, pos = [-95.62, -401.95, 25.13] },
+        { hash = 0x32926B30, pos = [-10.26, 1112.44, 53.30] },
+        { hash = 0x4326EB1, pos = [-382.13, 687.15, 15.35], intensity = 25.00 },
+        { hash = 0xFC505C35, pos = [-298.35, -111.82, 341.50], intensity = 130.00 },
+        { hash = 0x46955486, pos = [-259.90, 222.67, 222.10] },
+        { hash = 0x14F6BCFB, pos = [-10.05, 1112.44, 53.30] },
+        { hash = 0xB716AD1, pos = [-20.15, 1125.70, 53.30] },
+        { hash = 0x11962638, pos = [-298.35, -89.06, 341.50], intensity = 130.00 },
+        { hash = 0xC4295E09, pos = [-269.62, -89.06, 341.50], intensity = 130.00 },
+        { hash = 0x4DBC0F87, pos = [-268.37, 208.05, 222.10] },
+        { hash = 0x4DA4504E, pos = [-269.62, -111.82, 341.50], intensity = 130.00 },
+        { hash = 0xA86532E2, pos = [-86.18, -433.85, 124.60] },
+        { hash = 0xDBDD6358, pos = [-222.29, 40.17, 75.30] },
+        { hash = 0xE346927D, pos = [-269.62, -89.06, 341.50], intensity = 140.00 },
+        { hash = 0xB663898A, pos = [-417.18, 633.95, 15.35], intensity = 25.00 },
+        { hash = 0xCA62BB4B, pos = [-269.62, -111.82, 341.50], intensity = 140.00 },
+        { hash = 0x17CA0C40, pos = [-298.35, -89.06, 341.50], intensity = 140.00 },
+        { hash = 0xA292E91F, pos = [-298.35, -111.82, 341.50], intensity = 140.00 },
+        { hash = 0xE719141D, pos = [-298.35, -89.06, 341.50], intensity = 160.00 },
+        { hash = 0x63F3BC6, pos = [-269.62, -111.82, 341.50], intensity = 160.00 },
+        { hash = 0x45CBD718, pos = [-269.62, -89.06, 341.50], intensity = 160.00 },
+        { hash = 0x259ED380, pos = [-298.35, -111.82, 341.50], intensity = 160.00 },
+        { hash = 0xBD818A1C, pos = [-274.53, 208.05, 222.10] },
+        { hash = 0x4A6D67E2, pos = [-86.18, -380.73, 124.60] },
+        { hash = 0xB25FFD22, pos = [-86.18, -433.85, 124.60] },
+
+        # EEUU flag 1
+        { hash = 0xD032D9DF, pos = [-194.46, 154.29, 17.21], dir = [-1.00, 0.00, -0.00], radius = 10.00, intensity = 20.00, outer_cone_angle = -1.00, light_type = true, attached = [
+
+            # Attached light #0
+            { pos = [-189.93, 154.38, 17.21], dir = [0.97, 0.25, -0.01], radius = 10.00, intensity = 20.00, outer_cone_angle = -1.00, light_type = true }
+        ] },
+        { hash = 0xB858957D, pos = [-86.18, -380.73, 124.60] },
+        { hash = 0x28D7F3BC, pos = [-419.01, 687.10, 15.35], intensity = 25.00 },
+        { hash = 0x8E708360, pos = [-85.55, -402.00, 25.13] },
+        { hash = 0x1EC551D3, pos = [-255.42, 410.82, 31.64], radius = 40.00 },
+        { hash = 0x4C570870, pos = [-259.90, 208.05, 222.10] },
+        { hash = 0x8FC09260, pos = [-274.52, 222.67, 222.10] },
+        { hash = 0xAEF72B93, pos = [-75.42, -401.95, 25.13] },
+        { hash = 0xF63F07D1, pos = [-75.39, -414.68, 25.13] },
+        { hash = 0xA64A0FA4, pos = [-184.78, 101.04, 18.44], light_type = true },
+        { hash = 0x4039055B, pos = [-328.09, 161.50, 24.15] },
+        { hash = 0x1A7408D, pos = [-85.64, -414.70, 25.13] },
+        { hash = 0x2A65A0D5, pos = [-95.76, -414.73, 25.13] },
+        { hash = 0x823E24CB, pos = [-117.29, -13.18, 20.17] },
+        { hash = 0xB94A4E54, pos = [-75.19, -401.68, 25.13] },
+
+        # sedrpnes1
+        { hash = 0x59987111, pos = [-127.01, -117.47, 24.03], radius = 9.00, intensity = 17.00, volumetric_scale = 5.00, attached = [
+
+            # Attached light #0
+            { pos = [-126.33, -117.27, 24.03], radius = 9.00, intensity = 17.00, volumetric_scale = 5.00, light_type = false }
+        ] },
+        { hash = 0x15D37471, pos = [-274.51, 215.56, 222.10] },
+        { hash = 0xB5A2FFB, pos = [-95.31, -415.05, 25.13] },
+        { hash = 0xBD47A6C5, pos = [-95.32, -401.73, 25.13] },
+        { hash = 0xDFF35716, pos = [-152.09, -436.01, 14.20] },
+        { hash = 0xEC5511AB, pos = [-155.99, -439.90, 14.20] },
+        { hash = 0x3397BACD, pos = [-222.29, 40.17, 75.30] },
+        { hash = 0xD2A69333, pos = [-267.07, 222.67, 222.10] },
+        { hash = 0xC92F1653, pos = [-266.02, 208.05, 222.10] },
+        { hash = 0x5542D078, radius = 16.00 },
+        { hash = 0x8A7C0A2, pos = [-382.12, 633.84, 15.35], intensity = 25.00 },
+        { hash = 0xD4864A39, pos = [-255.42, 410.82, 31.64], radius = 40.00 },
+        { hash = 0xF88135DB, pos = [-259.90, 215.56, 222.10] },
+        { hash = 0xC931EC0D, pos = [-221.93, 83.03, 73.70] },
+        { hash = 0xA718F7EE, pos = [-222.54, 124.56, 75.30] },
+        { hash = 0xD17B9476, pos = [-221.93, 83.03, 73.70] },
+        { hash = 0x97A09588, pos = [-382.13, 687.15, 15.35], intensity = 25.00 },
+        { hash = 0xC30773D0, radius = 16.00 },
+        { hash = 0xA6BB8803, radius = 16.00 },
+        { hash = 0xA45FAE19, pos = [-382.12, 633.84, 15.35], intensity = 25.00 },
+        { hash = 0x4716BA49, pos = [-417.18, 633.95, 15.35], intensity = 25.00 },
+        { hash = 0x3242EBC9, pos = [-276.61, 392.95, 31.50], radius = 40.00 },
+        { hash = 0x1D7FC1CF, pos = [-262.91, 439.22, 31.64], radius = 40.00 },
+        { hash = 0xB7AB669C, pos = [-331.08, 163.57, 24.15] },
+
+        #  sedrpnes2
+        { hash = 0xFF7CA2CB, pos = [-133.65, -88.29, 24.05], radius = 9.00, intensity = 17.00, volumetric_scale = 5.00, light_type = false, attached = [
+
+            # Attached light #0
+            { pos = [-134.40, -88.48, 24.05], radius = 9.00, intensity = 17.00, volumetric_scale = 5.00, light_type = false }
+        ] },
+        { hash = 0x16F193B3, pos = [-328.09, 161.50, 24.15] },
+        { hash = 0xB05B8B27, pos = [-331.08, 163.57, 24.15] },
+        { hash = 0xD4E10143, pos = [-316.81, 280.90, 19.30] },
+        { hash = 0xC4077DEE, pos = [-288.50, 280.90, 19.30] },
+        { hash = 0xCBB091D0, pos = [113.28, 642.41, 17.49] },
+        { hash = 0x1224AB7A, pos = [113.23, 645.86, 17.49], attached = [
+
+            # Attached light #0
+            { pos = [113.20, 644.46, 17.49] }
+        ] },
+        { hash = 0xEFBF48CE, pos = [-186.11, 373.55, 18.91], radius = 10.00 },
+        { hash = 0x8D76CE76, pos = [-194.42, 154.29, 17.21], radius = 10.00, intensity = 20.00, attached = [
+
+            # Attached light #0
+            { pos = [-189.88, 154.38, 17.21], radius = 10.00, intensity = 20.00 }
+        ] },
+        { hash = 0x9752CA8B, pos = [-262.91, 439.22, 31.64], radius = 40.00 },
+        { hash = 0xFBEDFE7E, pos = [-276.61, 392.95, 31.50], radius = 40.00 },
+
+        # bawsaq 1
+        { hash = 0xA2AAD2E8, pos = [-178.03, 247.43, 26.42], radius = 35.00, intensity = 15.00, attached = [
+
+            # Attached light #0
+            { pos = [-187.45, 234.11, 26.42], radius = 35.00, intensity = 15.00 }
+        ] },
+        { hash = 0x3FAEF124, pos = [-178.03, 247.43, 26.42], radius = 35.00, intensity = 15.00, attached = [
+
+            # Attached light #0
+            { pos = [-187.45, 234.11, 26.42], radius = 35.00, intensity = 15.00 }
+        ] },
+
+        # clucking bell
+        { hash = 0x42FD1C71, pos = [-141.22, 71.56, 19.22], inner_cone_angle = 0.87 },
+        { hash = 0x1B1432F5, pos = [-121.88, 14.51, 20.17] },
+        { hash = 0xF0E0264C, pos = [-121.88, 14.51, 20.17] },
+        { hash = 0x2209320F, pos = [-111.69, 16.61, 26.61] },
+        { hash = 0xFC0D48C5, pos = [-120.84, -0.97, 20.17] },
+        { hash = 0xFD803E6E, pos = [-120.84, -0.97, 20.17] },
+        { hash = 0xBA98248B, pos = [-117.29, -13.38, 20.17] },
+        { hash = 0xF064C287, pos = [-125.93, 68.11, 62.22] },
+        { hash = 0x19714ACA, pos = [-113.55, -23.41, 18.06], radius = 7.00, intensity = 7.00, attached = [
+
+            # Attached light #0
+            { pos = [-113.55, -23.41, 18.56], radius = 7.00, intensity = 7.00 }
+        ] },
+        { hash = 0x86E8DB6A, pos = [-121.11, 4.32, 26.61] },
+        { hash = 0x6DF5FB98, pos = [-121.11, 4.32, 26.61] },
+        { hash = 0xD4E22DAE, pos = [-218.26, 277.09, 23.18] },
+        { hash = 0x2FECC87D, pos = [-218.26, 277.09, 23.18] },
+        { hash = 0xF038CC6C, pos = [-243.01, 275.09, 27.43] },
+        { hash = 0xA985DC2B, pos = [-243.01, 275.09, 27.43] },
+        { hash = 0x188AEDB6, pos = [-92.95, -98.26, 17.99] },
+        { hash = 0xD8FDA760, pos = [-186.70, -139.61, 34.45], attached = [
+
+            # Attached light #0
+            { pos = [-185.98, -140.33, 34.45] }
+        ] },
+
+        # rarebuilding
+        { hash = 0xB54BAC9D, pos = [-301.09, 124.43, 39.40] },
+        { hash = 0x7C45A6A8 },
+        { hash = 0x4B23F2E3, pos = [-300.16, 71.26, 39.40] },
+
+        # amdram
+        { hash = 0xD4C475D6, pos = [-286.07, 17.62, 24.37], radius = 4.50, attached = [
+
+            # Attached light #0
+            { pos = [-285.49, 17.60, 24.37], radius = 4.50 }
+        ] },
+
+        # wigwan
+        { hash = 0xD6087DC3, attached = [
+
+            # Attached light #0
+            { pos = [-295.11, 20.73, 19.71], radius = 5.00, intensity = 5.00, volumetric_scale = 1.00 },
+
+            # Attached light #1
+            { pos = [-307.91, 20.76, 19.71], radius = 5.00, intensity = 5.00, volumetric_scale = 1.00 }
+        ] },
     ]},
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ]
+
+
